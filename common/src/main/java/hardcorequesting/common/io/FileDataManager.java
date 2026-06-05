@@ -1,5 +1,7 @@
 package hardcorequesting.common.io;
 
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.storage.LevelResource;
 import org.apache.logging.log4j.LogManager;
@@ -42,7 +44,24 @@ public class FileDataManager implements DataReader, DataWriter {
     
     @Override
     public Optional<String> read(String name) {
-        return SaveHandler.load(path.resolve(name));
+        Optional<String> result = SaveHandler.load(path.resolve(name));
+        if (result.isPresent() && isValidContent(name, result.get())) return result;
+
+        Path backup = path.resolve(name + "_old");
+        if (!Files.exists(backup)) return Optional.empty();
+
+        LOGGER.warn("Restoring '{}' from backup", name);
+        return SaveHandler.load(backup);
+    }
+
+    private static boolean isValidContent(String name, String content) {
+        if (!name.endsWith(".json")) return true;
+        try {
+            JsonParser.parseString(content);
+            return true;
+        } catch (JsonParseException e) {
+            return false;
+        }
     }
     
     @Override

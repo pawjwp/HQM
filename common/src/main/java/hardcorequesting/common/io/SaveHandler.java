@@ -17,11 +17,12 @@ import hardcorequesting.common.team.Team;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
+import net.minecraft.Util;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -133,8 +134,12 @@ public class SaveHandler {
     
     public static void save(File file, String s) {
         if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
-        try (BufferedWriter fileWriter = Files.newBufferedWriter(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-            fileWriter.write(s);
+        try {
+            File temp = File.createTempFile(file.getName(), ".tmp", file.getParentFile());
+            try (BufferedWriter writer = Files.newBufferedWriter(temp.toPath())) {
+                writer.write(s);
+            }
+            Util.safeReplaceFile(file, temp, new File(file.getPath() + "_old"));
         } catch (IOException e) {
             e.printStackTrace();
         }

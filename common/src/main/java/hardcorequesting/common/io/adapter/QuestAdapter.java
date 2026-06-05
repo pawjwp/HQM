@@ -298,9 +298,9 @@ public class QuestAdapter {
                     .add(NAME, src.getName())
                     .add(QUESTS, array()
                             .use(builder -> {
-                                for (Quest quest : src.getQuests().values()) {
-                                    builder.add(QUEST_ADAPTER.serialize(quest));
-                                }
+                                src.getQuests().values().stream()
+                                    .sorted(Comparator.comparing(Quest::getQuestId))
+                                    .forEach(quest -> builder.add(QUEST_ADAPTER.serialize(quest)));
                             })
                             .build())
                     .add(REPUTATION_BAR, array()

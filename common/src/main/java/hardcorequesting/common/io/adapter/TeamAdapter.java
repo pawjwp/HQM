@@ -59,12 +59,12 @@ public class TeamAdapter {
                             .build())
                     .add(QUEST_DATA_LIST, array()
                             .use(builder -> {
-                                for (Map.Entry<UUID, QuestData> data : src.getQuestData().entrySet()) {
-                                    builder.add(object()
+                                src.getQuestData().entrySet().stream()
+                                        .sorted(Map.Entry.comparingByKey())
+                                        .forEach(data -> builder.add(object()
                                             .add(QUEST_ID, data.getKey().toString())
                                             .add(QUEST_DATA, QuestDataAdapter.serialize(data.getValue()))
-                                            .build());
-                                }
+                                            .build()));
                             })
                             .build())
                     .add(INVITES, array()

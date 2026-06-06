@@ -299,6 +299,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
     
                 switch (quest.getTriggerType()) {
                     case ANTI_TRIGGER -> invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisLocked"));
+                    case PREVIEW_TRIGGER -> invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisPreviewLocked"));
                     case QUEST_TRIGGER -> {
                         invisibilityMessage = Optional.of(Translator.translatable("hqm.questBook.invisPerm"));
                         parentInvisible = false;

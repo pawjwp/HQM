@@ -47,6 +47,12 @@ public enum TriggerType {
         public boolean isQuestVisible(Quest quest, UUID playerId) {
             return quest.isEnabled(playerId, false);
         }
+    },
+    PREVIEW_TRIGGER("preview", false, false) {
+        @Override
+        public boolean isQuestVisible(Quest quest, UUID playerId) {
+            return quest.getRequirements().stream().anyMatch(parent -> parent.isEnabled(playerId, false));
+        }
     };
     
     private String id;

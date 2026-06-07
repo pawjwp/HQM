@@ -123,25 +123,23 @@ public class QuestSetsGraphic extends EditableGraphic {
         for (QuestSet questSet : setScroll.getVisibleEntries()) {
             
             String name = questSet.getName(questSets.indexOf(questSet));
-            int total = questSet.getQuests().size();
             
             boolean enabled = questSet.isEnabled(player, isVisibleCache, isLinkFreeCache);
             
             int completedCount; //no need to check for the completed count if it's not enabled
             if (enabled) {
-                completedCount = questSet.getCompletedCount(player, isVisibleCache, isLinkFreeCache);
+                completedCount = questSet.getCompletedCount(player, isLinkFreeCache);
             } else {
                 completedCount = 0;
             }
             
-            boolean completed = true;
             int unclaimed = 0;
+            int total = 0;
             for (Quest quest : questSet.getQuests().values()) {
-                if (completed && !quest.isCompleted(player) && quest.isLinkFree(player, isLinkFreeCache)) {
-                    completed = false;
-                }
+                if (quest.countsForCompletion(player, isLinkFreeCache)) total++;
                 if (quest.isCompleted(player) && quest.hasReward(player.getUUID())) unclaimed++;
             }
+            boolean completed = enabled && completedCount == total; //the set is considered complete when every counted quest is
             boolean selected = questSet == selectedSet;
             boolean inBounds = gui.inBounds(LIST_X, setY, gui.getStringWidth(name), GuiQuestBook.TEXT_HEIGHT, mX, mY);
             

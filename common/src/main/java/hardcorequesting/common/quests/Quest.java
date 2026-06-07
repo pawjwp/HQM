@@ -469,6 +469,10 @@ public class Quest {
     public void setTriggerType(TriggerType triggerType) {
         this.triggerType = triggerType;
     }
+
+    public boolean countsForCompletion(Player player, Map<Quest, Boolean> isLinkFreeCache) {
+        return triggerType != TriggerType.QUEST_TRIGGER && isLinkFree(player, isLinkFreeCache);
+    }
     
     public int getTriggerTasks() {
         return triggerTasks;

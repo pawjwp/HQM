@@ -119,8 +119,9 @@ public class QuestSet {
     public boolean isCompleted(Player player) {
         if (quests.isEmpty()) return false;
         
+        Map<Quest, Boolean> isLinkFreeCache = new HashMap<>();
         for (Quest quest : quests.values()) {
-            if (!quest.isCompleted(player)) {
+            if (quest.countsForCompletion(player, isLinkFreeCache) && !quest.isCompleted(player)) {
                 return false;
             }
         }
@@ -146,13 +147,13 @@ public class QuestSet {
     }
     
     public int getCompletedCount(Player player) {
-        return getCompletedCount(player, new HashMap<>(), new HashMap<>());
+        return getCompletedCount(player, new HashMap<>());
     }
     
-    public int getCompletedCount(Player player, Map<Quest, Boolean> isVisibleCache, Map<Quest, Boolean> isLinkFreeCache) {
+    public int getCompletedCount(Player player, Map<Quest, Boolean> isLinkFreeCache) {
         int count = 0;
         for (Quest quest : quests.values()) {
-            if (quest.isCompleted(player) && quest.isEnabled(player, isVisibleCache, isLinkFreeCache)) {
+            if (quest.countsForCompletion(player, isLinkFreeCache) && quest.isCompleted(player)) {
                 count++;
             }
         }

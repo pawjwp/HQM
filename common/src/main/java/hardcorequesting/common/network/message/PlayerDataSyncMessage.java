@@ -12,6 +12,7 @@ import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.util.SyncUtil;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
@@ -34,12 +35,13 @@ public class PlayerDataSyncMessage implements IMessage {
     }
     
     public PlayerDataSyncMessage(QuestLine questLine, Player player) {
-        this.mainDescription = questLine.getMainDescription();
+        this.mainDescription = questLine.getRawMainDescription().toJson().toString();
         this.reputations = questLine.reputationManager.saveToString();
         this.bags = questLine.groupTierManager.saveToString();
         this.questsSets = Maps.newLinkedHashMap();
+        Map<QuestSet, String> filenames = QuestSet.assignUniqueFilenames(questLine.questSetsManager.questSets);
         for (QuestSet set : questLine.questSetsManager.questSets) {
-            questsSets.put(set.getFilename(), SaveHandler.save(set, QuestSet.class));
+            questsSets.put(filenames.get(set), SaveHandler.save(set, QuestSet.class));
         }
         this.questing = questLine.questingDataManager.isQuestActive();
         this.hardcore = questLine.questingDataManager.isHardcoreActive();
@@ -111,7 +113,7 @@ public class PlayerDataSyncMessage implements IMessage {
             }
             questLine.questSetsManager.load(data);
             
-            questLine.setMainDescription(message.mainDescription);
+            questLine.setMainDescription(WrappedText.fromJson(SaveHandler.JSON_PARSER.parse(message.mainDescription), "No description", false));
             questLine.reputationManager.clearAndLoad(message.reputations);
             questLine.groupTierManager.clearAndLoad(message.bags);
             

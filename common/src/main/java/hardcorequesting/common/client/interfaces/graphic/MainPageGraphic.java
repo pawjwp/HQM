@@ -7,7 +7,7 @@ import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
+import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.sounds.SoundHandler;
@@ -90,7 +90,7 @@ public class MainPageGraphic extends EditableGraphic {
             }
         } else {
             if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.RENAME && gui.inBounds(DESCRIPTION_X, DESCRIPTION_Y, 130, (int) (VISIBLE_MAIN_DESCRIPTION_LINES * GuiQuestBook.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                TextMenu.display(gui, Quest.getRawMainDescription(), false, desc -> {
+                WrappedTextMenu.display(gui, Quest.getRawMainDescription(), false, desc -> {
                     QuestLine.getActiveQuestLine().setMainDescription(desc);
                     cachedMainDescription = null;
                 });
@@ -100,7 +100,7 @@ public class MainPageGraphic extends EditableGraphic {
     
     private List<FormattedText> getDescriptionLines() {
         if (cachedMainDescription == null)
-            cachedMainDescription = gui.getLinesFromText(Translator.plain(Quest.getRawMainDescription()), 0.7F, 130);
+            cachedMainDescription = gui.getLinesFromText(Quest.getRawMainDescription().getText(), 0.7F, 130);
         return cachedMainDescription;
     }
 }

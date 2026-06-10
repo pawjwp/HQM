@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.io.DataReader;
 import hardcorequesting.common.io.DataWriter;
+import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.DeathStatsMessage;
 import hardcorequesting.common.network.message.PlayerDataSyncMessage;
@@ -16,13 +17,16 @@ import hardcorequesting.common.network.message.TeamStatsMessage;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.TeamManager;
 import hardcorequesting.common.util.SaveHelper;
+import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 public class QuestLine {
@@ -37,7 +41,7 @@ public class QuestLine {
     public final TeamManager teamManager;
     public final Serializable descriptionManager;
     
-    private String mainDescription = "No description";
+    private WrappedText mainDescription = WrappedText.create("No description");
     @Environment(EnvType.CLIENT)
     public ResourceLocation front;
     private final List<Serializable> questSerializables = Lists.newArrayList();
@@ -50,30 +54,26 @@ public class QuestLine {
         this.deathStatsManager = new DeathStatsManager();
         this.questSetsManager = new QuestSetsManager();
         this.teamManager = new TeamManager();
-        this.descriptionManager = new SimpleSerializable() {
-            @Override
-            public String filePath() {
-                return "description.txt";
-            }
-        
-            @Override
-            public String saveToString() {
-                return getMainDescription();
-            }
-    
-            @Override
-            public void clear() {
-                setMainDescription("No description");
-            }
-    
-            @Override
-            public void loadFromString(String string) {
-                setMainDescription(string);
-            }
-        
+        this.descriptionManager = new Serializable() {
             @Override
             public boolean isData() {
                 return false;
+            }
+    
+            @Override
+            public void save(DataWriter writer) {
+                writer.write("description.json", getRawMainDescription().toJson().toString());
+            }
+        
+            @Override
+            public void load(DataReader reader) {
+                setMainDescription(WrappedText.create("No description"));
+                Optional<String> json = reader.read("description.json");
+                if (json.isPresent()) {
+                    setMainDescription(WrappedText.fromJson(SaveHandler.JSON_PARSER.parse(json.get()), "No description", false));
+                } else {    // Migrate the pre-translation-key plain text file, if present
+                    reader.read("description.txt").ifPresent(text -> setMainDescription(WrappedText.create(text)));
+                }
             }
         };
         GroupTier.initBaseTiers(this);
@@ -127,11 +127,15 @@ public class QuestLine {
         NetworkManager.sendToPlayer(new TeamStatsMessage(StreamSupport.stream(questLine.teamManager.getNamedTeams().spliterator(), false)), player);
     }
     
-    public String getMainDescription() {
+    public MutableComponent getMainDescription() {
+        return mainDescription.getText();
+    }
+
+    public WrappedText getRawMainDescription() {
         return mainDescription;
     }
     
-    public void setMainDescription(String mainDescription) {
+    public void setMainDescription(WrappedText mainDescription) {
         this.mainDescription = mainDescription;
     }
     

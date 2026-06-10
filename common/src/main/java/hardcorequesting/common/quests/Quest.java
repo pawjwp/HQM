@@ -104,8 +104,8 @@ public class Quest {
         return QuestLine.getActiveQuestLine().questSetsManager.questSets;
     }
     
-    public static String getRawMainDescription() {
-        return QuestLine.getActiveQuestLine().getMainDescription();
+    public static WrappedText getRawMainDescription() {
+        return QuestLine.getActiveQuestLine().getRawMainDescription();
     }
     
     @Nullable

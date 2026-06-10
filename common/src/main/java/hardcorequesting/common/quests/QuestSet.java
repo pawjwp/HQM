@@ -2,6 +2,7 @@ package hardcorequesting.common.quests;
 
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.reputation.ReputationBar;
+import hardcorequesting.common.util.Translator;
 import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,18 +12,17 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 public class QuestSet {
     
-    private String name;
+    private WrappedText name;
     private WrappedText description;
     private List<FormattedText> cachedDescription;
     private Map<UUID, Quest> quests = new ConcurrentHashMap<>();
     private List<ReputationBar> reputationBars;
     private int id;
     
-    public QuestSet(String name, WrappedText description) {
+    public QuestSet(WrappedText name, WrappedText description) {
         this.name = name;
         this.description = description;
         this.reputationBars = new ArrayList<>();
@@ -46,49 +46,52 @@ public class QuestSet {
         reputationBars.removeAll(toRemove);
     }
     
-    public String getName() {
+    public MutableComponent getName() {
+        return name.getText();
+    }
+
+    public WrappedText getRawName() {
         return name;
     }
-    
-    private static List<String> FORBIDDEN_SET_NAMES = Arrays.asList("sets", "reputations", "bags", "con", "prn", "aux", "nul", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "com0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "lpt0");
-    private static List<String> FORBIDDEN_SET_NAME_PIECES = Arrays.asList("<", ">", ":", "\"", "\\", "/", "|", "?", "*");
-    
-    public boolean setName(String name) {
-        // Let's add some sanity checking.
-        String test_name = name.toLowerCase().trim();
-        
-        if (FORBIDDEN_SET_NAMES.contains(test_name)) {
+
+    private static final List<String> FORBIDDEN_SET_NAMES = Arrays.asList("sets", "reputations", "bags", "con", "prn", "aux", "nul", "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9", "com0", "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9", "lpt0");
+
+    public boolean setName(WrappedText name) {
+        // The raw text also serves as the quest chapter filename, reject reserved names and duplicates
+        if (FORBIDDEN_SET_NAMES.contains(sanitizeFilename(name.getRawText()).toLowerCase()))
             return false;
-        } else {
-            for (String piece : FORBIDDEN_SET_NAME_PIECES) {
-                if (test_name.contains(piece)) {
-                    return false;
-                }
-            }
-        }
-        
-        int inc = 1;
-        
-        String new_name = name;
-        
-        List<String> names = Quest.getQuestSets().stream().filter((q) -> q != this).map((q) -> q.getName().toLowerCase()).collect(Collectors.toList());
-        
-        while (names.contains(new_name.toLowerCase())) {
-            new_name = String.format("%s%d", name, inc++);
-            
-            if (inc >= 20) return false;
-        }
-        
-        this.name = new_name;
+        if (Quest.getQuestSets().stream().anyMatch(set -> set != this && set.getRawName().getRawText().equalsIgnoreCase(name.getRawText())))
+            return false;
+
+        this.name = name;
         return true;
     }
-    
-    public String getFilename() {
-        return name.replaceAll(" ", "_");
+
+    // Strips whitespace, periods, and filesystem-illegal characters
+    private static String sanitizeFilename(String raw) {
+        return raw.replaceAll("[\\s.<>:\"/\\\\|?*]", "_");
     }
-    
-    public String getName(int i) {
-        return (i + 1) + ". " + name;
+
+    public String getFilename() {
+        return sanitizeFilename(name.getRawText());
+    }
+
+    // Assigns each set a unique sanitized filename to avoid accidental overwrites for similarly named quest lines
+    public static Map<QuestSet, String> assignUniqueFilenames(Collection<QuestSet> sets) {
+        Map<QuestSet, String> result = new LinkedHashMap<>();
+        Set<String> used = new HashSet<>();
+        for (QuestSet set : sets) {
+            String base = set.getFilename(), unique = base;
+            int i = 2;
+            while (!used.add(unique.toLowerCase()))
+                unique = base + "_" + i++;
+            result.put(set, unique);
+        }
+        return result;
+    }
+
+    public MutableComponent getName(int i) {
+        return Translator.text((i + 1) + ". ").append(name.getText());
     }
     
     @Environment(EnvType.CLIENT)

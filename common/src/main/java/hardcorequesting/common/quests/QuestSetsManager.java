@@ -59,14 +59,15 @@ public class QuestSetsManager implements Serializable {
     
     @Override
     public void save(DataWriter writer) {
+        Map<QuestSet, String> filenames = QuestSet.assignUniqueFilenames(questSets);
         JsonObject object = new JsonObject();
         JsonArray array = new JsonArray();
-        questSets.stream().map(QuestSet::getFilename).distinct().forEach(array::add);
+        filenames.values().forEach(array::add);
         object.add("sets", array);
         writer.write("sets.json", object.toString());
         
         for (QuestSet set : questSets) {
-            writer.write("sets/" + set.getFilename() + ".json", SaveHandler.save(set, QuestSet.class));
+            writer.write("sets/" + filenames.get(set) + ".json", SaveHandler.save(set, QuestSet.class));
         }
     }
     
@@ -118,10 +119,10 @@ public class QuestSetsManager implements Serializable {
                 .forEach(questSets::add);
         questSets.sort((s1, s2) -> {
             if (s1.equals(s2)) return 0;
-            int is1 = order.indexOf(s1.getName());
-            int is2 = order.indexOf(s2.getName());
+            int is1 = order.indexOf(s1.getRawName().getRawText());
+            int is2 = order.indexOf(s2.getRawName().getRawText());
             if (is1 == -1) {
-                return is2 == -1 ? s1.getName().compareTo(s2.getName()) : 1;
+                return is2 == -1 ? s1.getRawName().getRawText().compareTo(s2.getRawName().getRawText()) : 1;
             }
             if (is2 == -1) return -1;
             if (is1 == is2) return 0;

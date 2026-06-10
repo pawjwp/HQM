@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.BookPage;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
-import hardcorequesting.common.client.interfaces.edit.TextMenu;
 import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
@@ -24,6 +23,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.player.Player;
 
@@ -80,9 +80,9 @@ public class QuestSetsGraphic extends EditableGraphic {
             public void onClick() {
                 int i = 0;
                 for (QuestSet set : Quest.getQuestSets()) {
-                    if (set.getName().startsWith("Unnamed set")) i++;
+                    if (set.getRawName().getRawText().startsWith("Unnamed set")) i++;
                 }
-                Quest.getQuestSets().add(new QuestSet("Unnamed set" + (i == 0 ? "" : i), WrappedText.create("No description")));
+                Quest.getQuestSets().add(new QuestSet(WrappedText.create("Unnamed set" + (i == 0 ? "" : i)), WrappedText.create("No description")));
                 SaveHelper.add(EditType.SET_CREATE);
             }
         });
@@ -122,7 +122,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         int setY = LIST_Y;
         for (QuestSet questSet : setScroll.getVisibleEntries()) {
             
-            String name = questSet.getName(questSets.indexOf(questSet));
+            MutableComponent name = questSet.getName(questSets.indexOf(questSet));
             
             boolean enabled = questSet.isEnabled(player, isVisibleCache, isLinkFreeCache);
             
@@ -173,7 +173,7 @@ public class QuestSetsGraphic extends EditableGraphic {
             } else {
                 color = HQMConfig.DISABLED_SET;
             }
-            gui.drawString(graphics, Translator.plain(name), LIST_X, setY, color);
+            gui.drawString(graphics, name, LIST_X, setY, color);
             
             FormattedText info;
             if (enabled) {
@@ -277,7 +277,7 @@ public class QuestSetsGraphic extends EditableGraphic {
                         gui.modifyingQuestSet = (gui.modifyingQuestSet == questSet ? null : questSet);
                         break;
                     case RENAME:
-                        TextMenu.display(gui, questSet.getName(), true,
+                        WrappedTextMenu.display(gui, questSet.getRawName(), true,
                                 result -> {
                                     if (!questSet.setName(result)) {
                                         gui.getPlayer().sendSystemMessage(Component.translatable("hqm.editMode.rename.invalid_set").setStyle(Style.EMPTY.withBold(true).withColor(ChatFormatting.RED)));

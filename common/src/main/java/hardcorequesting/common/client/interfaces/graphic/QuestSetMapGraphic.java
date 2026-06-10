@@ -225,7 +225,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 component.append(" ").append(holdingText(holdingE, "E"));
                 if (holdingE) {
                     for (Quest parent : externalQuests) {
-                        MutableComponent questComponent = Translator.text(parent.getName() + " (" + parent.getQuestSet().getName() + ")").withStyle(ChatFormatting.RED);
+                        MutableComponent questComponent = parent.getName().append(" (").append(parent.getQuestSet().getName()).append(")").withStyle(ChatFormatting.RED);
                         tooltip.add(questComponent);
                         if (parent.isCompleted(playerId)) {
                             MutableComponent completedComponent = Translator.box(Translator.translatable("hqm.questBook.completed")).withStyle(ChatFormatting.WHITE);
@@ -349,7 +349,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                     MutableComponent component = option.getName().withStyle(ChatFormatting.DARK_BLUE);
                     tooltip.add(component);
                     if (!option.hasSameSetAs(quest)) {
-                        component.append(" (" + option.getQuestSet().getName() + ")");
+                        component.append(" (").append(option.getQuestSet().getName()).append(")");
                     }
                 }
             }
@@ -375,7 +375,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 
                 if (holdingU) {
                     for (Quest child : externalQuests) {
-                        tooltip.add(Translator.text(child.getName() + " (" + child.getQuestSet().getName() + ")").withStyle(ChatFormatting.RED));
+                        tooltip.add(child.getName().append(" (").append(child.getQuestSet().getName()).append(")").withStyle(ChatFormatting.RED));
                     }
                 }
             }

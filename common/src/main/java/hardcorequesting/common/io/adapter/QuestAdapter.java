@@ -295,7 +295,7 @@ public class QuestAdapter {
         @Override
         public JsonElement serialize(QuestSet src) {
             return object()
-                    .add(NAME, src.getName())
+                    .add(NAME, src.getRawName().toJson())
                     .add(QUESTS, array()
                             .use(builder -> {
                                 src.getQuests().values().stream()
@@ -323,7 +323,7 @@ public class QuestAdapter {
             List<Quest> quests = new ArrayList<>();
             JsonObject object = json.getAsJsonObject();
             
-            String name = GsonHelper.getAsString(object, NAME);
+            WrappedText name = WrappedText.fromJson(object.get(NAME), "Unnamed set", false);
             WrappedText description = WrappedText.fromJson(object.get(DESCRIPTION), "No description", false);
             for (JsonElement element : GsonHelper.getAsJsonArray(object, QUESTS)) {
                 Quest quest = QUEST_ADAPTER.fromJsonTree(element);
@@ -337,13 +337,13 @@ public class QuestAdapter {
             
             QuestSet set = null;
             for (QuestSet existing : Quest.getQuestSets()) {
-                if (existing.getName().equals(name)) {
+                if (existing.getRawName().getRawText().equals(name.getRawText())) {
                     set = existing;
                     set.setDescription(description);
                     break;
                 }
             }
-            if (name != null && set == null) {
+            if (set == null) {
                 set = new QuestSet(name, description);
                 Quest.getQuestSets().add(set);
                 SaveHelper.add(EditType.SET_CREATE);

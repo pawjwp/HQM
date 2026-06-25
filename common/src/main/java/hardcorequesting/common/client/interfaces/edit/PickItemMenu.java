@@ -12,6 +12,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.ItemPrecision;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.Minecraft;
@@ -138,12 +139,12 @@ public class PickItemMenu<T> extends GuiEditMenu {
     @Override
     public void draw(GuiGraphics graphics, int mX, int mY) {
         super.draw(graphics, mX, mY);
-        gui.drawString(graphics, Translator.plain("Selected"), 20, 20, 0x404040);
+        gui.drawString(graphics, Translator.plain("Selected"), 20, 20, HQMConfig.TEXT_NORMAL);
         type.draw(selected, graphics, gui, 70, 15, mX, mY);
-        gui.drawString(graphics, Translator.plain("Search"), 180, 20, 0x404040);
+        gui.drawString(graphics, Translator.plain("Search"), 180, 20, HQMConfig.TEXT_NORMAL);
         drawList(graphics, gui, SEARCH_X, SEARCH_Y, searchItems, mX, mY);
         
-        gui.drawString(graphics, Translator.plain("Player inventory"), 20, 70, 0x404040);
+        gui.drawString(graphics, Translator.plain("Player inventory"), 20, 70, HQMConfig.TEXT_NORMAL);
         drawList(graphics, gui, PLAYER_X, PLAYER_Y, playerItems, mX, mY);
         
         if (usePrecision()) {
@@ -151,7 +152,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
 
             drawArrow(graphics, gui, mX, mY, true);
             drawArrow(graphics, gui, mX, mY, false);
-            gui.drawCenteredString(graphics, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            gui.drawCenteredString(graphics, Translator.plain(precision.getName()), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, HQMConfig.TEXT_NORMAL);
         }
     }
     

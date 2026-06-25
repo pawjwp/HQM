@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.MultilineTextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -99,7 +100,7 @@ public class WrappedTextMenu extends AbstractTextMenu {
         if (this.isTranslated && !I18n.exists(text)) {
             this.textLogic.setTextColor(0xAA0000);
         } else {
-            this.textLogic.setTextColor(MultilineTextBox.DEFAULT_TEXT_COLOR);
+            this.textLogic.setTextColor(HQMConfig.TEXT_NORMAL);
         }
         if (this.isTranslated && I18n.exists(text)) {
             this.translatedText = Objects.requireNonNull(I18n.get(text));
@@ -120,7 +121,7 @@ public class WrappedTextMenu extends AbstractTextMenu {
         super.draw(graphics, mX, mY);
         
         if (this.translatedLines != null) {
-            this.gui.drawString(graphics, this.translatedLines, 20, 100, 1F, MultilineTextBox.DEFAULT_TEXT_COLOR);
+            this.gui.drawString(graphics, this.translatedLines, 20, 100, 1F, HQMConfig.TEXT_NORMAL);
         }
     }
     

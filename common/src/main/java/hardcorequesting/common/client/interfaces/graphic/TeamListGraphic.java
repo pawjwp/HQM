@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.graphic;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.RenderRotation;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.team.TeamLiteStat;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,15 +52,15 @@ public class TeamListGraphic extends Graphic {
             
             int x = (i - start) < TEAMS_PER_PAGE ? TEAM_X : TEAM_X_2ND_PAGE;
             int y = TEAM_Y + ((i - start) % TEAMS_PER_PAGE) * TEAM_OFFSET;
-            gui.drawString(graphics, Translator.plain(teamStat.getName()), x, y, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.plain(teamStat.getName()), x, y, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.teamList.done", teamStat.getProgress()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET, 0.7F, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.teamList.players", teamStat.getPlayers()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 2, 0.7F, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.teamList.lives", teamStat.getLives()), x + TEAM_LINE_INDENT, y + TEAM_LINE_OFFSET * 3, 0.7F, HQMConfig.TEXT_NORMAL);
         }
         
-        gui.drawCenteredString(graphics, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, 0x707070);
+        gui.drawCenteredString(graphics, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 1)), 0, 202, 0.7F, 170, 30, HQMConfig.TEXT_HINT);
         if (end - start > TEAMS_PER_PAGE) {
-            gui.drawCenteredString(graphics, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, 0x707070);
+            gui.drawCenteredString(graphics, Translator.translatable("hqm.teamList.page", ((pagePair * 2) + 2)), 170, 202, 0.7F, 170, 30, HQMConfig.TEXT_HINT);
         }
     }
     

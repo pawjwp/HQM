@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.IntInputMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.reputation.KillReputationTask;
 import hardcorequesting.common.util.Translator;
@@ -48,11 +49,11 @@ public class KillReputationTaskGraphic extends ReputationTaskGraphic {
     
         int killCount = task.getKills(playerId);
         if (Quest.canQuestsBeEdited()) {
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.repKil.kills", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.repKil.kills", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, HQMConfig.TEXT_NORMAL);
         } else {
             gui.drawString(graphics, gui.getLinesFromText(killCount == task.getKillsRequirement()
                     ? Translator.translatable("hqm.repKil.killCount", Translator.player(task.getKillsRequirement())).withStyle(ChatFormatting.DARK_GREEN)
-                    : Translator.translatable("hqm.repKil.killCountOutOf", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, 0x404040);
+                    : Translator.translatable("hqm.repKil.killCountOutOf", killCount, Translator.player(task.getKillsRequirement())), 1F, 130), START_X, START_Y, 1F, HQMConfig.TEXT_NORMAL);
         }
     }
 }

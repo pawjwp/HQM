@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.util.WrappedText;
@@ -77,7 +78,7 @@ public abstract class TaskGraphic extends Graphic {
         super.draw(graphics, mX, mY);
     
         gui.drawString(graphics, taskDescriptionScroll.getVisibleEntries(),
-                TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, 0x404040);
+                TASK_DESCRIPTION_X, TASK_DESCRIPTION_Y, 0.7F, HQMConfig.TEXT_NORMAL);
     }
     
     @Override

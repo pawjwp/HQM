@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.edit.GuiEditMenu;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
@@ -92,7 +93,7 @@ public class EditTrackerScreen extends GuiBase {
                 protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
                     super.draw(graphics, selected, mX, mY);
             
-                    this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + GuiEditMenu.BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                    this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.menuTracker.radius.desc"), 0.7F, 130), x, y + GuiEditMenu.BOX_OFFSET + TEXT_OFFSET, 0.7F, HQMConfig.TEXT_NORMAL);
                 }
             });
         }
@@ -112,7 +113,7 @@ public class EditTrackerScreen extends GuiBase {
         
         textBoxes.render(graphics, mX, mY);
     
-        drawCenteredString(graphics, tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, 0x404040);
+        drawCenteredString(graphics, tracker.getCurrentQuest() != null ? tracker.getCurrentQuest().getName() : Translator.translatable("hqm.menuTracker.noQuest"), 0, 5, 1F, 170, 20, HQMConfig.TEXT_NORMAL);
     
         selectionHelper.render(graphics, mX, mY);
     

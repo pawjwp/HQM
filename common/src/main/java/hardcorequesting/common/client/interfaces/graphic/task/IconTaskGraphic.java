@@ -5,6 +5,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.icon.IconLayoutTask;
 import hardcorequesting.common.util.Positioned;
 import net.fabricmc.api.EnvType;
@@ -50,7 +51,7 @@ public abstract class IconTaskGraphic<Part extends IconLayoutTask.Part> extends 
         part.getIconStack().ifLeft(itemStack -> gui.drawItemStack(graphics, itemStack, x, y, mX, mY, false))
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, graphics, x, y, mX, mY));
         
-        gui.drawString(graphics, part.getName(), textX, textY, 0x404040);
+        gui.drawString(graphics, part.getName(), textX, textY, HQMConfig.TEXT_NORMAL);
         drawElementText(graphics, part, id, textX + X_TEXT_INDENT, textY + 9);
     }
     

@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.minecraft.client.gui.GuiGraphics;
@@ -42,7 +43,7 @@ public abstract class AbstractCheckBox implements Drawable, Clickable {
         gui.applyColor(0xFFFFFFFF);
 
         gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
-        gui.drawString(graphics, cached, x + 12, y + 2, 0.7F, 0x404040);
+        gui.drawString(graphics, cached, x + 12, y + 2, 0.7F, HQMConfig.TEXT_NORMAL);
     }
     
     @Override

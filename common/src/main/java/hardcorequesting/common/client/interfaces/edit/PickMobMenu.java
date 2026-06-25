@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.*;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.client.gui.GuiGraphics;
@@ -135,14 +136,14 @@ public class PickMobMenu extends GuiEditMenu {
             boolean selected = entry.equals(mob);
             boolean inBounds = gui.inBounds(START_X, mobY, 130, 6, mX, mY);
             
-            gui.drawString(graphics, entry.description, START_X, mobY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(graphics, entry.description, START_X, mobY, 0.7F, selected ? inBounds ? HQMConfig.TEXT_SELECTED_HOVERED : HQMConfig.TEXT_SELECTED : inBounds ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
             mobY += OFFSET_Y;
         }
         
-        gui.drawString(graphics, Translator.translatable("hqm." + textKey + ".search"), 180, 20, 0x404040);
-        gui.drawString(graphics, Translator.translatable("hqm." + textKey + "." + (mob == null ? "nothing" : "currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm." + textKey + ".search"), 180, 20, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.translatable("hqm." + textKey + "." + (mob == null ? "nothing" : "currently") + "Selected"), 180, 40, HQMConfig.TEXT_NORMAL);
         if (mob != null) {
-            gui.drawString(graphics, mob.description, 180, 50, 0.7F, 0x404040);
+            gui.drawString(graphics, mob.description, 180, 50, 0.7F, HQMConfig.TEXT_NORMAL);
         }
     }
     

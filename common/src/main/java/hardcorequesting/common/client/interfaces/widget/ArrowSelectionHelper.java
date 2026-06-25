@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.minecraft.client.gui.GuiGraphics;
@@ -39,10 +40,10 @@ public abstract class ArrowSelectionHelper implements Drawable, Clickable {
             drawArrow(graphics, gui, mX, mY, true);
             drawArrow(graphics, gui, mX, mY, false);
             
-            gui.drawCenteredString(graphics, getArrowText(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, 0x404040);
+            gui.drawCenteredString(graphics, getArrowText(), ARROW_X_LEFT + ARROW_W, ARROW_Y, 0.7F, ARROW_X_RIGHT - (ARROW_X_LEFT + ARROW_W), ARROW_H, HQMConfig.TEXT_NORMAL);
             FormattedText description = getArrowDescription();
             if (description != null) {
-                gui.drawString(graphics, gui.getLinesFromText(description, 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, 0x404040);
+                gui.drawString(graphics, gui.getLinesFromText(description, 0.7F, ARROW_X_RIGHT - ARROW_X_LEFT + ARROW_W), ARROW_X_LEFT, ARROW_DESCRIPTION_Y, 0.7F, HQMConfig.TEXT_NORMAL);
             }
         }
     }

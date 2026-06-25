@@ -192,11 +192,11 @@ public class QuestSetsGraphic extends EditableGraphic {
         }
         
         if ((Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.CREATE)) {
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.createNewSet"), 0.7F, 130), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, HQMConfig.TEXT_NORMAL);
         } else {
             if (selectedSet != null) {
                 List<FormattedText> description = descriptionScroll.getVisibleEntries(selectedSet.getDescription(gui), VISIBLE_DESCRIPTION_LINES);
-                gui.drawString(graphics, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
+                gui.drawString(graphics, description, DESCRIPTION_X, DESCRIPTION_Y, 0.7F, HQMConfig.TEXT_NORMAL);
             }
             
             drawQuestInfo(graphics, gui, selectedSet, DESCRIPTION_X, selectedSet == null ? DESCRIPTION_Y : INFO_Y, isVisibleCache, isLinkFreeCache);
@@ -245,7 +245,7 @@ public class QuestSetsGraphic extends EditableGraphic {
         if (Quest.canQuestsBeEdited() && !Screen.hasControlDown()) {
             info.add(Translator.translatable("hqm.questBook.inclInvisiQuests", Translator.quest(realTotal)).withStyle(ChatFormatting.GRAY));
         }
-        gui.drawString(graphics, info, x, y, 0.7F, 0x404040);
+        gui.drawString(graphics, info, x, y, 0.7F, HQMConfig.TEXT_NORMAL);
     }
     
     @Override

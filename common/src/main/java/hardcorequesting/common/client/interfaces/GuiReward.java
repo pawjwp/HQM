@@ -118,8 +118,8 @@ public class GuiReward extends GuiBase {
         }
         
         drawCenteredString(graphics, title, 0, 0, 1F, TEXTURE_WIDTH, TITLE_HEIGHT, group.getTier().getColor().getHexColor());
-        drawCenteredString(graphics, statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, 0x707070);
-        drawCenteredString(graphics, Translator.translatable("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, 0x707070);
+        drawCenteredString(graphics, statisticsText, 0, TITLE_HEIGHT, 0.7F, TEXTURE_WIDTH, TOP_HEIGHT - TITLE_HEIGHT, HQMConfig.TEXT_HINT);
+        drawCenteredString(graphics, Translator.translatable("hqm.rewardGui.close"), 0, TOP_HEIGHT + lines * MIDDLE_HEIGHT, 0.7F, TEXTURE_WIDTH, BOTTOM_HEIGHT, HQMConfig.TEXT_HINT);
         
         for (Reward reward : rewards) {
             try {

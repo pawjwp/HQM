@@ -87,19 +87,19 @@ public class MenuPageGraphic extends EditableGraphic {
         Player player = gui.getPlayer();
         
         QuestingDataManager manager = QuestingDataManager.getInstance();
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.lives"), INFO_RIGHT_X, INFO_LIVES_Y, HQMConfig.TEXT_NORMAL);
         if (HQMConfig.getInstance().ENABLE_TEAMS)
-            gui.drawString(graphics, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, 0x404040);
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, 0x404040);
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.questBook.party"), INFO_RIGHT_X, INFO_TEAM_Y, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.quests"), INFO_LEFT_X, INFO_QUESTS_Y, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.reputation"), INFO_LEFT_X, INFO_REPUTATION_Y, HQMConfig.TEXT_NORMAL);
         
         QuestSetsGraphic.drawQuestInfo(graphics, gui, null, INFO_LEFT_X, INFO_QUESTS_Y + (int) (GuiQuestBook.TEXT_HEIGHT * 1.5F));
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, 0x707070);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.showQuests"), INFO_LEFT_X, INFO_QUESTS_Y + QUEST_CLICK_TEXT_Y, 0.7F, HQMConfig.TEXT_HINT);
         
         if (manager.isHardcoreActive()) {
             boolean almostOut = manager.getQuestingData(player).getLives() == manager.getQuestingData(player).getLivesToStayAlive();
             if (almostOut) {
-                gui.drawString(graphics, Translator.translatable("hqm.questBook.deadOut").withStyle(ChatFormatting.DARK_RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.questBook.deadOut").withStyle(ChatFormatting.DARK_RED), INFO_RIGHT_X + 50, INFO_LIVES_Y + 2, 0.7F, HQMConfig.TEXT_NORMAL);
             }
             
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -113,20 +113,20 @@ public class MenuPageGraphic extends EditableGraphic {
                 heartX = INFO_RIGHT_X + INFO_HEARTS_X + 20;
                 count = 3;
                 spacing = 3;
-                gui.drawString(graphics, Translator.plain(lives + " x"), INFO_RIGHT_X + 5, INFO_LIVES_Y + INFO_HEARTS_Y + 5, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.plain(lives + " x"), INFO_RIGHT_X + 5, INFO_LIVES_Y + INFO_HEARTS_Y + 5, 0.7F, HQMConfig.TEXT_NORMAL);
             }
             
             for (int i = 0; i < count; i++) {
                 gui.drawItemStack(graphics, new ItemStack(ModItems.heart.get(), 1), heartX + spacing * i, INFO_LIVES_Y + INFO_HEARTS_Y, almostOut);
             }
         } else {
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.infiniteLives"), 0.5F, GuiQuestBook.PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, 0x707070);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.infiniteLives"), 0.5F, GuiQuestBook.PAGE_WIDTH - 30), INFO_RIGHT_X, INFO_LIVES_Y + 12, 0.5F, HQMConfig.TEXT_HINT);
         }
         
         
         int deaths = DeathStatsManager.getInstance().getDeathStat(player.getUUID()).getTotalDeaths();
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.deaths", Translator.plural("hqm.times", deaths)), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, 0x404040);
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, 0x707070);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.deaths", Translator.plural("hqm.times", deaths)), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_TEXT_Y, 0.7F, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.moreInfo"), INFO_RIGHT_X, INFO_DEATHS_Y + DEATH_CLICK_TEXT_Y, 0.7F, HQMConfig.TEXT_HINT);
         
         if (!HQMConfig.getInstance().ENABLE_TEAMS) return;
         
@@ -149,12 +149,12 @@ public class MenuPageGraphic extends EditableGraphic {
             str = Translator.translatable("hqm.questBook.inParty", Translator.player(players));
         }
         
-        gui.drawString(graphics, str, INFO_RIGHT_X, INFO_TEAM_Y + TEAM_TEXT_Y, 0.7F, 0x404040);
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.openParty"), INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, 0.7F, 0x707070);
+        gui.drawString(graphics, str, INFO_RIGHT_X, INFO_TEAM_Y + TEAM_TEXT_Y, 0.7F, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.openParty"), INFO_RIGHT_X, INFO_TEAM_Y + TEAM_CLICK_TEXT_Y, 0.7F, HQMConfig.TEXT_HINT);
         
         if (gui.isOpBook) {
-            gui.drawString(graphics, Translator.translatable("hqm.questBook.resetParty"), 22, 182, 0.6F, 0x404040);
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, 0xff5555);
+            gui.drawString(graphics, Translator.translatable("hqm.questBook.resetParty"), 22, 182, 0.6F, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftCtrlConfirm"), 0.6F, 70), 22, 192, 0.6F, HQMConfig.TEXT_WARNING);
         }
         
         drawReputations(graphics, gui, mX, mY, player.getUUID());

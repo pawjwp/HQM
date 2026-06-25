@@ -6,6 +6,7 @@ import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -70,8 +71,8 @@ public class EditGroupGraphic extends EditableGraphic {
             }
         }
         
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.maxRetrieval"), 180, 20, 0x404040);
-        gui.drawString(graphics, Translator.translatable("hqm.questBook.noRestriction"), 180, 48, 0.7F, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.maxRetrieval"), 180, 20, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.translatable("hqm.questBook.noRestriction"), 180, 48, 0.7F, HQMConfig.TEXT_NORMAL);
     }
     
     @Override

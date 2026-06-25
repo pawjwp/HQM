@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.Translator;
@@ -113,7 +114,7 @@ public class EditBagsGraphic extends EditableGraphic {
                 gui.drawCenteredString(graphics, Translator.text(groupTier.getWeights()[j] + "").withStyle(bagTier.getColor()),
                         TIERS_X + TIERS_SECOND_LINE_X + j * WEIGHT_SPACING,
                         yPos + TIERS_SECOND_LINE_Y, 0.7F,
-                        WEIGHT_SPACING, 0, 0x404040);
+                        WEIGHT_SPACING, 0, HQMConfig.TEXT_NORMAL);
             }
             yPos += TIERS_SPACING;
         }
@@ -144,7 +145,7 @@ public class EditBagsGraphic extends EditableGraphic {
             gui.drawString(graphics, Translator.translatable("hqm.questBook.items", group.getItems().size()),
                     GROUPS_X + GROUPS_SECOND_LINE_X,
                     yPos + GROUPS_SECOND_LINE_Y,
-                    0.7F, 0x404040);
+                    0.7F, HQMConfig.TEXT_NORMAL);
             yPos += GROUPS_SPACING;
         }
     }

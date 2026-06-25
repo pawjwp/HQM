@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.util.Translator;
@@ -72,7 +73,7 @@ public abstract class LargeButton implements Drawable, Clickable {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             boolean enabled = isEnabled();
             this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
-            this.gui.drawCenteredString(graphics, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? 0x404040 : 0xA0A070);
+            this.gui.drawCenteredString(graphics, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? HQMConfig.TEXT_NORMAL : 0xA0A070);
         }
     }
     

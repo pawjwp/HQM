@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.edit.EditRepTierValueMenu;
 import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
@@ -102,7 +103,7 @@ public class EditReputationGraphic extends EditableGraphic {
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), FONT_HEIGHT, mX, mY);
                 boolean selected = reputation.equals(selectedReputation);
                 
-                gui.drawString(graphics, str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(graphics, str, x, y, selected ? hover ? HQMConfig.COMPLETED_SELECTED_IN_BOUNDS_SET : HQMConfig.COMPLETED_SELECTED_OUT_OF_BOUNDS_SET : hover ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
                 
                 y += REPUTATION_OFFSET;
             }
@@ -110,7 +111,7 @@ public class EditReputationGraphic extends EditableGraphic {
         
         if (selectedReputation != null) {
             FormattedText neutralName = Translator.translatable("hqm.rep.neutral", selectedReputation.getNeutralName());
-            gui.drawString(graphics, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? 0xAAAAAA : 0x404040);
+            gui.drawString(graphics, neutralName, REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.inBounds(REPUTATION_MARKER_LIST_X, REPUTATION_NEUTRAL_Y, gui.getStringWidth(neutralName), FONT_HEIGHT, mX, mY) ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
     
             int x = REPUTATION_MARKER_LIST_X;
             int y = REPUTATION_MARKER_LIST_Y;
@@ -119,7 +120,7 @@ public class EditReputationGraphic extends EditableGraphic {
                 Component title = marker.getTitle();
                 
                 boolean hover = gui.inBounds(x, y, gui.getStringWidth(title), FONT_HEIGHT, mX, mY);
-                gui.drawString(graphics, title, x, y, hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(graphics, title, x, y, hover ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
                 
                 y += REPUTATION_OFFSET;
             }

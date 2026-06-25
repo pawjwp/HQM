@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.AbstractCheckBox;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.reputation.ReputationTask;
 import hardcorequesting.common.reputation.Reputation;
 import hardcorequesting.common.reputation.ReputationManager;
@@ -122,17 +123,17 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
             
             
             
-            gui.drawString(graphics, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, HQMConfig.TEXT_NORMAL);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             FormattedText info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(lower.getLabel()), false);
             
-            gui.drawString(graphics, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, HQMConfig.TEXT_NORMAL);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(upper.getLabel()), false);
             
-            gui.drawString(graphics, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, HQMConfig.TEXT_NORMAL);
             gui.applyColor(0xFFFFFFFF);
             ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
             info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, playerId, true, lower, upper, inverted, null, null, false);

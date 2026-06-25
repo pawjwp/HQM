@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.widget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import net.minecraft.SharedConstants;
@@ -94,7 +95,7 @@ public class TextBox {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
         this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mX, mY) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
-        this.gui.drawString(graphics, visibleText, x + 3, y + offsetY, scale, 0x404040);
+        this.gui.drawString(graphics, visibleText, x + 3, y + offsetY, scale, HQMConfig.TEXT_NORMAL);
         
         if (selected) {
             int cursor = helper.getCursorPos();

@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.Translator;
@@ -55,7 +56,7 @@ public class LocationMenu extends GuiEditMenu {
             protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
                 super.draw(graphics, selected, mX, mY);
                 
-                this.gui.drawString(graphics, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, 0x404040);
+                this.gui.drawString(graphics, Translator.translatable("hqm.locationMenu.dim"), x, y + NumberTextBox.TEXT_OFFSET, HQMConfig.TEXT_NORMAL);
             }
         });
         
@@ -64,7 +65,7 @@ public class LocationMenu extends GuiEditMenu {
             protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
                 super.draw(graphics, selected, mX, mY);
     
-                this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.locationMenu.negRadius"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.locationMenu.negRadius"), 0.7F, 130), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, HQMConfig.TEXT_NORMAL);
             }
         });
         

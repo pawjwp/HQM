@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.SaveHelper;
@@ -60,7 +61,7 @@ public class EditCommandRewardsMenu extends AbstractTextMenu {
         for (int i = 0; i < this.commands.size(); i++) {
             Entry entry = commands.get(i);
             if (entry.command.isEmpty()) {
-                drawStringTrimmed(graphics, gui, Translator.translatable("hqm.commandEdit.deleted"), START_X, START_Y + (i * LINE_HEIGHT), 0xFF0000);
+                drawStringTrimmed(graphics, gui, Translator.translatable("hqm.commandEdit.deleted"), START_X, START_Y + (i * LINE_HEIGHT), HQMConfig.TEXT_ERROR);
             } else {
                 drawStringTrimmed(graphics, gui, Translator.plain(entry.command), START_X, getLineY(i), entry.edited ? 0xFF4500 : 0x000000);
             }

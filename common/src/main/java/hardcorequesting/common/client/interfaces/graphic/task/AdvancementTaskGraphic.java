@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickAdvancementMenu;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.icon.GetAdvancementTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -27,7 +28,7 @@ public class AdvancementTaskGraphic extends IconTaskGraphic<GetAdvancementTask.P
     @Override
     protected void drawElementText(GuiGraphics graphics, GetAdvancementTask.Part part, int id, int x, int y) {
         if (task.advanced(id, playerId)) {
-            gui.drawString(graphics, Translator.translatable("hqm.advancementMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.advancementMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, HQMConfig.TEXT_NORMAL);
         }
     }
     

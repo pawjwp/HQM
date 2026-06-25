@@ -7,6 +7,7 @@ import hardcorequesting.common.bag.TierColor;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.HQMUtil;
 import hardcorequesting.common.util.SaveHelper;
@@ -70,14 +71,14 @@ public class EditBagTierMenu extends GuiEditMenu {
         
         gui.drawString(graphics, tier.getName(), TIERS_TEXT_X, TIERS_TEXT_Y, tier.getColor().getHexColor());
         
-        gui.drawString(graphics, Translator.translatable("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.menuTier.weights"), TIERS_TEXT_X, TIERS_WEIGHTS_TEXT_Y, HQMConfig.TEXT_NORMAL);
         
         BagTier[] values = BagTier.values();
         for (int i = 0; i < values.length; i++) {
             BagTier bagTier = values[i];
             
             int posY = TIERS_WEIGHTS_Y + i * TIERS_WEIGHTS_SPACING;
-            gui.drawString(graphics, bagTier.getColoredName(), TIERS_WEIGHTS_X, posY, 0x404040);
+            gui.drawString(graphics, bagTier.getColoredName(), TIERS_WEIGHTS_X, posY, HQMConfig.TEXT_NORMAL);
         }
     }
     

@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.*;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.quests.task.QuestTask;
@@ -51,7 +52,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
         super.draw(graphics, mX, mY);
         
         if (gui.isOpBook) {
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, 0x707070);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.questBook.shiftSetReset"), 0.7F, 130), 184, 192, 0.7F, HQMConfig.TEXT_HINT);
         }
         
         Player player = gui.getPlayer();
@@ -392,7 +393,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 for (Quest parent : child.getRequirements()) {
                     if (Quest.canQuestsBeEdited() || parent.isVisible(player, isVisibleCache, isLinkFreeCache)) {
                         if (parent.hasSameSetAs(child)) {
-                            int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? 0x55404040 : 0xFF404040;
+                            int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? HQMConfig.dimmed(HQMConfig.MAP_CONNECTING_LINE) : HQMConfig.MAP_CONNECTING_LINE;
                             gui.drawLine(graphics, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                     5,
@@ -406,7 +407,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
             for (Quest child : set.getQuests().values()) {
                 for (Quest parent : child.getOptionLinks()) {
                     if (parent.hasSameSetAs(child)) {
-                        int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? 0x554040DD : 0xFF4040DD;
+                        int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? HQMConfig.dimmed(HQMConfig.MAP_OPTION_LINK_LINE) : HQMConfig.MAP_OPTION_LINK_LINE;
                         gui.drawLine(graphics, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                 gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
                                 5,
@@ -425,8 +426,8 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 
                 int color;
-                if (quest == draggedQuest || quest == selectedQuest) color = 0xffbbffbb;
-                else if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) color = 0xfff8bbff;
+                if (quest == draggedQuest || quest == selectedQuest) color = HQMConfig.MAP_SELECTED_MARKER;
+                else if (quest.getQuestId().equals(Quest.speciallySelectedQuestId)) color = HQMConfig.MAP_SPECIAL_SELECTED_MARKER;
                 else color = quest.getColorFilter(player, gui.getTick());
                 
                 gui.applyColor(color);

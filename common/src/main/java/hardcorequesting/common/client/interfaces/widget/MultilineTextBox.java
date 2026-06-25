@@ -2,6 +2,7 @@ package hardcorequesting.common.client.interfaces.widget;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
+import hardcorequesting.common.config.HQMConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.font.TextFieldHelper;
@@ -22,8 +23,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public final class MultilineTextBox implements Drawable, Clickable {
-    public static final int DEFAULT_TEXT_COLOR = 0x404040;
-    
     private static final int LINES_PER_PAGE = 21;
     
     private final GuiBase gui;
@@ -35,7 +34,7 @@ public final class MultilineTextBox implements Drawable, Clickable {
     private String text;
     private final List<Line> lines = new ArrayList<>();
     private boolean dragging;
-    private int textColor = DEFAULT_TEXT_COLOR;
+    private int textColor = HQMConfig.TEXT_NORMAL;
     @Nullable
     private Consumer<String> textListener = null;
     

@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.graphic.task.TaskGraphics;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.Quest;
@@ -141,10 +142,10 @@ public final class QuestGraphic extends EditableGraphic {
             setSelectedTask(quest.getTasks().size() > 0 ? quest.getTasks().get(0) : null);
         }
         
-        gui.drawString(graphics, quest.getName(), START_X, TITLE_START_Y, 0x404040);
-        
+        gui.drawString(graphics, quest.getName(), START_X, TITLE_START_Y, HQMConfig.TEXT_NORMAL);
+
         List<FormattedText> description = descriptionScroll.getVisibleEntries();
-        gui.drawString(graphics, description, START_X, DESCRIPTION_START_Y, 0.7F, 0x404040);
+        gui.drawString(graphics, description, START_X, DESCRIPTION_START_Y, 0.7F, HQMConfig.TEXT_NORMAL);
         
         int id = 0;
         for (QuestTask<?> task : taskScroll.getVisibleEntries(quest.getTasks(), VISIBLE_TASKS)) {
@@ -154,7 +155,11 @@ public final class QuestGraphic extends EditableGraphic {
                 int yPos = getTaskY(id);
                 boolean inBounds = gui.inBounds(START_X, yPos, gui.getStringWidth(task.getName()), GuiBase.TEXT_HEIGHT, mX, mY);
                 boolean isSelected = task == selectedTask;
-                gui.drawString(graphics, task.getName(), START_X, yPos, completed ? isSelected ? inBounds ? 0x40BB40 : 0x40A040 : inBounds ? 0x10A010 : 0x107010 : isSelected ? inBounds ? 0xAAAAAA : 0x888888 : inBounds ? 0x666666 : isVisible ? 0x404040 : 0xDDDDDD);
+                gui.drawString(graphics, task.getName(), START_X, yPos, completed
+                        ? isSelected ? inBounds ? HQMConfig.COMPLETED_SELECTED_IN_BOUNDS_SET : HQMConfig.COMPLETED_SELECTED_OUT_OF_BOUNDS_SET
+                                     : inBounds ? HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET : HQMConfig.COMPLETED_UNSELECTED_OUT_OF_BOUNDS_SET
+                        : isSelected ? inBounds ? HQMConfig.UNCOMPLETED_SELECTED_IN_BOUNDS_SET : HQMConfig.UNCOMPLETED_SELECTED_OUT_OF_BOUNDS_SET
+                                     : inBounds ? HQMConfig.UNCOMPLETED_UNSELECTED_IN_BOUNDS_SET : isVisible ? HQMConfig.UNCOMPLETED_UNSELECTED_OUT_OF_BOUNDS_SET : HQMConfig.DISABLED_SET);
                 
                 id++;
             }
@@ -167,7 +172,7 @@ public final class QuestGraphic extends EditableGraphic {
         if (taskGraphic != null) {
             taskGraphic.draw(graphics, mX, mY);
         } else if (Quest.canQuestsBeEdited() && gui.getCurrentMode() == EditMode.TASK) {
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, 0x404040);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.quest.createTasks"), 0.7F, 130), 180, 20, 0.7F, HQMConfig.TEXT_NORMAL);
         }
     }
     

@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.gui.GuiGraphics;
@@ -110,14 +111,14 @@ public class PickAdvancementMenu extends GuiEditMenu {
             boolean selected = name.equals(advancement);
             boolean inBounds = gui.inBounds(START_X, nameY, 130, 6, mX, mY);
             
-            gui.drawString(graphics, Translator.plain(name), START_X, nameY, 0.7F, selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040);
+            gui.drawString(graphics, Translator.plain(name), START_X, nameY, 0.7F, selected ? inBounds ? HQMConfig.TEXT_SELECTED_HOVERED : HQMConfig.TEXT_SELECTED : inBounds ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
             nameY += OFFSET_Y;
         }
         
-        gui.drawString(graphics, Translator.plain("Search"), 180, 20, 0x404040);
-        gui.drawString(graphics, Translator.plain(((advancement == null) ? "Nothing" : "Currently") + "Selected"), 180, 40, 0x404040);
+        gui.drawString(graphics, Translator.plain("Search"), 180, 20, HQMConfig.TEXT_NORMAL);
+        gui.drawString(graphics, Translator.plain(((advancement == null) ? "Nothing" : "Currently") + "Selected"), 180, 40, HQMConfig.TEXT_NORMAL);
         if (advancement != null) {
-            gui.drawString(graphics, Translator.plain(advancement), 180, 50, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.plain(advancement), 180, 50, 0.7F, HQMConfig.TEXT_NORMAL);
         }
     }
     

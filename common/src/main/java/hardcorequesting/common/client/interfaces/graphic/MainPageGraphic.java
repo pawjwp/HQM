@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.edit.WrappedTextMenu;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.sounds.SoundHandler;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.util.Translator;
@@ -51,10 +52,10 @@ public class MainPageGraphic extends EditableGraphic {
         super.draw(graphics, mX, mY);
         
         QuestLine questLine = QuestLine.getActiveQuestLine();
-        gui.drawString(graphics, mainDescriptionScroll.getVisibleEntries(), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, 0x404040);
-        gui.drawCenteredString(graphics, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
+        gui.drawString(graphics, mainDescriptionScroll.getVisibleEntries(), DESCRIPTION_X, DESCRIPTION_Y, 0.7F, HQMConfig.TEXT_NORMAL);
+        gui.drawCenteredString(graphics, Translator.translatable("hqm.questBook.start"), 0, 195, 0.7F, GuiQuestBook.PAGE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT - 195, HQMConfig.TEXT_HINT);
         if (SoundHandler.hasLoreMusic() && !SoundHandler.isLorePlaying()) {
-            gui.drawCenteredString(graphics, Translator.translatable("hqm.questBook.playAgain"), GuiQuestBook.PAGE_WIDTH, 195, 0.7F, GuiQuestBook.PAGE_WIDTH - 10, GuiQuestBook.TEXTURE_HEIGHT - 195, 0x707070);
+            gui.drawCenteredString(graphics, Translator.translatable("hqm.questBook.playAgain"), GuiQuestBook.PAGE_WIDTH, 195, 0.7F, GuiQuestBook.PAGE_WIDTH - 10, GuiQuestBook.TEXTURE_HEIGHT - 195, HQMConfig.TEXT_HINT);
         }
         if (questLine.front == null) {
             File file = new File(HardcoreQuestingCore.configDir.toFile(), "front.png");

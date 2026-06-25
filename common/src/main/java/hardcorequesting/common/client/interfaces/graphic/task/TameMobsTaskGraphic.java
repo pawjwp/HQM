@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.PickMobMenu;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.icon.TameMobsTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -28,11 +29,11 @@ public class TameMobsTaskGraphic extends IconTaskGraphic<TameMobsTask.Part> {
     protected void drawElementText(GuiGraphics graphics, TameMobsTask.Part part, int index, int x, int y) {
         int tamed = task.tamed(index, playerId);
         if (tamed == part.getCount()) {
-            gui.drawString(graphics, Translator.translatable("hqm.tameTask.allTamed").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.tameTask.allTamed").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, HQMConfig.TEXT_NORMAL);
         } else {
-            gui.drawString(graphics, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.getCount())), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.tameTask.partTames", tamed, (100 * tamed / part.getCount())), x, y, 0.7F, HQMConfig.TEXT_NORMAL);
         }
-        gui.drawString(graphics, Translator.translatable("hqm.tameTask.totalTames", part.getCount()), x, y + 6, 0.7F, 0x404040);
+        gui.drawString(graphics, Translator.translatable("hqm.tameTask.totalTames", part.getCount()), x, y + 6, 0.7F, HQMConfig.TEXT_NORMAL);
     }
     
     @Override

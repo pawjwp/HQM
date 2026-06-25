@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.edit.LocationMenu;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.task.icon.VisitLocationTask;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -29,11 +30,11 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
     @Override
     protected void drawElementText(GuiGraphics graphics, VisitLocationTask.Part part, int index, int x, int y) {
         if (task.visited(index, playerId)) {
-            gui.drawString(graphics, Translator.translatable("hqm.locationMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.locationMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x, y, 0.7F, HQMConfig.TEXT_NORMAL);
         } else if (part.getVisibility().doShowCoordinate()) {
             int row = 0;
             if (part.getRadius() >= 0) {
-                gui.drawString(graphics, Translator.plain("(" + part.getPosition().toShortString() + ")"), x, y, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.plain("(" + part.getPosition().toShortString() + ")"), x, y, 0.7F, HQMConfig.TEXT_NORMAL);
                 row++;
             }
             
@@ -46,11 +47,11 @@ public class LocationTaskGraphic extends IconTaskGraphic<VisitLocationTask.Part>
                     if (part.getVisibility().doShowRadius()) {
                         str = FormattedText.composite(str, Translator.plain(" ["), Translator.translatable("hqm.locationMenu.mRadius", part.getRadius()), Translator.plain("]"));
                     }
-                    gui.drawString(graphics, str, x, y + 6*row, 0.7F, 0x404040);
+                    gui.drawString(graphics, str, x, y + 6*row, 0.7F, HQMConfig.TEXT_NORMAL);
                 }
                 
             } else {
-                gui.drawString(graphics, Translator.translatable("hqm.locationMenu.wrongDim"), x, y + 6*row, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.locationMenu.wrongDim"), x, y + 6*row, 0.7F, HQMConfig.TEXT_NORMAL);
             }
         }
     }

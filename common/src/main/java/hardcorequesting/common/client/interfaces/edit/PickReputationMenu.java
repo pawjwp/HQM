@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.reputation.Reputation;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -54,11 +55,11 @@ public class PickReputationMenu extends GuiEditMenu {
             boolean hover = gui.inBounds(x, y, gui.getStringWidth(str), EditReputationGraphic.FONT_HEIGHT, mX, mY);
             boolean selected = reputation.equals(selectedReputation);
             
-            gui.drawString(graphics, str, x, y, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+            gui.drawString(graphics, str, x, y, selected ? hover ? HQMConfig.COMPLETED_SELECTED_IN_BOUNDS_SET : HQMConfig.COMPLETED_SELECTED_OUT_OF_BOUNDS_SET : hover ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
             
             y += EditReputationGraphic.REPUTATION_OFFSET;
         }
-        gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, 0x404040);
+        gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.rep.select"), 1F, 120), EditReputationGraphic.REPUTATION_MARKER_LIST_X, EditReputationGraphic.REPUTATION_LIST_Y, 1F, HQMConfig.TEXT_NORMAL);
     }
     
     @Override

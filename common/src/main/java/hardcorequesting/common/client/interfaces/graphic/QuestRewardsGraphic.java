@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.edit.ReputationRewardMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.data.QuestData;
@@ -117,14 +118,14 @@ public class QuestRewardsGraphic extends Graphic {
         NonNullList<ItemStack> itemRewards = rewards.getReward();
         NonNullList<ItemStack> choiceRewards = rewards.getRewardChoice();
         if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
-            gui.drawString(graphics, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.quest.rewards"), START_X, REWARD_STR_Y, HQMConfig.TEXT_NORMAL);
             drawRewards(graphics, gui, itemRewards, REWARD_Y, -1, mX, mY, MAX_REWARD_SLOTS);
             if (!choiceRewards.isEmpty() || Quest.canQuestsBeEdited()) {
-                gui.drawString(graphics, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.quest.pickOne"), START_X, REWARD_STR_Y + REWARD_Y_OFFSET, HQMConfig.TEXT_NORMAL);
                 drawRewards(graphics, gui, choiceRewards, REWARD_Y + REWARD_Y_OFFSET, selectedReward, mX, mY, MAX_SELECT_REWARD_SLOTS);
             }
         } else if (!choiceRewards.isEmpty()) {
-            gui.drawString(graphics, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.quest.pickOneReward"), START_X, REWARD_STR_Y, HQMConfig.TEXT_NORMAL);
             drawRewards(graphics, gui, choiceRewards, REWARD_Y, selectedReward, mX, mY, MAX_SELECT_REWARD_SLOTS);
         }
     }

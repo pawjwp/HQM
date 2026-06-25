@@ -9,6 +9,7 @@ import hardcorequesting.common.client.interfaces.graphic.EditReputationGraphic;
 import hardcorequesting.common.client.interfaces.graphic.Graphic;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.sounds.SoundHandler;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.*;
 import hardcorequesting.common.reputation.ReputationBar;
 import hardcorequesting.common.util.SaveHelper;
@@ -159,8 +160,8 @@ public class GuiQuestBook extends GuiBase {
             if (currentMode == EditMode.DELETE) {
                 graphics.pose().pushPose();
                 graphics.pose().translate(0, 0, 200);
-                drawCenteredString(graphics, Translator.translatable("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
-                drawCenteredString(graphics, Translator.translatable("hqm.questBook.deleteOnClick"), 0, font.lineHeight * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0xFF0000);
+                drawCenteredString(graphics, Translator.translatable("hqm.questBook.warning"), 0, 0, 2F, TEXTURE_WIDTH, TEXTURE_HEIGHT, HQMConfig.TEXT_ERROR);
+                drawCenteredString(graphics, Translator.translatable("hqm.questBook.deleteOnClick"), 0, font.lineHeight * 2, 1F, TEXTURE_WIDTH, TEXTURE_HEIGHT, HQMConfig.TEXT_ERROR);
                 graphics.pose().popPose();
             }
     

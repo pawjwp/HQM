@@ -7,6 +7,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStat;
 import hardcorequesting.common.death.DeathStatsManager;
 import hardcorequesting.common.death.DeathType;
@@ -76,7 +77,7 @@ public class DeathStatsGraphic extends Graphic {
             boolean inBounds = gui.inBounds(PLAYERS_X, statY, 130, 9, mX, mY);
             gui.drawString(graphics, Translator.text((deathStats.indexOf(stats) + 1) + ". ").append(stats.getName()), PLAYERS_X, statY, getColor(selected, inBounds));
             String deaths = String.valueOf(stats.getTotalDeaths());
-            gui.drawString(graphics, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, 0x404040);
+            gui.drawString(graphics, Translator.plain(deaths), DEATHS_RIGHT - gui.getStringWidth(deaths), statY, HQMConfig.TEXT_NORMAL);
             statY += PLAYERS_SPACING;
         }
         
@@ -96,8 +97,8 @@ public class DeathStatsGraphic extends Graphic {
                 gui.drawRect(graphics, GuiBase.MAP_TEXTURE, TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
             
-            gui.drawString(graphics, stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, 0x404040);
+            gui.drawString(graphics, stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.deathMenu.total", stats.getTotalDeaths()), PLAYER_INFO_X, PLAYER_INFO_Y + PLAYER_TOTAL_DEATHS_Y, 0.7F, HQMConfig.TEXT_NORMAL);
             
             for (DeathType type : DeathType.values()) {
                 int i = type.ordinal();
@@ -111,7 +112,7 @@ public class DeathStatsGraphic extends Graphic {
                     f = findScale(text);
                 }
                 int offset = f == 1 ? 0 : Math.round(9 * (1 - f) - 1);
-                gui.drawString(graphics, text, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, 0x404040);
+                gui.drawString(graphics, text, TYPE_LOCATION_X + TYPE_SPACING_X * x + TEXT_OFFSET_X, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + TEXT_OFFSET_Y + offset, f, HQMConfig.TEXT_NORMAL);
             }
         }
     }
@@ -193,6 +194,6 @@ public class DeathStatsGraphic extends Graphic {
     }
     
     private int getColor(boolean selected, boolean inBounds) {
-        return selected ? inBounds ? 0xC0C0C0 : 0xA0A0A0 : inBounds ? 0x707070 : 0x404040;
+        return selected ? inBounds ? HQMConfig.TEXT_SELECTED_HOVERED : HQMConfig.TEXT_SELECTED : inBounds ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL;
     }
 }

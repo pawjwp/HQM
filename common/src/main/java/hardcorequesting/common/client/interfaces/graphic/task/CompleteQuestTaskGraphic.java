@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.graphic.task;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.task.CompleteQuestTask;
 import hardcorequesting.common.util.EditType;
@@ -52,14 +53,14 @@ public class CompleteQuestTaskGraphic extends ListTaskGraphic<CompleteQuestTask.
                 .ifRight(fluidStack -> gui.drawFluid(fluidStack, graphics, x, y, mX, mY));
         
         if (part.getQuest() != null) {
-            gui.drawString(graphics, part.getName(), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
+            gui.drawString(graphics, part.getName(), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, HQMConfig.TEXT_NORMAL);
             if (task.completed(id, playerId)) {
-                gui.drawString(graphics, Translator.translatable("hqm.completedMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.completedMenu.visited").withStyle(ChatFormatting.DARK_GREEN), x + X_TEXT_OFFSET + X_TEXT_INDENT, y + Y_TEXT_OFFSET + 9, 0.7F, HQMConfig.TEXT_NORMAL);
             }
         } else {
-            gui.drawString(graphics, Translator.translatable("hqm.completionTask.firstline").withStyle(ChatFormatting.DARK_RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.completionTask.secondline").withStyle(ChatFormatting.DARK_RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.completionTask.thirdline").withStyle(ChatFormatting.DARK_RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.completionTask.firstline").withStyle(ChatFormatting.DARK_RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.completionTask.secondline").withStyle(ChatFormatting.DARK_RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 9, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.completionTask.thirdline").withStyle(ChatFormatting.DARK_RED), x + X_TEXT_OFFSET, y + Y_TEXT_OFFSET + 18, HQMConfig.TEXT_NORMAL);
         }
     }
     

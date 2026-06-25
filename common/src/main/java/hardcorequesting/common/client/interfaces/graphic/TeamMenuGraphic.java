@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.ScrollBar;
 import hardcorequesting.common.client.interfaces.widget.TextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.team.Team;
@@ -258,23 +259,23 @@ public class TeamMenuGraphic extends Graphic {
         
         if (team.isSingle() && inviteTeam == null) {
             if (!team.getInvites().isEmpty()) {
-                gui.drawString(graphics, Translator.translatable("hqm.party.invites"), TITLE_X, TITLE_Y, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.party.invites"), TITLE_X, TITLE_Y, HQMConfig.TEXT_NORMAL);
                 
                 int inviteY = PLAYER_Y;
                 for (Team invite : inviteScroll.getVisibleEntries()) {
-                    gui.drawString(graphics, Translator.plain(invite.getName()), PLAYER_X, inviteY, 0x404040);
+                    gui.drawString(graphics, Translator.plain(invite.getName()), PLAYER_X, inviteY, HQMConfig.TEXT_NORMAL);
                     inviteY += PLAYER_SPACING;
                 }
             } else {
-                gui.drawString(graphics, Translator.translatable("hqm.party.noInvites"), TITLE_X, TITLE_Y, 0x404040);
+                gui.drawString(graphics, Translator.translatable("hqm.party.noInvites"), TITLE_X, TITLE_Y, HQMConfig.TEXT_NORMAL);
             }
             
-            gui.drawString(graphics, Translator.translatable("hqm.party.name"), 180, 20, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.party.name"), 180, 20, 0.7F, HQMConfig.TEXT_NORMAL);
         } else {
             boolean isOwner = inviteTeam == null && entry.isOwner();
             Team shownTeam = inviteTeam == null ? team : inviteTeam;
             String title = shownTeam.getName();
-            gui.drawString(graphics, Translator.plain(title), TITLE_X, TITLE_Y, 0x404040);
+            gui.drawString(graphics, Translator.plain(title), TITLE_X, TITLE_Y, HQMConfig.TEXT_NORMAL);
             List<PlayerEntry> players = isOwner ? shownTeam.getPlayers() : shownTeam.getTeamMembers();
             
             int memberY = PLAYER_Y;
@@ -286,12 +287,12 @@ public class TeamMenuGraphic extends Graphic {
                     text.append(" ").append(Translator.box(Translator.translatable("hqm.party.invite")).withStyle(ChatFormatting.GRAY));
                 }
                 
-                int color = 0x404040;
+                int color = HQMConfig.TEXT_NORMAL;
                 if (isOwner) {
                     if (player.equals(selectedEntry)) {
-                        color = 0xD0D0D0;
+                        color = HQMConfig.TEXT_SELECTED;
                     } else if (gui.inBounds(PLAYER_X, memberY, (int) (gui.getStringWidth(player.getDisplayName()) * 0.7F), (int) (GuiBase.TEXT_HEIGHT * 0.7F), mX, mY)) {
-                        color = 0x808080;
+                        color = HQMConfig.TEXT_HOVERED;
                     }
                 }
                 gui.drawString(graphics, text, PLAYER_X, memberY, 0.7F, color);
@@ -300,21 +301,21 @@ public class TeamMenuGraphic extends Graphic {
             
             if (inviteTeam == null) {
                 if (entry.isOwner()) {
-                    gui.drawString(graphics, Translator.translatable("hqm.party.playerName"), 180, 20, 0.7F, 0x404040);
+                    gui.drawString(graphics, Translator.translatable("hqm.party.playerName"), 180, 20, 0.7F, HQMConfig.TEXT_NORMAL);
                     
                     if (selectedEntry != null) {
-                        gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.currentSelection", selectedEntry.getDisplayName()), 0.7F, 70), 177, 52, 0.7F, 0x404040);
+                        gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.currentSelection", selectedEntry.getDisplayName()), 0.7F, 70), 177, 52, 0.7F, HQMConfig.TEXT_NORMAL);
                         
                         if (selectedEntry.isOwner()) {
-                            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.shiftCtrlConfirm"), 0.6F, 70), 177, 162, 0.6F, 0xff5555);
+                            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.shiftCtrlConfirm"), 0.6F, 70), 177, 162, 0.6F, HQMConfig.TEXT_WARNING);
                         }
                     }
                     
                 } else {
-                    gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, 0xff5555);
+                    gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.shiftConfirm"), 0.7F, 70), 177, 162, 0.7F, HQMConfig.TEXT_WARNING);
                 }
             }
-            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.stats"), 0.7F, 70), 177, 192, 0.7F, 0x404040);
+            gui.drawString(graphics, gui.getLinesFromText(Translator.translatable("hqm.party.stats"), 0.7F, 70), 177, 192, 0.7F, HQMConfig.TEXT_NORMAL);
     
             int infoY = getInfoY();
             
@@ -324,8 +325,8 @@ public class TeamMenuGraphic extends Graphic {
             gui.drawRect(graphics, GuiBase.MAP_TEXTURE, INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             gui.drawRect(graphics, GuiBase.MAP_TEXTURE, INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             
-            gui.drawString(graphics, Translator.translatable("hqm.party.lifeSetting", shownTeam.getLifeSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
-            gui.drawString(graphics, Translator.translatable("hqm.party.rewardSetting", shownTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, 0x404040);
+            gui.drawString(graphics, Translator.translatable("hqm.party.lifeSetting", shownTeam.getLifeSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + INFO_BOX_TEXT_OFFSET_Y, 0.7F, HQMConfig.TEXT_NORMAL);
+            gui.drawString(graphics, Translator.translatable("hqm.party.rewardSetting", shownTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, HQMConfig.TEXT_NORMAL);
             
         }
         

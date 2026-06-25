@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.RepeatInfo;
 import hardcorequesting.common.quests.RepeatType;
 import hardcorequesting.common.util.HQMUtil;
@@ -41,7 +42,7 @@ public class RepeatInfoMenu extends GuiEditMenu {
             protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
                 super.draw(graphics, selected, mX, mY);
     
-                this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, 0x404040);
+                this.gui.drawString(graphics, this.gui.getLinesFromText(Translator.translatable("hqm.repeatMenu.mcDaysHours"), 0.7F, 150), x, y + BOX_OFFSET + TEXT_OFFSET, 0.7F, HQMConfig.TEXT_NORMAL);
             }
         });
         

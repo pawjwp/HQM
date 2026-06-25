@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.widget.ArrowSelectionHelper;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.NumberTextBox;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.quests.reward.ReputationReward;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.util.Translator;
@@ -118,14 +119,14 @@ public class ReputationRewardMenu extends GuiEditMenu {
                 FormattedText str = rewards.get(i).getLabel();
                 boolean hover = gui.inBounds(START_X, START_Y + i * OFFSET, gui.getStringWidth(str), 9, mX, mY);
                 boolean selected = rewards.get(i).equals(selectedReward);
-                gui.drawString(graphics, str, START_X, START_Y + i * OFFSET, selected ? hover ? 0x40CC40 : 0x409040 : hover ? 0xAAAAAA : 0x404040);
+                gui.drawString(graphics, str, START_X, START_Y + i * OFFSET, selected ? hover ? HQMConfig.COMPLETED_SELECTED_IN_BOUNDS_SET : HQMConfig.COMPLETED_SELECTED_OUT_OF_BOUNDS_SET : hover ? HQMConfig.TEXT_HOVERED : HQMConfig.TEXT_NORMAL);
             }
         } else {
             if (error == null) {
                 error = gui.getLinesFromText(Translator.translatable("hqm.repReward.noValidReps"), 0.7F, 140);
             }
             
-            gui.drawString(graphics, error, START_X, ERROR_Y, 0.7F, 0x404040);
+            gui.drawString(graphics, error, START_X, ERROR_Y, 0.7F, HQMConfig.TEXT_NORMAL);
         }
     }
     

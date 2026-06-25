@@ -96,6 +96,33 @@ public class HQMConfig {
     
     public static int QUEST_AVAILABLE = 0x554286f4;
     
+    public static int TEXT_NORMAL = 0x404040;
+
+    public static int TEXT_HINT = 0x707070;
+
+    public static int TEXT_WARNING = 0xff5555;
+
+    public static int TEXT_ERROR = 0xff0000;
+
+    public static int TEXT_HOVERED = 0xaaaaaa;
+
+    public static int TEXT_SELECTED = 0xc0c0c0;
+
+    public static int TEXT_SELECTED_HOVERED = 0xd0d0d0;
+
+    public static int MAP_CONNECTING_LINE = 0xff404040;
+
+    public static int MAP_OPTION_LINK_LINE = 0xff4040dd;
+
+    public static int MAP_SELECTED_MARKER = 0xffbbffbb;
+
+    public static int MAP_SPECIAL_SELECTED_MARKER = 0xfff8bbff;
+
+    // Same RGB as the line color but with the dimming used for links to invisible quests.
+    public static int dimmed(int color) {
+        return (color & 0xFFFFFF) | 0x55000000;
+    }
+
     public static HQMConfig getInstance() {
         if (instance == null) {
             try {
@@ -144,10 +171,39 @@ public class HQMConfig {
         }
     }
     
+    public static void parseTextColours() {
+        try {
+            Interface.Text t = getInstance().Interface.Text;
+            TEXT_NORMAL = Long.decode(t.NORMAL.toLowerCase()).intValue();
+            TEXT_HINT = Long.decode(t.HINT.toLowerCase()).intValue();
+            TEXT_WARNING = Long.decode(t.WARNING.toLowerCase()).intValue();
+            TEXT_ERROR = Long.decode(t.ERROR.toLowerCase()).intValue();
+            TEXT_HOVERED = Long.decode(t.HOVERED.toLowerCase()).intValue();
+            TEXT_SELECTED = Long.decode(t.SELECTED.toLowerCase()).intValue();
+            TEXT_SELECTED_HOVERED = Long.decode(t.SELECTED_HOVERED.toLowerCase()).intValue();
+        } catch (NumberFormatException e) {
+            HardcoreQuestingCore.LOGGER.error("Unable to parse text colours", e);
+        }
+    }
+
+    public static void parseMapColours() {
+        try {
+            Interface.QuestMap m = getInstance().Interface.QuestMap;
+            MAP_CONNECTING_LINE = Long.decode(m.CONNECTING_LINE.toLowerCase()).intValue();
+            MAP_OPTION_LINK_LINE = Long.decode(m.OPTION_LINK_LINE.toLowerCase()).intValue();
+            MAP_SELECTED_MARKER = Long.decode(m.SELECTED_MARKER.toLowerCase()).intValue();
+            MAP_SPECIAL_SELECTED_MARKER = Long.decode(m.SPECIAL_SELECTED_MARKER.toLowerCase()).intValue();
+        } catch (NumberFormatException e) {
+            HardcoreQuestingCore.LOGGER.error("Unable to parse map colours", e);
+        }
+    }
+
     @SuppressWarnings("deprecation")
     public static void loadConfig() {
         parseSetColours();
         parseQuestColours();
+        parseTextColours();
+        parseMapColours();
         
         RewardSetting.isAllModeEnabled = getInstance().MULTI_REWARD;
         BagItem.displayGui = getInstance().Loot.REWARD_INTERFACE;
@@ -219,7 +275,52 @@ public class HQMConfig {
         //@Name("Quest Colours")
         @Comment("Colour settings for quests")
         public Quests Quests = new Quests();
-        
+        //@Name("Text Colours")
+        @Comment("Colour settings for the quest book text")
+        public Text Text = new Text();
+        //@Name("Quest Map Colours")
+        @Comment("Colour settings for the quest map")
+        public QuestMap QuestMap = new QuestMap();
+
+        public static class Text {
+            //@Name("Standard text")
+            @Comment("Use the HTML format, e.g.: #404040")
+            public String NORMAL = "#404040";
+            //@Name("Hint text")
+            @Comment("Use the HTML format, e.g.: #707070")
+            public String HINT = "#707070";
+            //@Name("Warning text")
+            @Comment("Use the HTML format, e.g.: #ff5555")
+            public String WARNING = "#ff5555";
+            //@Name("Error text")
+            @Comment("Use the HTML format, e.g.: #ff0000")
+            public String ERROR = "#ff0000";
+            //@Name("Hovered row")
+            @Comment("Use the HTML format, e.g.: #aaaaaa")
+            public String HOVERED = "#aaaaaa";
+            //@Name("Selected row")
+            @Comment("Use the HTML format, e.g.: #c0c0c0")
+            public String SELECTED = "#c0c0c0";
+            //@Name("Selected hovered row")
+            @Comment("Use the HTML format, e.g.: #d0d0d0")
+            public String SELECTED_HOVERED = "#d0d0d0";
+        }
+
+        public static class QuestMap {
+            //@Name("Requirement line")
+            @Comment("Use the HTML format with alpha, e.g.: #ff404040")
+            public String CONNECTING_LINE = "#ff404040";
+            //@Name("Option link line")
+            @Comment("Use the HTML format with alpha, e.g.: #ff4040dd")
+            public String OPTION_LINK_LINE = "#ff4040dd";
+            //@Name("Selected marker")
+            @Comment("Use the HTML format with alpha, e.g.: #ffbbffbb")
+            public String SELECTED_MARKER = "#ffbbffbb";
+            //@Name("Specially selected marker")
+            @Comment("Use the HTML format with alpha, e.g.: #fff8bbff")
+            public String SPECIAL_SELECTED_MARKER = "#fff8bbff";
+        }
+
         public static class QuestSets {
             //@Name("Set is completed, selected")
             @Comment("Use the HTML format, e.g.: #ffffff")

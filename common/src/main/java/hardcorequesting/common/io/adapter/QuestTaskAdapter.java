@@ -105,6 +105,8 @@ public class QuestTaskAdapter {
         private static final String Y = "y";
         private static final String Z = "z";
         private static final String DIM = "dim";
+        private static final String BIOME = "biome";
+        private static final String STRUCTURE = "structure";
         private static final String ICON = "icon";
         private static final String FLUID_ICON = "fluid_icon";
         private static final String RADIUS = "radius";
@@ -122,6 +124,8 @@ public class QuestTaskAdapter {
                     .add(RADIUS, src.getRadius())
                     .add(VISIBLE, src.getVisibility().name())
                     .use(builder -> {
+                        if (!src.getBiome().isEmpty()) builder.add(BIOME, src.getBiome());
+                        if (!src.getStructure().isEmpty()) builder.add(STRUCTURE, src.getStructure());
                         Optional<ItemStack> item = src.getIconStack().left();
                         Optional<FluidStack> fluid = src.getIconStack().right();
                         item.ifPresent(itemStack -> builder.add(ICON, MinecraftAdapter.ICON_ITEM_STACK.serialize(itemStack)));
@@ -138,6 +142,8 @@ public class QuestTaskAdapter {
                 result.setName(WrappedText.fromJson(object.get(NAME), false));
             result.setPosition(new BlockPos(GsonHelper.getAsInt(object, X), GsonHelper.getAsInt(object, Y), GsonHelper.getAsInt(object, Z)));
             result.setDimension(GsonHelper.getAsString(object, DIM));
+            result.setBiome(GsonHelper.getAsString(object, BIOME, ""));
+            result.setStructure(GsonHelper.getAsString(object, STRUCTURE, ""));
             result.setRadius(GsonHelper.getAsInt(object, RADIUS));
             result.setVisibility(VisitLocationTask.Visibility.valueOf(GsonHelper.getAsString(object, VISIBLE, result.getVisibility().name())));
             if (object.has(ICON)) {

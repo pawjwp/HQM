@@ -12,15 +12,23 @@ import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import hardcorequesting.common.util.Translator;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.structure.Structure;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -52,28 +60,20 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
             Level world = player.getCommandSenderWorld();
             if (!world.isClientSide) {
                 LocationTaskData data = this.getData(player);
-                boolean all = true;
+                ServerLevel level = (ServerLevel) world;
                 boolean updated = false;
                 
                 for (int i = 0; i < parts.size(); ++i) {
-                    Part part = this.parts.get(i);
-                    
-                    if (!data.getValue(i) && Objects.equals(player.getCommandSenderWorld().dimension().location().toString(), part.dimension)) {
-                        int current = (int) player.distanceToSqr((double) part.pos.getX() + 0.5D, (double) part.pos.getY() + 0.5D, (double) part.pos.getZ() + 0.5D);
-                        int target = part.radius * part.radius;
-                        if (part.radius >= 0 && current > target) {
-                            all = false;
-                        } else {
-                            if (!this.isCompleted(player) && this.isVisible(player.getUUID()) && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
-                                updated = true;
-                                data.complete(i);
-                            }
-                        }
+                    if (!data.getValue(i) && satisfies(level, (ServerPlayer) player, parts.get(i))
+                            && !this.isCompleted(player) && this.isVisible(player.getUUID())
+                            && this.parent.isEnabled(player) && this.parent.isAvailable(player)) {
+                        data.complete(i);
+                        updated = true;
                     }
                 }
                 
                 if (updated) {
-                    if (all) {
+                    if (data.areAllCompleted(parts.size())) {
                         completeTask(player.getUUID());
                     }
                     parent.sendUpdatedDataToTeam(player);
@@ -82,16 +82,62 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         }
     }
     
+    // Checks whether the player currently satisfies all configured criteria.
+    private boolean satisfies(ServerLevel level, ServerPlayer player, Part part) {
+        boolean any = false;
+        if (!part.dimension.isEmpty()) {
+            any = true;
+            if (!level.dimension().location().toString().equals(part.dimension)) return false;
+        }
+        if (part.radius >= 0) {
+            any = true;
+            double max = (double) part.radius * part.radius;
+            if (player.distanceToSqr(part.pos.getX() + 0.5D, part.pos.getY() + 0.5D, part.pos.getZ() + 0.5D) > max) return false;
+        }
+        BlockPos at = player.blockPosition();
+        if (!part.biome.isEmpty()) {
+            any = true;
+            if (!matchesBiome(level, at, part.biome)) return false;
+        }
+        if (!part.structure.isEmpty()) {
+            any = true;
+            if (!matchesStructure(level, at, part.structure)) return false;
+        }
+        return any;
+    }
+
+    private boolean matchesBiome(ServerLevel level, BlockPos pos, String id) {
+        Holder<Biome> biome = level.getBiome(pos);
+        if (id.startsWith("#")) {
+            ResourceLocation rl = ResourceLocation.tryParse(id.substring(1));
+            return rl != null && biome.is(TagKey.create(Registries.BIOME, rl));
+        }
+        ResourceLocation rl = ResourceLocation.tryParse(id);
+        return rl != null && biome.is(rl);
+    }
+
+    private boolean matchesStructure(ServerLevel level, BlockPos pos, String id) {
+        StructureManager manager = level.structureManager();
+        if (id.startsWith("#")) {
+            ResourceLocation rl = ResourceLocation.tryParse(id.substring(1));
+            return rl != null && manager.getStructureWithPieceAt(pos, TagKey.create(Registries.STRUCTURE, rl)).isValid();
+        }
+        ResourceLocation rl = ResourceLocation.tryParse(id);
+        return rl != null && manager.getStructureWithPieceAt(pos, ResourceKey.create(Registries.STRUCTURE, rl)).isValid();
+    }
+
     public boolean visited(int id, UUID playerId) {
         return getData(playerId).getValue(id);
     }
-    
-    public void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension) {
+
+    public void setInfo(int id, Visibility visibility, BlockPos pos, int radius, String dimension, String biome, String structure) {
         Part part = parts.getOrCreateForModify(id);
         part.setVisibility(visibility);
         part.setPosition(pos);
         part.setRadius(radius);
         part.setDimension(dimension);
+        part.setBiome(biome);
+        part.setStructure(structure);
     }
     
     @Override
@@ -197,8 +243,10 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         private BlockPos pos = BlockPos.ZERO;
         private int radius = 3;
         private Visibility visibility = Visibility.LOCATION;
-        private String dimension;
-        
+        private String dimension = "";
+        private String biome = "";
+        private String structure = "";
+
         public BlockPos getPosition() {
             return pos;
         }
@@ -229,6 +277,22 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         
         public void setDimension(String dimension) {
             this.dimension = dimension;
+        }
+
+        public String getBiome() {
+            return biome;
+        }
+
+        public void setBiome(String biome) {
+            this.biome = biome;
+        }
+
+        public String getStructure() {
+            return structure;
+        }
+
+        public void setStructure(String structure) {
+            this.structure = structure;
         }
     }
 }

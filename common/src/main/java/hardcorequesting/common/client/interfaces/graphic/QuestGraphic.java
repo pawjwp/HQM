@@ -28,6 +28,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -187,6 +188,17 @@ public final class QuestGraphic extends EditableGraphic {
         rewardsGraphic.drawTooltip(graphics, mX, mY);
     }
     
+    @Override
+    public ItemStack getStackUnderMouse(int mX, int mY) {
+        if (taskGraphic != null) {
+            ItemStack stack = taskGraphic.getStackUnderMouse(mX, mY);
+            if (!stack.isEmpty()) {
+                return stack;
+            }
+        }
+        return rewardsGraphic.getStackUnderMouse(mX, mY);
+    }
+
     private int getVisibleTasks() {
         if (Quest.canQuestsBeEdited()) {
             return quest.getTasks().size();

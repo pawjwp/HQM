@@ -229,6 +229,33 @@ public class QuestRewardsGraphic extends Graphic {
         super.onClick(mX, mY, b);
     }
     
+    @Override
+    public ItemStack getStackUnderMouse(int mX, int mY) {
+        NonNullList<ItemStack> itemRewards = rewards.getReward();
+        NonNullList<ItemStack> choiceRewards = rewards.getRewardChoice();
+        ItemStack stack;
+        if (!itemRewards.isEmpty() || Quest.canQuestsBeEdited()) {
+            if (!(stack = getRewardUnderMouse(itemRewards, REWARD_Y, mX, mY)).isEmpty()) {
+                return stack;
+            }
+            if (!choiceRewards.isEmpty() || Quest.canQuestsBeEdited()) {
+                return getRewardUnderMouse(choiceRewards, REWARD_Y + REWARD_Y_OFFSET, mX, mY);
+            }
+        } else if (!choiceRewards.isEmpty()) {
+            return getRewardUnderMouse(choiceRewards, REWARD_Y, mX, mY);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    private ItemStack getRewardUnderMouse(NonNullList<ItemStack> rewards, int y, int mX, int mY) {
+        for (int i = 0; i < rewards.size(); i++) {
+            if (gui.inBounds(START_X + i * REWARD_OFFSET, y, ITEM_SIZE, ITEM_SIZE, mX, mY) && !rewards.get(i).isEmpty()) {
+                return rewards.get(i);
+            }
+        }
+        return ItemStack.EMPTY;
+    }
+
     private NonNullList<ItemStack> getEditFriendlyRewards(NonNullList<ItemStack> rewards, int max) {
         if (rewards.isEmpty()) {
             return NonNullList.withSize(1, ItemStack.EMPTY);

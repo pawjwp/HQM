@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.widget.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +78,10 @@ public abstract class Graphic {
         for (ScrollBar scrollBar : scrollBars) {
             scrollBar.onScroll(x, y, scroll);
         }
+    }
+    
+    public ItemStack getStackUnderMouse(int mX, int mY) {
+        return ItemStack.EMPTY;
     }
     
     protected void addScrollBar(ScrollBar scrollBar) {

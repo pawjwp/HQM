@@ -26,6 +26,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -167,12 +168,19 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             OPBookHelper.reverseRequirementCompletion(task, id, playerId);
         } else if (Quest.canQuestsBeEdited()) {
             super.handlePartClick(part, id);
-        } else {
-            /* TODO REI
-            if (Loader.isModLoaded("jei")) {
-                JEIIntegration.showItemStack(part.getStack());
-            }*/
         }
+    }
+
+    @Override
+    public ItemStack getStackUnderMouse(int mX, int mY) {
+        int id = getClickedPart(mX, mY);
+        if (id >= 0) {
+            ItemRequirementTask.Part part = parts.getShownElements().get(id);
+            if (part.stack.left().isPresent()) {
+                return part.getPermutatedItem();
+            }
+        }
+        return ItemStack.EMPTY;
     }
     
     @Override

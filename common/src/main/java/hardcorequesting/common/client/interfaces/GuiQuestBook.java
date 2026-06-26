@@ -23,6 +23,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.glfw.GLFW;
 
@@ -116,6 +117,13 @@ public class GuiQuestBook extends GuiBase {
     
     public int getTick() {
         return tick;
+    }
+    
+    public ItemStack getStackUnderMouse(double mouseX, double mouseY) {
+        if (editMenu != null) {
+            return ItemStack.EMPTY;
+        }
+        return pageGraphic.getStackUnderMouse((int) (mouseX - left), (int) (mouseY - top));
     }
     
     public void setEditMenu(GuiEditMenu editMenu) {

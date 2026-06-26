@@ -60,6 +60,9 @@ public class HQMConfig {
     @Comment("Settings related to edit mode")
     //@Name("Editing settings")
     public Editing Editing = new Editing();
+    @Comment("Settings related to item viewer integration (JEI/EMI)")
+    //@Name("Integration settings")
+    public Integration Integration = new Integration();
     
     public static int OVERLAY_XPOS;
     
@@ -278,6 +281,12 @@ public class HQMConfig {
         //@Name("Enable edit mode by default")
         @Comment("Set to true to automatically enable edit mode when entering worlds in single-player. Has no effect in multiplayer.")
         public boolean USE_EDITOR = false;
+    }
+
+    public static class Integration {
+        //@Name("Show JEI sidebar")
+        @Comment("Set to true to show JEI's item list sidebar next to the quest book. Has no effect on EMI, which never shows its sidebar here.")
+        public boolean SHOW_JEI_SIDEBAR = false;
     }
     
     public static class Interface {

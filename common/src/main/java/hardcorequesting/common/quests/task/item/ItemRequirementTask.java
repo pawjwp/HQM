@@ -17,11 +17,18 @@ import hardcorequesting.common.team.Team;
 import hardcorequesting.common.util.EditType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.Comparator;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
@@ -60,8 +67,17 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         requirement.required = amount;
         requirement.precision = precision;
         requirement.permutations = null;
-        
+        requirement.tag = null;
+        requirement.cycleOverride = null;
+
         parent.setIconIfEmpty(stack);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void setTagInfo(int id, TagKey<Item> tag, boolean cycling) {
+        Part requirement = parts.getOrCreateForModify(id);
+        requirement.setTag(tag);
+        requirement.setCycling(cycling);
     }
     
     public int getProgress(UUID playerId, int id) {
@@ -199,11 +215,14 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
     }
     
     public static class Part {
-        private static int CYCLE_TIME = 2;//2 second cycle
+        private static int CYCLE_TIME = 1; // 1 second cycle
+        private static final int FUZZY_CAP = 100;
         
         public Either<ItemStack, FluidStack> stack;
         public int required;
         private ItemPrecision precision = ItemPrecision.PRECISE;
+        private TagKey<Item> tag;
+        private Boolean cycleOverride;
         private ItemStack[] permutations;
         private int cycleAt = -1;
         private int current = 0;
@@ -232,6 +251,42 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             permutations = null;
         }
         
+        public TagKey<Item> getTag() {
+            return tag;
+        }
+
+        public void setTag(TagKey<Item> tag) {
+            this.tag = tag;
+            permutations = null;
+        }
+
+        private boolean isTagPrecision() {
+            return precision == ItemPrecision.TAG_FUZZY || precision == ItemPrecision.TAG_NBT_FUZZY;
+        }
+
+        public boolean usesTag() {
+            return tag != null && isTagPrecision();
+        }
+
+        public boolean isCycling() {
+            return cycleOverride == null || cycleOverride;
+        }
+
+        public void setCycling(boolean cycling) {
+            // A value is only stored when cycling is turned off
+            cycleOverride = cycling ? null : false;
+            permutations = null;
+        }
+        
+        public Boolean getCycleOverride() {
+            return cycleOverride;
+        }
+
+        public void setCycleOverride(Boolean cycleOverride) {
+            this.cycleOverride = cycleOverride;
+            permutations = null;
+        }
+
         public boolean hasItem() {
             return stack.left().isPresent();
         }
@@ -241,7 +296,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         }
         
         public boolean isStack(ItemStack otherStack) {
-            return stack.left().map(itemStack -> getPrecision().areItemsSame(itemStack, otherStack)).orElse(false);
+            return stack.left().map(itemStack -> getPrecision().areItemsSame(itemStack, otherStack, usesTag() ? tag : null)).orElse(false);
         }
         
         public boolean isFluid(Fluid fluid) {
@@ -259,16 +314,47 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         
         private void setPermutations() {
             stack.ifLeft(itemStack -> {
-                permutations = precision.getPermutations(itemStack);
+                permutations = computePermutations(itemStack);
                 if (permutations != null && permutations.length > 0) {
                     last = permutations.length - 1;
+                    current = 0;
                     cycleAt = -1;
                 }
             });
         }
-        
+
+        private ItemStack[] computePermutations(ItemStack itemStack) {
+            if (usesTag())
+                return tagPermutations(tag);
+            if (isTagPrecision())
+                return fuzzyPermutations(itemStack);
+            return precision.getPermutations(itemStack);
+        }
+
+        private static ItemStack[] tagPermutations(TagKey<Item> tag) {
+            return BuiltInRegistries.ITEM.getTag(tag)
+                    .map(holders -> holders.stream().map(holder -> new ItemStack(holder.value())).toArray(ItemStack[]::new))
+                    .orElse(new ItemStack[0]);
+        }
+
+        // A capped list of all items that share a tag with the selected item
+        private static ItemStack[] fuzzyPermutations(ItemStack itemStack) {
+            return itemStack.getTags()
+                    .map(BuiltInRegistries.ITEM::getTag)
+                    .filter(Optional::isPresent).map(Optional::get)
+                    .flatMap(HolderSet.Named::stream)
+                    .map(Holder::value)
+                    .distinct()
+                    .sorted(Comparator.comparing(item -> BuiltInRegistries.ITEM.getKey(item).toString()))
+                    .limit(FUZZY_CAP)
+                    .map(ItemStack::new)
+                    .toArray(ItemStack[]::new);
+        }
+
         public ItemStack getPermutatedItem() {
-            if (permutations == null && precision.hasPermutations())
+            if (!isCycling())
+                return stack.left().orElse(ItemStack.EMPTY);
+            if (permutations == null)
                 setPermutations();
             if (permutations == null || permutations.length < 2)
                 return stack.left().orElse(ItemStack.EMPTY);

@@ -23,8 +23,11 @@ import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.reputation.ReputationMarker;
 import hardcorequesting.common.util.WrappedText;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.io.IOException;
@@ -39,6 +42,8 @@ public class QuestTaskAdapter {
         private static final String FLUID = "fluid";
         private static final String REQUIRED = "required";
         private static final String PRECISION = "precision";
+        private static final String TAG = "tag";
+        private static final String CYCLE = "cycle";
     
         @Override
         public void write(JsonWriter out, ItemRequirementTask.Part value) throws IOException {
@@ -62,6 +67,10 @@ public class QuestTaskAdapter {
                 out.name(REQUIRED).value(required);
             if (precision != ItemPrecision.PRECISE)
                 out.name(PRECISION).value(ItemPrecision.getUniqueID(precision));
+            if (value.getTag() != null)
+                out.name(TAG).value(value.getTag().location().toString());
+            if (value.getCycleOverride() != null)
+                out.name(CYCLE).value(value.getCycleOverride());
             out.endObject();
         }
     
@@ -72,6 +81,8 @@ public class QuestTaskAdapter {
             FluidStack fluidVolume = null;
             int required = 1;
             ItemPrecision precision = ItemPrecision.PRECISE;
+            TagKey<Item> tag = null;
+            Boolean cycle = null;
             while (in.hasNext()) {
                 String next = in.nextName();
                 if (next.equalsIgnoreCase(ITEM)) {
@@ -85,6 +96,10 @@ public class QuestTaskAdapter {
                     if (itemPrecision != null) {
                         precision = itemPrecision;
                     }
+                } else if (next.equalsIgnoreCase(TAG)) {
+                    tag = TagKey.create(Registries.ITEM, new ResourceLocation(in.nextString()));
+                } else if (next.equalsIgnoreCase(CYCLE)) {
+                    cycle = in.nextBoolean();
                 }
             }
             in.endObject();
@@ -97,6 +112,9 @@ public class QuestTaskAdapter {
                 return null;
             }
             result.setPrecision(precision);
+            if (tag != null)
+                result.setTag(tag);
+            result.setCycleOverride(cycle);
             return result;
         }
     };

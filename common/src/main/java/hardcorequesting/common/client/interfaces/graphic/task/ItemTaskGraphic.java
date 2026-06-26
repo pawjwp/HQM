@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Either;
 import hardcorequesting.common.client.EditMode;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.interfaces.edit.ItemTagMenu;
 import hardcorequesting.common.client.interfaces.edit.PickItemMenu;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.network.GeneralUsage;
@@ -138,7 +139,7 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
                     list.add(Component.literal(entryId).withStyle(ChatFormatting.DARK_GRAY));
                 }
                 str.addAll(list);
-            }).ifLeft(itemStack -> str.addAll(Screen.getTooltipFromItem(Minecraft.getInstance(), itemStack)));
+            }).ifLeft(itemStack -> str.addAll(Screen.getTooltipFromItem(Minecraft.getInstance(), part.getPermutatedItem())));
         
             str.add(FormattedText.composite(Translator.translatable("hqm.questBook.itemRequirementProgress"), Translator.plain(": " + task.getProgress(playerId, id) + "/" + part.required)));
             if (part.hasItem() && Quest.canQuestsBeEdited()) {
@@ -194,7 +195,13 @@ public class ItemTaskGraphic extends ListTaskGraphic<ItemRequirementTask.Part> {
             lastClicked = tickCount;
         }
     
-        if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
+        if (gui.getCurrentMode() == EditMode.LOCATION) {
+            if (part.hasItem()) {
+                ItemTagMenu.display(gui, part.getStack(), part.getTag(), part.getPrecision(), part.getCycleOverride(),
+                        (tag, cycling) -> task.setTagInfo(id, tag, cycling));
+            }
+            return true;
+        } else if (gui.getCurrentMode() == EditMode.ITEM || doubleClick) {
             if (task.mayUseFluids()) {
                 PickItemMenu.display(gui, part.stack, PickItemMenu.Type.ITEM_FLUID, part.required, part.getPrecision(),
                         result -> task.setItem(result.get(), result.getAmount(), result.getPrecision(), id));

@@ -4,10 +4,14 @@ import com.google.common.collect.ImmutableList;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class ItemPrecision {
     
@@ -32,17 +36,27 @@ public abstract class ItemPrecision {
     public static final ItemPrecision TAG_NBT_FUZZY = new ItemPrecision("tagNbtFuzzy", true) {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            if (stack1.getItem() == stack2.getItem())
-                return true;
-            return stack1.getTags().anyMatch(stack2::is);
+            return same(stack1, stack2, null);
+        }
+
+        @Override
+        protected boolean same(ItemStack stack1, ItemStack stack2, @Nullable TagKey<Item> tag) {
+            boolean inTag = tag != null ? stack2.is(tag)
+                    : stack1.getItem() == stack2.getItem() || stack1.getTags().anyMatch(stack2::is);
+            return inTag && Objects.equals(stack1.getTag(), stack2.getTag());
         }
     };
     public static final ItemPrecision TAG_FUZZY = new ItemPrecision("tagFuzzy", true) {
         @Override
         protected boolean same(ItemStack stack1, ItemStack stack2) {
-            if (stack1.getItem() == stack2.getItem())
-                return true;
-            return stack1.getTags().anyMatch(stack2::is);
+            return same(stack1, stack2, null);
+        }
+
+        @Override
+        protected boolean same(ItemStack stack1, ItemStack stack2, @Nullable TagKey<Item> tag) {
+            if (tag != null)
+                return stack2.is(tag);
+            return stack1.getItem() == stack2.getItem() || stack1.getTags().anyMatch(stack2::is);
         }
     };
     private static final LinkedHashMap<String, ItemPrecision> precisionTypes;
@@ -120,8 +134,16 @@ public abstract class ItemPrecision {
     
     protected abstract boolean same(ItemStack stack1, ItemStack stack2);
     
+    protected boolean same(ItemStack stack1, ItemStack stack2, @Nullable TagKey<Item> tag) {
+        return same(stack1, stack2);
+    }
+
     public final boolean areItemsSame(ItemStack stack1, ItemStack stack2) {
-        return stack1.isEmpty() && stack2.isEmpty() || !stack1.isEmpty() && !stack2.isEmpty() && same(stack1, stack2);
+        return areItemsSame(stack1, stack2, null);
+    }
+
+    public final boolean areItemsSame(ItemStack stack1, ItemStack stack2, @Nullable TagKey<Item> tag) {
+        return stack1.isEmpty() && stack2.isEmpty() || !stack1.isEmpty() && !stack2.isEmpty() && same(stack1, stack2, tag);
     }
     
     @Override

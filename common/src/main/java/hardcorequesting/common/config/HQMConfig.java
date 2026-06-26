@@ -54,6 +54,9 @@ public class HQMConfig {
     @Comment("Settings related to messages sent from the server")
     //@Name("Message settings")
     public Message Message = new Message();
+    @Comment("Settings related to the quest book keybind")
+    //@Name("Keybind settings")
+    public Keybind Keybind = new Keybind();
     @Comment("Settings related to edit mode")
     //@Name("Editing settings")
     public Editing Editing = new Editing();
@@ -262,6 +265,15 @@ public class HQMConfig {
         public boolean OP_REMINDER = true;
     }
     
+    public static class Keybind {
+        //@Name("Require book in inventory")
+        @Comment("Require the player to have a quest book in their inventory to open it with the keybind")
+        public boolean REQUIRE_BOOK = false;
+        //@Name("Toggle book with keybind")
+        @Comment("Pressing the keybind while the book is already open closes it")
+        public boolean TOGGLE = false;
+    }
+
     public static class Editing {
         //@Name("Enable edit mode by default")
         @Comment("Set to true to automatically enable edit mode when entering worlds in single-player. Has no effect in multiplayer.")

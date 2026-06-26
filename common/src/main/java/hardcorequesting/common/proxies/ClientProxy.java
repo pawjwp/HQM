@@ -2,6 +2,7 @@ package hardcorequesting.common.proxies;
 
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.QuestBookKeyHandler;
 import hardcorequesting.common.client.interfaces.graphic.task.*;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.Quest;
@@ -16,7 +17,11 @@ public class ClientProxy extends CommonProxy {
     public void init() {
         super.init();
         Quest.clientTicker = new QuestTicker();
-        HardcoreQuestingCore.platform.registerOnClientTick(minecraftClient -> Quest.clientTicker.tick(minecraftClient.level, true));
+        QuestBookKeyHandler.register();
+        HardcoreQuestingCore.platform.registerOnClientTick(minecraftClient -> {
+            Quest.clientTicker.tick(minecraftClient.level, true);
+            QuestBookKeyHandler.handleTick(minecraftClient);
+        });
         ClientLifecycleEvent.CLIENT_SETUP.register(instance -> setupTaskGraphics());
     }
     

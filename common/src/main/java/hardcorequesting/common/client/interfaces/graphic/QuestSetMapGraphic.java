@@ -396,7 +396,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                             int color = Quest.canQuestsBeEdited() && (!child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache)) ? HQMConfig.dimmed(HQMConfig.MAP_CONNECTING_LINE) : HQMConfig.MAP_CONNECTING_LINE;
                             gui.drawLine(graphics, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                     gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
-                                    5,
+                                    HQMConfig.MAP_LINE_THICKNESS,
                                     color);
                         }
                     }
@@ -410,7 +410,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                         int color = !child.isVisible(player, isVisibleCache, isLinkFreeCache) || !parent.isVisible(player, isVisibleCache, isLinkFreeCache) ? HQMConfig.dimmed(HQMConfig.MAP_OPTION_LINK_LINE) : HQMConfig.MAP_OPTION_LINK_LINE;
                         gui.drawLine(graphics, gui.getLeft() + parent.getGuiCenterX(), gui.getTop() + parent.getGuiCenterY(),
                                 gui.getLeft() + child.getGuiCenterX(), gui.getTop() + child.getGuiCenterY(),
-                                5,
+                                HQMConfig.MAP_LINE_THICKNESS,
                                 color);
                     }
                 }

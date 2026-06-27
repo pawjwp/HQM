@@ -124,6 +124,8 @@ public class HQMConfig {
 
     public static int MAP_SPECIAL_SELECTED_MARKER = 0xfff8bbff;
 
+    public static float MAP_LINE_THICKNESS = 2;
+
     // Same RGB as the line color but with the dimming used for links to invisible quests.
     public static int dimmed(int color) {
         return (color & 0xFFFFFF) | 0x55000000;
@@ -199,6 +201,7 @@ public class HQMConfig {
             MAP_OPTION_LINK_LINE = Long.decode(m.OPTION_LINK_LINE.toLowerCase()).intValue();
             MAP_SELECTED_MARKER = Long.decode(m.SELECTED_MARKER.toLowerCase()).intValue();
             MAP_SPECIAL_SELECTED_MARKER = Long.decode(m.SPECIAL_SELECTED_MARKER.toLowerCase()).intValue();
+            MAP_LINE_THICKNESS = m.LINE_THICKNESS;
         } catch (NumberFormatException e) {
             HardcoreQuestingCore.LOGGER.error("Unable to parse map colours", e);
         }
@@ -340,6 +343,9 @@ public class HQMConfig {
             //@Name("Specially selected marker")
             @Comment("Use the HTML format with alpha, e.g.: #fff8bbff")
             public String SPECIAL_SELECTED_MARKER = "#fff8bbff";
+            //@Name("Line thickness")
+            @Comment("Thickness of the connecting lines in GUI-scaled pixels")
+            public float LINE_THICKNESS = 2;
         }
 
         public static class QuestSets {

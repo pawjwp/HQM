@@ -145,25 +145,28 @@ public class GuiBase extends Screen {
         graphics.renderTooltip(font, Language.getInstance().getVisualOrder((List<FormattedText>) stringRenderables), x, y);
     }
     
-    public void drawLine(GuiGraphics graphics, int x1, int y1, int x2, int y2, int thickness, int color) {
-        // This block was written with insufficient knowledge on normals, adapted so that the line shows up correctly
-        // Feel free to have the normals changed if you feel more knowledgeable on the subject
-        if (y2 < y1) {
-            drawLine(graphics, x2, y2, x1, y1, thickness, color);
-            return;
-        }
-        int dx = x2 - x1, dy = y2 - y1;
-        
+    // Draws a line as a filled quad
+    public void drawLine(GuiGraphics graphics, int x1, int y1, int x2, int y2, float thickness, int color) {
+        float dx = x2 - x1, dy = y2 - y1;
+        float len = (float) Math.sqrt(dx * dx + dy * dy);
+        if (len == 0) return;
+        // perpendicular vector scaled to half the thickness
+        float hx = -dy / len * thickness / 2F;
+        float hy = dx / len * thickness / 2F;
+
         applyColor(color);
-        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
-        float scale = (float) this.minecraft.getWindow().getGuiScale();
-        RenderSystem.lineWidth(1 + thickness * scale / 2F);
-    
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Matrix4f matrix = graphics.pose().last().pose();
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
-        builder.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
-        builder.vertex(graphics.pose().last().pose(), x1, y1, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
-        builder.vertex(graphics.pose().last().pose(), x2, y2, 0).color(255, 255, 255, 255).normal(dx, dy, 0.0F).endVertex();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        builder.vertex(matrix, x1 + hx, y1 + hy, 0).color(1F, 1F, 1F, 1F).endVertex();
+        builder.vertex(matrix, x2 + hx, y2 + hy, 0).color(1F, 1F, 1F, 1F).endVertex();
+        builder.vertex(matrix, x2 - hx, y2 - hy, 0).color(1F, 1F, 1F, 1F).endVertex();
+        builder.vertex(matrix, x1 - hx, y1 - hy, 0).color(1F, 1F, 1F, 1F).endVertex();
         tesselator.end();
     }
     

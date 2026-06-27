@@ -284,6 +284,26 @@ public class HQMConfig {
         //@Name("Enable edit mode by default")
         @Comment("Set to true to automatically enable edit mode when entering worlds in single-player. Has no effect in multiplayer.")
         public boolean USE_EDITOR = false;
+
+        //@Name("Snap quest markers to a grid")
+        @Comment("Snap quest markers to a grid when moving or creating them in the editor. Hold shift while dragging or placing to bypass snapping.")
+        public boolean SNAP_TO_GRID = false;
+
+        //@Name("Horizontal snap increment")
+        @Comment("Horizontal grid increment in pixels.")
+        public int SNAP_HORIZONTAL = 8;
+
+        //@Name("Vertical snap increment")
+        @Comment("Vertical grid increment in pixels.")
+        public int SNAP_VERTICAL = 9;
+
+        //@Name("Horizontal snap offset")
+        @Comment("Horizontal grid offset.")
+        public int SNAP_OFFSET_HORIZONTAL = 2;
+
+        //@Name("Vertical snap offset")
+        @Comment("Vertical grid offset.")
+        public int SNAP_OFFSET_VERTICAL = 0;
     }
 
     public static class Integration {

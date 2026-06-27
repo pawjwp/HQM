@@ -458,8 +458,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 case CREATE:
                     if (mX > 0) {
                         Quest newQuest = new Quest(WrappedText.create("Unnamed"), WrappedText.create("Unnamed quest"), 0, 0, false);
-                        newQuest.setGuiCenterX(mX);
-                        newQuest.setGuiCenterY(mY);
+                        applyCenter(newQuest, mX, mY);
                         newQuest.setQuestSet(set);
                         SaveHelper.add(EditType.QUEST_CREATE);
                     }
@@ -595,9 +594,24 @@ public class QuestSetMapGraphic extends EditableGraphic {
         super.onDrag(mX, mY, b);
     
         if (draggedQuest != null && Quest.canQuestsBeEdited() && this.gui.getCurrentMode() == EditMode.MOVE) {
-            draggedQuest.setGuiCenterX(mX);
-            draggedQuest.setGuiCenterY(mY);
+            applyCenter(draggedQuest, mX, mY);
         }
+    }
+
+    // Places a quest at the given coordinates, snapping to the grid unless shift is held down.
+    private void applyCenter(Quest quest, int mX, int mY) {
+        HQMConfig.Editing cfg = HQMConfig.getInstance().Editing;
+        if (cfg.SNAP_TO_GRID && !Screen.hasShiftDown()) {
+            mX = snap(mX, cfg.SNAP_HORIZONTAL, cfg.SNAP_OFFSET_HORIZONTAL);
+            mY = snap(mY, cfg.SNAP_VERTICAL, cfg.SNAP_OFFSET_VERTICAL);
+        }
+        quest.setGuiCenterX(mX);
+        quest.setGuiCenterY(mY);
+    }
+
+    private static int snap(int value, int increment, int offset) {
+        if (increment <= 0) return value;
+        return Math.round((float) (value - offset) / increment) * increment + offset;
     }
     
     @Override

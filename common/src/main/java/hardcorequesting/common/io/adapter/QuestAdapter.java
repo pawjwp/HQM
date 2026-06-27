@@ -164,8 +164,8 @@ public class QuestAdapter {
                     .add(UUID, src.getQuestId().toString())
                     .add(NAME, src.getRawName().toJson())
                     .add(DESCRIPTION, src.getDescription().toJson())
-                    .add(X, src.getGuiX())
-                    .add(Y, src.getGuiY())
+                    .add(X, src.getGuiCenterX())
+                    .add(Y, src.getGuiCenterY())
                     .use(builder -> {
                         if (src.useBigIcon())
                             builder.add(BIG_ICON, true);
@@ -284,6 +284,9 @@ public class QuestAdapter {
         private static final String DESCRIPTION = "description";
         private static final String QUESTS = "quests";
         private static final String REPUTATION_BAR = "reputationBar";
+        private static final String VERSION = "version";
+        // Increase whenever the format of a quest set changes
+        private static final int CURRENT_VERSION = 1;
         
         private QuestSet removeQuestsRaw(List<Quest> quests) {
             for (Quest quest : quests) {
@@ -295,6 +298,7 @@ public class QuestAdapter {
         @Override
         public JsonElement serialize(QuestSet src) {
             return object()
+                    .add(VERSION, CURRENT_VERSION)
                     .add(NAME, src.getRawName().toJson())
                     .add(QUESTS, array()
                             .use(builder -> {
@@ -323,11 +327,13 @@ public class QuestAdapter {
             List<Quest> quests = new ArrayList<>();
             JsonObject object = json.getAsJsonObject();
             
+            int version = GsonHelper.getAsInt(object, VERSION, 0);
             WrappedText name = WrappedText.fromJson(object.get(NAME), "Unnamed set", false);
             WrappedText description = WrappedText.fromJson(object.get(DESCRIPTION), "No description", false);
             for (JsonElement element : GsonHelper.getAsJsonArray(object, QUESTS)) {
                 Quest quest = QUEST_ADAPTER.fromJsonTree(element);
                 if (quest != null) {
+                    if (version < 1) quest.migrateLegacyGuiPosition();
                     quests.add(quest);
                 }
             }

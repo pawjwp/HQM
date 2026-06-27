@@ -387,16 +387,16 @@ public class Quest {
     
     //interface stuff
     public int getGuiX() {
-        return x;
+        return getGuiCenterX() - getGuiW() / 2;
     }
     
     public int getGuiY() {
-        return y;
+        return getGuiCenterY() - getGuiH() / 2;
     }
     
     @Environment(EnvType.CLIENT)
     public int getGuiU() {
-        return isBig ? GuiQuestBook.PAGE_WIDTH + 25 : GuiQuestBook.PAGE_WIDTH;
+        return isBig ? GuiQuestBook.PAGE_WIDTH + 25 : GuiQuestBook.PAGE_WIDTH - 1;
     }
     
     @Environment(EnvType.CLIENT)
@@ -404,28 +404,37 @@ public class Quest {
         return isEnabled(player) && isMouseInObject(x, y) ? getGuiH() : 0;
     }
     
+    // Size of the quest marker texture, slightly larger in case the icon is changed later.
+    // Small quest markers have a 1px buffer, big ones have a 2px buffer.
     public int getGuiW() {
-        return isBig ? 31 : 25;
+        return isBig ? 34 : 26;
     }
     
     public int getGuiH() {
-        return isBig ? 37 : 30;
+        return isBig ? 38 : 30;
     }
     
     public int getGuiCenterX() {
-        return getGuiX() + getGuiW() / 2;
+        return x;
     }
     
     public void setGuiCenterX(int x) {
-        this.x = x - getGuiW() / 2;
+        this.x = x;
     }
     
     public int getGuiCenterY() {
-        return getGuiY() + getGuiH() / 2;
+        return y;
     }
     
     public void setGuiCenterY(int y) {
-        this.y = y - getGuiH() / 2;
+        this.y = y;
+    }
+
+    // Quest sets saved before version 1 of the quest file store the top-left corner of the quest marker.
+    // This offsets the new coordinates so the marker stays in the same place but the coordinates saved to file get updated.
+    public void migrateLegacyGuiPosition() {
+        x += isBig ? 16 : 12;
+        y += isBig ? 19 : 15;
     }
     
     public Either<ItemStack, FluidStack> getIconStack() {
@@ -513,32 +522,26 @@ public class Quest {
     }
     
     @Environment(EnvType.CLIENT)
-    public boolean isMouseInObject(int x, int y) {
+    public boolean isMouseInObject(int mX, int mY) {
         //quick check
-        if (getGuiX() > x || x > getGuiX() + getGuiW() || getGuiY() > y || y > getGuiY() + getGuiH()) return false;
+        if (getGuiX() > mX || mX > getGuiX() + getGuiW() || getGuiY() > mY || mY > getGuiY() + getGuiH()) return false;
         
         
         //precise check
+        int cx = getGuiCenterX(), cy = getGuiCenterY();
+        int hw = isBig ? 14 : 11;   // half-width at the shoulders
+        int sy = isBig ? 8 : 7;     // shoulder offset from center
+        int ay = isBig ? 16 : 13;   // top/bottom apex offset from center
+
         Polygon poly = new Polygon();
+        poly.addPoint(cx - hw, cy - sy);
+        poly.addPoint(cx, cy - ay);
+        poly.addPoint(cx + hw, cy - sy);
+        poly.addPoint(cx + hw, cy + sy);
+        poly.addPoint(cx, cy + ay);
+        poly.addPoint(cx - hw, cy + sy);
         
-        if (isBig) {
-            poly.addPoint(getGuiX() + 1, getGuiY() + 10);
-            poly.addPoint(getGuiX() + 15, getGuiY() + 1);
-            poly.addPoint(getGuiX() + 30, getGuiY() + 10);
-            poly.addPoint(getGuiX() + 30, getGuiY() + 27);
-            poly.addPoint(getGuiX() + 15, getGuiY() + 36);
-            poly.addPoint(getGuiX() + 1, getGuiY() + 27);
-        } else {
-            poly.addPoint(getGuiX() + 1, getGuiY() + 8);
-            poly.addPoint(getGuiX() + 12, getGuiY() + 2);
-            poly.addPoint(getGuiX() + 23, getGuiY() + 8);
-            poly.addPoint(getGuiX() + 23, getGuiY() + 8);
-            poly.addPoint(getGuiX() + 23, getGuiY() + 21);
-            poly.addPoint(getGuiX() + 12, getGuiY() + 27);
-            poly.addPoint(getGuiX() + 1, getGuiY() + 21);
-        }
-        
-        return poly.contains(x, y);
+        return poly.contains(mX, mY);
     }
     
     public QuestData createData(int players) {

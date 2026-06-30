@@ -15,6 +15,18 @@ architectury {
     forge()
 }
 
+loom {
+    runs {
+        data {
+            data()
+            name "Data Generation"
+            programArgs("--all", "--mod", "hardcorequesting")
+            programArgs("--output", file("../common/src/generated/resources").absolutePath)
+            programArgs("--existing", file("../common/src/main/resources").absolutePath)
+        }
+    }
+}
+
 dependencies {
     forge "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 

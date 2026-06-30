@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "hardcorequesting:block/hqm_quest_tracker"
+  }
+}

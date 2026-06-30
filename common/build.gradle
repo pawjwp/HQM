@@ -19,3 +19,9 @@ dependencies {
 architectury {
     common("fabric", "forge")
 }
+
+sourceSets.main.resources { srcDir "src/generated/resources" }
+
+processResources {
+    exclude ".cache/**"
+}

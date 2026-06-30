@@ -1,0 +1,6 @@
+// 1.20.1	2026-06-29T21:34:46.1697041	Block States: hardcorequesting
+9a4448401e90f0dec9e8cef46114e8390b8bf80b assets/hardcorequesting/blockstates/item_barrel.json
+3bfa1f80bdaa6d03b922dcbd0eaab4975eb69a1d assets/hardcorequesting/blockstates/quest_tracker.json
+b7cc66b58b83c870d53c947561a2e9de63ffd5a2 assets/hardcorequesting/models/block/item_barrel.json
+2824510b0a7044875a27748f02a9cb5e90e156b0 assets/hardcorequesting/models/block/item_barrel_empty.json
+b00d2467377806a1a99a24ad2b77df9fc08e91c5 assets/hardcorequesting/models/block/quest_tracker.json

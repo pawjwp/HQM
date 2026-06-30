@@ -1,0 +1,4 @@
+{
+  "type": "minecraft:block",
+  "random_sequence": "hardcorequesting:blocks/quest_tracker"
+}

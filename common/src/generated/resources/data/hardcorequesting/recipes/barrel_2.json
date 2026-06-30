@@ -1,0 +1,24 @@
+{
+  "type": "hardcorequesting:book_catalyst_shaped",
+  "category": "misc",
+  "key": {
+    "g": {
+      "item": "minecraft:glass"
+    },
+    "q": {
+      "item": "hardcorequesting:enabled_quest_book"
+    },
+    "w": {
+      "tag": "minecraft:planks"
+    }
+  },
+  "pattern": [
+    "wgw",
+    "gqg",
+    "wgw"
+  ],
+  "result": {
+    "item": "hardcorequesting:item_barrel"
+  },
+  "show_notification": true
+}

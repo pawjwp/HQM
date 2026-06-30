@@ -9,7 +9,7 @@ public abstract class ItemInfo {
     
     //--Information for the Hearts
     public static final String HEART_UNLOCALIZED_NAME = "hearts";
-    public static final String[] HEART_ICONS = {"quarterheart", "halfheart", "threequarts", "heart", "rottenheart"};
+    public static final String[] HEART_ICONS = {"quarterheart", "halfheart", "threequartsheart", "heart", "rottenheart"};
     
     //--Information for the Bags
     public static final String BAG_UNLOCALIZED_NAME = "bags";

@@ -68,7 +68,7 @@ public class ReputationBar {
         if (reputation == null) return;
         
         gui.applyColor(0xFFFFFFFF);
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(gui.getMapTexture());
     
         FormattedText info = reputation.drawAndGetTooltip(graphics, gui, this.x, this.y, mX, mY, null, playerId, false, null, null, false, null, null, false);
         

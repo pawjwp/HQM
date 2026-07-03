@@ -37,6 +37,7 @@ public class GuiBase extends Screen {
     public static final int ITEM_SIZE = 18;
     protected static final int ITEM_SRC_Y = 235;
     protected int left, top;
+    protected ResourceLocation mapTexture = MAP_TEXTURE;
     
     protected GuiBase(Component title) {
         super(title);
@@ -213,9 +214,9 @@ public class GuiBase extends Screen {
     public void drawItemBackground(GuiGraphics graphics, int x, int y, int mX, int mY, boolean selected) {
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 
-        drawRect(graphics, MAP_TEXTURE, x, y, inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? ITEM_SIZE : 0, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
+        drawRect(graphics, mapTexture, x, y, inBounds(x, y, ITEM_SIZE, ITEM_SIZE, mX, mY) ? ITEM_SIZE : 0, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
         if (selected) {
-            drawRect(graphics, MAP_TEXTURE, x, y, ITEM_SIZE * 2, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
+            drawRect(graphics, mapTexture, x, y, ITEM_SIZE * 2, ITEM_SRC_Y, ITEM_SIZE, ITEM_SIZE);
         }
     }
     
@@ -245,6 +246,10 @@ public class GuiBase extends Screen {
         graphics.renderItemDecorations(font, stack, getLeft() + x, getTop() + y);
     }
     
+    public ResourceLocation getMapTexture() {
+        return mapTexture;
+    }
+
     public int getLeft() {
         return left;
     }

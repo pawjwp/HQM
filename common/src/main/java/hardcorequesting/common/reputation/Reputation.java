@@ -106,7 +106,7 @@ public class Reputation {
         FormattedText error = getError();
         
         if (error != null) {
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
+            gui.drawRect(graphics, gui.getMapTexture(), x + BAR_X, y + BAR_Y, BAR_SRC_X, BAR_SRC_Y, BAR_WIDTH, BAR_HEIGHT);
             gui.drawString(graphics, error, x + TEXT_X, y + TEXT_Y, 0.7F, 0xff5555);
             return;
         }
@@ -176,7 +176,7 @@ public class Reputation {
             selectedSrcY = BAR_SRC_Y;
         }
         
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + BAR_X, y + BAR_Y, BAR_SRC_X, normalSrcY, BAR_WIDTH, BAR_HEIGHT);
+        gui.drawRect(graphics, gui.getMapTexture(), x + BAR_X, y + BAR_Y, BAR_SRC_X, normalSrcY, BAR_WIDTH, BAR_HEIGHT);
         if (effects) {
             int leftX = getPointerPosition(lowerValue, lowerOnMarker);
             if (lowerMoved) {
@@ -186,7 +186,7 @@ public class Reputation {
             if (upperMoved) {
                 rightX -= upperMovedInner ? 1 : ARROW_MARKER_OFFSET;
             }
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + BAR_X + leftX, y + BAR_Y, BAR_SRC_X + leftX, selectedSrcY, rightX - leftX, BAR_HEIGHT);
+            gui.drawRect(graphics, gui.getMapTexture(), x + BAR_X + leftX, y + BAR_Y, BAR_SRC_X + leftX, selectedSrcY, rightX - leftX, BAR_HEIGHT);
         }
         
         for (int i = 0; i < markers.size(); i++) {
@@ -201,7 +201,7 @@ public class Reputation {
             }
             
             boolean selected = markers.get(i).equals(active) || (effects && ((lowerValue <= value && value <= upperValue) != inverted));
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, markerX, markerY, srcX, ARROW_SRC_Y + (selected ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), markerX, markerY, srcX, ARROW_SRC_Y + (selected ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
         }
         
         ReputationMarker current = null;
@@ -338,7 +338,7 @@ public class Reputation {
         if (gui.inBounds(pointerX, pointerY, ARROW_SIZE, ARROW_SIZE, mX, mY)) {
             srcX += ARROW_SIZE;
         }
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, pointerX, pointerY, srcX, ARROW_SRC_Y + (selectedTexture ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
+        gui.drawRect(graphics, gui.getMapTexture(), pointerX, pointerY, srcX, ARROW_SRC_Y + (selectedTexture ? -ARROW_SIZE : 0), ARROW_SIZE, ARROW_SIZE);
     }
     
     @Environment(EnvType.CLIENT)

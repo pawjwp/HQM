@@ -125,17 +125,17 @@ public class ReputationTaskPartMenu extends GuiEditMenu {
             
             gui.drawString(graphics, Translator.translatable("hqm.repSetting.lower"), BARS_X, LOWER_Y, HQMConfig.TEXT_NORMAL);
             gui.applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(gui.getMapTexture());
             FormattedText info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, LOWER_Y + BAR_OFFSET_Y, mX, mY, null, playerId, false, null, null, false, lower, lower == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(lower.getLabel()), false);
             
             gui.drawString(graphics, Translator.translatable("hqm.repSetting.upper"), BARS_X, UPPER_Y, HQMConfig.TEXT_NORMAL);
             gui.applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(gui.getMapTexture());
             info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, UPPER_Y + BAR_OFFSET_Y, mX, mY, info, playerId, false, null, null, false, upper, upper == null ? FormattedText.EMPTY : Translator.text("Selected: ").append(upper.getLabel()), false);
             
             gui.drawString(graphics, Translator.translatable("hqm.repSetting.preview"), BARS_X, RESULT_Y, HQMConfig.TEXT_NORMAL);
             gui.applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(gui.getMapTexture());
             info = reputation.drawAndGetTooltip(graphics, gui, BARS_X, RESULT_Y + BAR_OFFSET_Y, mX, mY, info, playerId, true, lower, upper, inverted, null, null, false);
             
             

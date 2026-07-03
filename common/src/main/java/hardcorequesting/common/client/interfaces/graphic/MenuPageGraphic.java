@@ -171,7 +171,7 @@ public class MenuPageGraphic extends EditableGraphic {
         
         for (Reputation reputation : reputationDisplayScroll.getVisibleEntries()) {
             gui.applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(gui.getMapTexture());
             info = reputation.drawAndGetTooltip(graphics, gui, INFO_LEFT_X + INFO_REPUTATION_OFFSET_X, repY,
                     mX, mY, info, playerId, false, null, null, false, null, null, false);
             repY += REPUTATION_OFFSET_Y;

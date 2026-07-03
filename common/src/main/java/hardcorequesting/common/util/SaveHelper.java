@@ -82,14 +82,14 @@ public final class SaveHelper {
     @Environment(EnvType.CLIENT)
     public static void render(GuiGraphics graphics, GuiQuestBook gui, int mX, int mY) {
         if (isLarge) {
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, X, Y, SRC_X, SRC_Y, WIDTH, HEIGHT);
+            gui.drawRect(graphics, gui.getMapTexture(), X, Y, SRC_X, SRC_Y, WIDTH, HEIGHT);
         } else {
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, X, Y, SMALL_SRC_X, SMALL_SRC_Y, SMALL_SIZE, SMALL_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), X, Y, SMALL_SRC_X, SMALL_SRC_Y, SMALL_SIZE, SMALL_SIZE);
         }
         
         int indexX = isLarge ? 0 : 1;
         int indexY = gui.inBounds(X + CHANGE_X, Y + CHANGE_Y, CHANGE_SIZE, CHANGE_SIZE, mX, mY) ? 1 : 0;
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, X + CHANGE_X, Y + CHANGE_Y, CHANGE_SRC_X + indexX * CHANGE_SIZE, SRC_Y + indexY * CHANGE_SIZE, CHANGE_SIZE, CHANGE_SIZE);
+        gui.drawRect(graphics, gui.getMapTexture(), X + CHANGE_X, Y + CHANGE_Y, CHANGE_SRC_X + indexX * CHANGE_SIZE, SRC_Y + indexY * CHANGE_SIZE, CHANGE_SIZE, CHANGE_SIZE);
         
         if (isLarge) {
             if (total == 0) {
@@ -118,7 +118,7 @@ public final class SaveHelper {
             }
         } else {
             int index = inSaveBounds(gui, mX, mY) ? 1 : 0;
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, X + SAVE_X, Y + SAVE_Y, SAVE_SRC_X + index * SAVE_SIZE, SRC_Y, SAVE_SIZE, SAVE_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), X + SAVE_X, Y + SAVE_Y, SAVE_SRC_X + index * SAVE_SIZE, SRC_Y, SAVE_SIZE, SAVE_SIZE);
         }
     }
     

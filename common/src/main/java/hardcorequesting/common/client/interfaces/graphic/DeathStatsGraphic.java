@@ -93,8 +93,8 @@ public class DeathStatsGraphic extends Graphic {
                 int x = i % 3;
                 int y = i / 3;
                 
-                gui.drawRect(graphics, GuiBase.MAP_TEXTURE, TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
-                gui.drawRect(graphics, GuiBase.MAP_TEXTURE, TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
+                gui.drawRect(graphics, gui.getMapTexture(), TYPE_LOCATION_X + TYPE_SPACING_X * x, TYPE_LOCATION_Y + TYPE_SPACING_Y * y, BACKGROUND_SRC_X, BACKGROUND_SRC_Y, BACKGROUND_SIZE, BACKGROUND_SIZE);
+                gui.drawRect(graphics, gui.getMapTexture(), TYPE_LOCATION_X + TYPE_SPACING_X * x + ICON_OFFSET, TYPE_LOCATION_Y + TYPE_SPACING_Y * y + ICON_OFFSET, ICON_SRC_X + ICON_SIZE * x, ICON_SRC_Y + ICON_SIZE * y, ICON_SIZE, ICON_SIZE);
             }
             
             gui.drawString(graphics, stats.getName(), PLAYER_INFO_X, PLAYER_INFO_Y, HQMConfig.TEXT_NORMAL);

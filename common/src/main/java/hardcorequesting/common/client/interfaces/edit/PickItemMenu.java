@@ -129,7 +129,7 @@ public class PickItemMenu<T> extends GuiEditMenu {
         int srcX = ARROW_SRC_X + (left ? 0 : ARROW_W);
         int srcY = ARROW_SRC_Y + (inArrowBounds(gui, mX, mY, left) ? clicked ? 1 : 2 : 0) * ARROW_H;
         
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
+        gui.drawRect(graphics, gui.getMapTexture(), left ? ARROW_X_LEFT : ARROW_X_RIGHT, ARROW_Y, srcX, srcY, ARROW_W, ARROW_H);
     }
     
     private boolean usePrecision() {

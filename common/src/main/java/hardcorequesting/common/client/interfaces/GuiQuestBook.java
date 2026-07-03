@@ -1,5 +1,6 @@
 package hardcorequesting.common.client.interfaces;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.BookPage;
@@ -49,11 +50,12 @@ public class GuiQuestBook extends GuiBase {
     private static final int MENU_ARROW_WIDTH = 14;
     private static final int MENU_ARROW_HEIGHT = 9;
     //endregion
-    private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource("book");
     //the page is static to keep the same page loaded when the book is reopened
     @NotNull
     private static BookPage page = BookPage.MainPage.INSTANCE;
     private Graphic pageGraphic;
+    protected final BookTheme theme;
+    protected ResourceLocation background;
     public final boolean isOpBook;
     private final Player player;
     public QuestSet modifyingQuestSet;
@@ -78,9 +80,16 @@ public class GuiQuestBook extends GuiBase {
     }
     
     private GuiQuestBook(Player player, boolean isOpBook) {
+        this(player, isOpBook, BookTheme.DEFAULT);
+    }
+
+    protected GuiQuestBook(Player player, boolean isOpBook, BookTheme theme) {
         super(CommonComponents.EMPTY);
         this.player = player;
         this.isOpBook = isOpBook;
+        this.theme = theme;
+        this.mapTexture = theme.map;
+        this.background = theme.background;
     }
     
     public static void resetBookPosition() {
@@ -140,13 +149,20 @@ public class GuiQuestBook extends GuiBase {
         
         applyColor(0xFFFFFFFF);
 
-        drawRect(graphics, BG_TEXTURE, 0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
-        ResourceHelper.bindResource(BG_TEXTURE);
-        drawRect(graphics, PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
-        
+        if (theme.fullSpread) {
+            // Blend on so the texture's antialiased (partially transparent) edge pixels composite correctly.
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
+            graphics.blit(background, left, top, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT, theme.sheetSize, theme.sheetSize);
+        } else {
+            drawRect(graphics, background, 0, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT);
+            ResourceHelper.bindResource(background);
+            drawRect(graphics, PAGE_WIDTH, 0, 0, 0, PAGE_WIDTH, TEXTURE_HEIGHT, RenderRotation.FLIP_HORIZONTAL);
+        }
+
         if (Quest.canQuestsBeEdited()) {
             applyColor(0xFFFFFFFF);
-            ResourceHelper.bindResource(MAP_TEXTURE);
+            ResourceHelper.bindResource(mapTexture);
             SaveHelper.render(graphics, this, x, y);
         }
         
@@ -155,10 +171,10 @@ public class GuiQuestBook extends GuiBase {
         applyColor(0xFFFFFFFF);
 
         if (shouldDisplayBackArrow()) {
-            drawRect(graphics, MAP_TEXTURE, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inBackArrowBounds(x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
+            drawRect(graphics, mapTexture, BACK_ARROW_X, BACK_ARROW_Y, BACK_ARROW_SRC_X + (inBackArrowBounds(x, y) ? BACK_ARROW_WIDTH : 0), BACK_ARROW_SRC_Y, BACK_ARROW_WIDTH, BACK_ARROW_HEIGHT);
         }
         if (shouldDisplayMenuArrow()) {
-            drawRect(graphics, MAP_TEXTURE, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inMenuArrowBounds(x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
+            drawRect(graphics, mapTexture, MENU_ARROW_X, MENU_ARROW_Y, MENU_ARROW_SRC_X + (inMenuArrowBounds(x, y) ? MENU_ARROW_WIDTH : 0), MENU_ARROW_SRC_Y, MENU_ARROW_WIDTH, MENU_ARROW_HEIGHT);
         }
         
         if (editMenu == null) {

@@ -60,8 +60,8 @@ public class EditButton {
     @Environment(EnvType.CLIENT)
     public void draw(GuiQuestBook gui, GuiGraphics graphics, int mX, int mY) {
         int srcY = gui.getCurrentMode() == mode ? 2 : gui.inBounds(x, y, BUTTON_SIZE, BUTTON_SIZE, mX, mY) ? 1 : 0;
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + 2, y + 2,
+        gui.drawRect(graphics, gui.getMapTexture(), x, y, 256 - BUTTON_SIZE, srcY * BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+        gui.drawRect(graphics, gui.getMapTexture(), x + 2, y + 2,
                 BUTTON_ICON_SRC_X + (mode.ordinal() % EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SRC_Y + (mode.ordinal() / EDIT_BUTTONS_SRC_PER_ROW) * BUTTON_ICON_SIZE,
                 BUTTON_ICON_SIZE, BUTTON_ICON_SIZE);

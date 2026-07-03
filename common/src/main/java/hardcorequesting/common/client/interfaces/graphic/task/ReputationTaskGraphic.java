@@ -57,7 +57,7 @@ public class ReputationTaskGraphic extends ListTaskGraphic<ReputationTask.Part> 
         gui.applyColor(0xFFFFFFFF);
 
         if (part.getReputation() == null) {
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
+            gui.drawRect(graphics, gui.getMapTexture(), x + Reputation.BAR_X, y + Reputation.BAR_Y, Reputation.BAR_SRC_X, Reputation.BAR_SRC_Y, Reputation.BAR_WIDTH, Reputation.BAR_HEIGHT);
         } else {
             part.getReputation().draw(graphics, gui, x, y, mX, mY, shouldShowPlayer() ? playerId : null, true, part.getLower(), part.getUpper(), part.isInverted(), null, null, task.isCompleted(playerId));
         }

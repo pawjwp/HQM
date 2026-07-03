@@ -128,7 +128,7 @@ public class PickMobMenu extends GuiEditMenu {
     public void draw(GuiGraphics graphics, int mX, int mY) {
         super.draw(graphics, mX, mY);
         
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(gui.getMapTexture());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
         int mobY = START_Y;

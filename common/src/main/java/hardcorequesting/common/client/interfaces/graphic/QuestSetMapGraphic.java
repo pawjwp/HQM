@@ -431,7 +431,7 @@ public class QuestSetMapGraphic extends EditableGraphic {
                 else color = quest.getColorFilter(player, gui.getTick());
                 
                 gui.applyColor(color);
-                gui.drawRect(graphics, GuiBase.MAP_TEXTURE, quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
+                gui.drawRect(graphics, gui.getMapTexture(), quest.getGuiX(), quest.getGuiY(), quest.getGuiU(), quest.getGuiV(player, x, y), quest.getGuiW(), quest.getGuiH());
                 
                 int iconX = quest.getGuiCenterX() - 8;
                 int iconY = quest.getGuiCenterY() - 8;

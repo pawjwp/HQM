@@ -72,7 +72,7 @@ public abstract class LargeButton implements Drawable, Clickable {
         if (isVisible()) {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             boolean enabled = isEnabled();
-            this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+            this.gui.drawRect(graphics, gui.getMapTexture(), x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
             this.gui.drawCenteredString(graphics, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? HQMConfig.TEXT_NORMAL : 0xA0A070);
         }
     }

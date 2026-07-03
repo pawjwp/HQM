@@ -253,7 +253,7 @@ public class TeamMenuGraphic extends Graphic {
         
         super.draw(graphics, mX, mY);
         
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(gui.getMapTexture());
         
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
@@ -319,11 +319,11 @@ public class TeamMenuGraphic extends Graphic {
     
             int infoY = getInfoY();
             
-            ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+            ResourceHelper.bindResource(gui.getMapTexture());
             
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), INFO_BOX_X, infoY, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), INFO_BOX_X, infoY + REWARD_SETTING_Y, INFO_BOX_SRC_X, INFO_BOX_SRC_Y, INFO_BOX_SIZE, INFO_BOX_SIZE);
             
             gui.drawString(graphics, Translator.translatable("hqm.party.lifeSetting", shownTeam.getLifeSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + INFO_BOX_TEXT_OFFSET_Y, 0.7F, HQMConfig.TEXT_NORMAL);
             gui.drawString(graphics, Translator.translatable("hqm.party.rewardSetting", shownTeam.getRewardSetting().getTitle()), INFO_BOX_X + INFO_BOX_TEXT_OFFSET_X, infoY + REWARD_SETTING_Y + INFO_BOX_TEXT_OFFSET_Y, 0.7F, HQMConfig.TEXT_NORMAL);

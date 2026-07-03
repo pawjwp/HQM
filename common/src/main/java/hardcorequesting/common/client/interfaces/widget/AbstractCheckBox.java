@@ -42,7 +42,7 @@ public abstract class AbstractCheckBox implements Drawable, Clickable {
         
         gui.applyColor(0xFFFFFFFF);
 
-        gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
+        gui.drawRect(graphics, gui.getMapTexture(), x, y, CHECK_BOX_SRC_X + (selected ? CHECK_BOX_SIZE : 0), CHECK_BOX_SRC_Y + (hover ? CHECK_BOX_SIZE : 0), CHECK_BOX_SIZE, CHECK_BOX_SIZE);
         gui.drawString(graphics, cached, x + 12, y + 2, 0.7F, HQMConfig.TEXT_NORMAL);
     }
     

@@ -175,8 +175,8 @@ public class QuestRewardsGraphic extends Graphic {
             
             int y = getRepIconY();
             foregroundIndex += 3;
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, REPUTATION_X, y, REPUTATION_SRC_X + backgroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
-            gui.drawRect(graphics, GuiBase.MAP_TEXTURE, REPUTATION_X, y, REPUTATION_SRC_X + foregroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), REPUTATION_X, y, REPUTATION_SRC_X + backgroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
+            gui.drawRect(graphics, gui.getMapTexture(), REPUTATION_X, y, REPUTATION_SRC_X + foregroundIndex * REPUTATION_SIZE, REPUTATION_SRC_Y, REPUTATION_SIZE, REPUTATION_SIZE);
         }
     }
     

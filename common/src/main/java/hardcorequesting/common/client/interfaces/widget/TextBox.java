@@ -91,10 +91,10 @@ public class TextBox {
     protected void draw(GuiGraphics graphics, boolean selected, int mX, int mY) {
         checkCursor();
         
-        ResourceHelper.bindResource(GuiQuestBook.MAP_TEXTURE);
+        ResourceHelper.bindResource(gui.getMapTexture());
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         
-        this.gui.drawRect(graphics, GuiBase.MAP_TEXTURE, x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mX, mY) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
+        this.gui.drawRect(graphics, gui.getMapTexture(), x, y, TEXT_BOX_SRC_X, TEXT_BOX_SRC_Y + (selected || inBounds(mX, mY) ? TEXT_BOX_HEIGHT : 0), TEXT_BOX_WIDTH, TEXT_BOX_HEIGHT);
         this.gui.drawString(graphics, visibleText, x + 3, y + offsetY, scale, HQMConfig.TEXT_NORMAL);
         
         if (selected) {

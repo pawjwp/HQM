@@ -55,6 +55,10 @@ public class HQMJeiPlugin implements IModPlugin {
     }
 
     private static IGuiProperties getGuiProperties(GuiQuestBook screen) {
+        // Return null to avoid error logging
+        if (screen.width <= 0 || screen.height <= 0) {
+            return null;
+        }
         if (HQMConfig.getInstance().Integration.SHOW_JEI_SIDEBAR) {
             int left = (screen.width - GuiQuestBook.TEXTURE_WIDTH) / 2;
             int top = (screen.height - GuiQuestBook.TEXTURE_HEIGHT) / 2;

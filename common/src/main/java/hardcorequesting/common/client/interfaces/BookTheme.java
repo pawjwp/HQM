@@ -7,7 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 // Set of textures used by the quest book GUI
 @Environment(EnvType.CLIENT)
 public enum BookTheme {
-    DEFAULT("book", "questmap", false, 256);
+    DEFAULT("book", "questmap", false, 256),
+    MAT("mat", "mat_questmap", true, 512);
 
     // Texture for the background image
     public final ResourceLocation background;

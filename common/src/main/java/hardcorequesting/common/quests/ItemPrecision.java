@@ -165,6 +165,10 @@ public abstract class ItemPrecision {
     public boolean hasPermutations() {
         return hasPermutations;
     }
+
+    public boolean isTagBased() {
+        return this == TAG_FUZZY || this == TAG_NBT_FUZZY;
+    }
     
     public ItemStack[] getPermutations(ItemStack stack) {
         return new ItemStack[0];

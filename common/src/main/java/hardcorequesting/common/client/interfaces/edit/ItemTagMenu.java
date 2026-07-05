@@ -85,11 +85,6 @@ public class ItemTagMenu extends GuiEditMenu {
                 shownTags.add(tag);
             }
         }
-        Collections.sort(shownTags);
-    }
-
-    private boolean isTagPrecision() {
-        return precision == ItemPrecision.TAG_FUZZY || precision == ItemPrecision.TAG_NBT_FUZZY;
     }
 
     private boolean effectiveCycling() {
@@ -140,7 +135,7 @@ public class ItemTagMenu extends GuiEditMenu {
 
         gui.drawString(graphics, Translator.translatable("hqm.itemTagMenu.clear").withStyle(gui.inBounds(INFO_X, CLEAR_Y, LIST_WIDTH, 8, mX, mY) ? ChatFormatting.WHITE : ChatFormatting.GRAY), INFO_X, CLEAR_Y, 0.7F, HQMConfig.TEXT_NORMAL);
 
-        if (!isTagPrecision()) {
+        if (!precision.isTagBased()) {
             List<FormattedText> hint = gui.getLinesFromText(Translator.translatable("hqm.itemTagMenu.notTagPrecision"), 0.7F, LIST_WIDTH);
             gui.drawString(graphics, hint, INFO_X, 100, 0.7F, ChatFormatting.RED.getColor());
         }

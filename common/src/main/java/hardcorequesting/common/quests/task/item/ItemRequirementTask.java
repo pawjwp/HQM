@@ -260,12 +260,8 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
             permutations = null;
         }
 
-        private boolean isTagPrecision() {
-            return precision == ItemPrecision.TAG_FUZZY || precision == ItemPrecision.TAG_NBT_FUZZY;
-        }
-
         public boolean usesTag() {
-            return tag != null && isTagPrecision();
+            return tag != null && precision.isTagBased();
         }
 
         public boolean isCycling() {
@@ -326,7 +322,7 @@ public abstract class ItemRequirementTask extends QuestTask<ItemsTaskData> {
         private ItemStack[] computePermutations(ItemStack itemStack) {
             if (usesTag())
                 return tagPermutations(tag);
-            if (isTagPrecision())
+            if (precision.isTagBased())
                 return fuzzyPermutations(itemStack);
             return precision.getPermutations(itemStack);
         }

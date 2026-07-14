@@ -29,6 +29,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -87,6 +90,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     private final DeferredRegister<Item> item = DeferredRegister.create(ForgeRegistries.ITEMS, HardcoreQuestingCore.ID);
     private final DeferredRegister<RecipeSerializer<?>> recipe = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, HardcoreQuestingCore.ID);
     private final DeferredRegister<BlockEntityType<?>> tileEntityType = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, HardcoreQuestingCore.ID);
+    private final DeferredRegister<MenuType<?>> menu = DeferredRegister.create(ForgeRegistries.MENU_TYPES, HardcoreQuestingCore.ID);
     
     public HardcoreQuestingForge() {
         EventBuses.registerModEventBus(HardcoreQuestingCore.ID, FMLJavaModLoadingContext.get().getModEventBus());
@@ -99,6 +103,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         item.register(FMLJavaModLoadingContext.get().getModEventBus());
         recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
+        menu.register(FMLJavaModLoadingContext.get().getModEventBus());
         MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
             if (event.getEntity() instanceof Player player) {
                 if (player instanceof FakePlayer
@@ -353,5 +358,10 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public Supplier<CreativeModeTab> registerTab(String id, Supplier<CreativeModeTab> supplier) {
         return tab.register(id, supplier);
+    }
+
+    @Override
+    public <T extends AbstractContainerMenu> Supplier<MenuType<T>> registerMenu(String id, MenuType.MenuSupplier<T> factory) {
+        return menu.register(id, () -> new MenuType<>(factory, FeatureFlags.VANILLA_SET));
     }
 }

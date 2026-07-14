@@ -54,6 +54,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -304,5 +307,13 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
         ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
         Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, location, tab.get());
         return () -> BuiltInRegistries.CREATIVE_MODE_TAB.get(location);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends AbstractContainerMenu> Supplier<MenuType<T>> registerMenu(String id, MenuType.MenuSupplier<T> factory) {
+        ResourceLocation location = new ResourceLocation(HardcoreQuestingCore.ID, id);
+        Registry.register(BuiltInRegistries.MENU, location, new MenuType<>(factory, FeatureFlags.VANILLA_SET));
+        return () -> (MenuType<T>) BuiltInRegistries.MENU.get(location);
     }
 }

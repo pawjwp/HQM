@@ -1,4 +1,4 @@
-// 1.20.1	2026-06-29T21:34:46.1717035	Item Models: hardcorequesting
+// 1.20.1	2026-07-02T15:21:25.6606735	Item Models: hardcorequesting
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/basic_bag.json
 61985e1ac52a80303379cd5befa9fc7a40dfbe72 assets/hardcorequesting/models/item/enabled_quest_book.json
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/epic_bag.json
@@ -9,6 +9,7 @@
 09fe72509a4dab2f18148630bdd31724734b7443 assets/hardcorequesting/models/item/hqm_invalid_item.json
 ea1ce32c9935d4147d2071b7cdb2432c4b20f5e9 assets/hardcorequesting/models/item/item_barrel.json
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/legendary_bag.json
+e47f13cb96dc55828a1972eb0595c2724bd22d57 assets/hardcorequesting/models/item/mat.json
 e87927d3f48c784ef26e50c542a6fb56160c29f1 assets/hardcorequesting/models/item/quarterheart.json
 9c9e81bf4a1c74a8509f747170fcb32f8bee37b5 assets/hardcorequesting/models/item/quest_book.json
 61413a1f69df64f7d10141218d9194a637a4a70f assets/hardcorequesting/models/item/quest_tracker.json

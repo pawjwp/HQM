@@ -5,13 +5,14 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.world.entity.player.Player;
 
 // Clientside MAT opening for certain modes
 @Environment(EnvType.CLIENT)
 public class MatScreens {
-    public static void open(Player player, MatMode mode) {
+    public static void open(Player player, MatMode mode, CompoundTag payload) {
         if (player == null) return;
         closeOpenContainer();
         if (mode == MatMode.QUEST) {

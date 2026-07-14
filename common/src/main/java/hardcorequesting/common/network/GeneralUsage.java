@@ -8,6 +8,7 @@ import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMode;
+import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -86,7 +87,7 @@ public enum GeneralUsage {
     MAT_OPEN {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            MatScreens.open(player, MatMode.fromId(nbt.getInt("Mode")));
+            MatScreens.open(player, MatMode.fromId(nbt.getInt("Mode")), nbt);
         }
     },
     OPEN_MAT_MODE {
@@ -97,7 +98,26 @@ public enum GeneralUsage {
             if (nbt.getBoolean("SetDefault")) {
                 MatHandler.setDefaultMode(player, mode);
             }
-            MatHandler.openMatMode(player, mode);
+            MatHandler.openMatMode(player, mode, nbt.getBoolean("Dock"));
+        }
+    },
+    MAT_DATA_SYNC {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
+            if (data != null) data.matData.fromNBT(nbt.getCompound("Data"));
+        }
+    },
+    MAT_SELECT_LOCATION {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
+            if (data == null) return;
+            int index = nbt.getInt("Index");
+            MatPlayerData mat = data.matData;
+            if (index < 0 || index >= mat.locations.size()) return;
+            mat.selectedLocation = mat.selectedLocation == index ? -1 : index;
+            if (player instanceof ServerPlayer serverPlayer) sendMatDataSync(serverPlayer);
         }
     };
     
@@ -110,18 +130,46 @@ public enum GeneralUsage {
 
     // server -> client
     public static void sendOpenMat(Player player, MatMode mode) {
-        CompoundTag nbt = new CompoundTag();
+        sendOpenMat(player, mode, new CompoundTag());
+    }
+
+    // server -> client
+    public static void sendOpenMat(Player player, MatMode mode, CompoundTag extra) {
+        CompoundTag nbt = extra.copy();
         nbt.putInt("Mode", mode.getId());
         MAT_OPEN.sendMessageToPlayer(nbt, player);
+    }
+
+    // server -> client
+    public static void sendMatDataSync(ServerPlayer player) {
+        MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+        CompoundTag nbt = new CompoundTag();
+        nbt.put("Data", mat.toNBT());
+        MAT_DATA_SYNC.sendMessageToPlayer(nbt, player);
     }
 
     // client -> server
     @Environment(EnvType.CLIENT)
     public static void sendOpenMatMode(MatMode mode, boolean setDefault) {
+        sendOpenMatMode(mode, setDefault, false);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendOpenMatMode(MatMode mode, boolean setDefault, boolean dock) {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("Mode", mode.getId());
         nbt.putBoolean("SetDefault", setDefault);
+        nbt.putBoolean("Dock", dock);
         OPEN_MAT_MODE.sendMessageToServer(nbt);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendMatSelectLocation(int index) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("Index", index);
+        MAT_SELECT_LOCATION.sendMessageToServer(nbt);
     }
     
     // client -> server

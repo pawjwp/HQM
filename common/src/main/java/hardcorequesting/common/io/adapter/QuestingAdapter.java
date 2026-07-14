@@ -1,9 +1,12 @@
 package hardcorequesting.common.io.adapter;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import hardcorequesting.common.bag.GroupData;
+import hardcorequesting.common.items.mat.MatPlayerData;
+import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.Team;
@@ -24,7 +27,8 @@ public class QuestingAdapter {
         public static final String KEY_SELECTED_QUEST = "selectedQuest";
         public static final String KEY_PLAYER_LORE = "playedLore";
         public static final String KEY_RECEIVED_BOOK = "receivedBook";
-        
+        public static final String KEY_MAT = "mat";
+
         @Override
         public JsonElement serialize(QuestingData src) {
             return object()
@@ -35,6 +39,7 @@ public class QuestingAdapter {
                     .add(KEY_SELECTED_QUEST, src.selectedQuestId != null ? src.selectedQuestId.toString() : null)
                     .add(KEY_PLAYER_LORE, src.playedLore)
                     .add(KEY_RECEIVED_BOOK, src.receivedBook)
+                    .add(KEY_MAT, serializeMat(src.matData))
                     .add(KEY_GROUP_DATA, object()
                             .use(builder -> {
                                 for (Map.Entry<UUID, GroupData> entry : src.getGroupData().entrySet())
@@ -43,6 +48,41 @@ public class QuestingAdapter {
                             })
                             .build())
                     .build();
+        }
+
+        private JsonElement serializeMat(MatPlayerData mat) {
+            JsonArray locations = new JsonArray();
+            for (TrackedLocation location : mat.locations) locations.add(location.toJson());
+            return object()
+                    .add("unlockedTutorials", stringArray(mat.unlockedTutorials))
+                    .add("completedTutorials", stringArray(mat.completedTutorials))
+                    .add("tutorialSeen", mat.matTutorialSeen)
+                    .add("unlockedStats", stringArray(mat.unlockedStats))
+                    .add("locations", locations)
+                    .add("selectedLocation", mat.selectedLocation)
+                    .add("dock", MinecraftAdapter.ITEM_STACK.serialize(mat.dockedTerminal))
+                    .build();
+        }
+
+        private JsonArray stringArray(Iterable<String> values) {
+            JsonArray array = new JsonArray();
+            for (String value : values) array.add(value);
+            return array;
+        }
+
+        private void deserializeMat(JsonObject object, MatPlayerData mat) {
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, "unlockedTutorials", new JsonArray()))
+                mat.unlockedTutorials.add(element.getAsString());
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, "completedTutorials", new JsonArray()))
+                mat.completedTutorials.add(element.getAsString());
+            mat.matTutorialSeen = GsonHelper.getAsBoolean(object, "tutorialSeen", false);
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, "unlockedStats", new JsonArray()))
+                mat.unlockedStats.add(element.getAsString());
+            for (JsonElement element : GsonHelper.getAsJsonArray(object, "locations", new JsonArray()))
+                mat.locations.add(TrackedLocation.fromJson(element.getAsJsonObject()));
+            mat.selectedLocation = GsonHelper.getAsInt(object, "selectedLocation", -1);
+            if (object.has("dock"))
+                mat.dockedTerminal = MinecraftAdapter.ITEM_STACK.deserialize(object.get("dock"));
         }
         
         @Override
@@ -70,6 +110,8 @@ public class QuestingAdapter {
             if (teamId.equals(Util.NIL_UUID))
                 questingData.setTeam(team);
             questingData.setName(GsonHelper.getAsString(object, KEY_NAME, null));
+            if (object.has(KEY_MAT))
+                deserializeMat(GsonHelper.getAsJsonObject(object, KEY_MAT), questingData.matData);
             return questingData;
         }
     };

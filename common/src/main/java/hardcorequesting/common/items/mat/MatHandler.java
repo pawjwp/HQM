@@ -47,6 +47,10 @@ public class MatHandler {
     }
 
     public static void openMatMode(Player player, MatMode mode) {
+        openMatMode(player, mode, false);
+    }
+
+    public static void openMatMode(Player player, MatMode mode, boolean dock) {
         if (!HQMConfig.getInstance().MAT.ENABLE_MAT || !mode.isEnabled()) {
             return;
         }

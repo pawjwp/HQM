@@ -7,6 +7,7 @@ import hardcorequesting.common.bag.LootGroup;
 import hardcorequesting.common.client.sounds.SoundHandler;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.LivesUpdate;
 import hardcorequesting.common.quests.data.QuestData;
@@ -32,6 +33,7 @@ public class QuestingData {
     public int selectedTask = -1;
     public boolean playedLore;
     public boolean receivedBook;
+    public final MatPlayerData matData = new MatPlayerData();
     private Team team;
     private int lives;
     private UUID playerId;

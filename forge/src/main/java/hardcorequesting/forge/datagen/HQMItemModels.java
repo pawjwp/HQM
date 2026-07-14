@@ -28,6 +28,17 @@ public class HQMItemModels extends ItemModelProvider {
         baseItem("quest_book", "hqm_quest_book");
         baseItem("enabled_quest_book", "hqm_quest_book_op");
         baseItem("hqm_invalid_item", "hqm_invalid_item");
+
+        matModels();
+    }
+
+    // Generate the MAT model, a three-layer file where the top two layers
+    // are recolored based on the current mode (see ClientProxy#setupMat)
+    private void matModels() {
+        withExistingParent("mat", modLoc("item/base_item"))
+                .texture("layer0", modLoc("item/mat"))
+                .texture("layer1", modLoc("item/mat_screen_base"))
+                .texture("layer2", modLoc("item/mat_screen_overlay"));
     }
 
     private void baseItem(String name, String texture) {

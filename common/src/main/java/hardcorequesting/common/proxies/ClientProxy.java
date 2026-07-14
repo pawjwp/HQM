@@ -1,9 +1,13 @@
 package hardcorequesting.common.proxies;
 
 import dev.architectury.event.events.client.ClientLifecycleEvent;
+import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.QuestBookKeyHandler;
 import hardcorequesting.common.client.interfaces.graphic.task.*;
+import hardcorequesting.common.items.MatItem;
+import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestTicker;
@@ -22,9 +26,24 @@ public class ClientProxy extends CommonProxy {
             Quest.clientTicker.tick(minecraftClient.level, true);
             QuestBookKeyHandler.handleTick(minecraftClient);
         });
-        ClientLifecycleEvent.CLIENT_SETUP.register(instance -> setupTaskGraphics());
+        ClientLifecycleEvent.CLIENT_SETUP.register(instance -> {
+            setupTaskGraphics();
+            setupMat();
+        });
     }
-    
+
+    private static void setupMat() {
+        // Tints the MAT item similar to spawn egg tinting
+        // Layer 0 (mat.png) is untinted
+        // Layer 1 (mat_screen_base.png) uses the mode's base color
+        // Layer 2 (mat_screen_overlay.png) uses the mode's overlay color
+        ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
+            if (tintIndex == 0) return 0xFFFFFFFF;
+            MatMode mode = MatItem.getMode(stack);
+            return 0xFF000000 | (tintIndex == 1 ? mode.getBaseColor() : mode.getOverlayColor());
+        }, ModItems.mat.get());
+    }
+
     // Has to be done after our task types have been initialized, so we do this at the client setup event
     private static void setupTaskGraphics() {
         TaskGraphics.register(TaskType.CHECKBOX.get(), CheckBoxTaskGraphic::new);

@@ -11,5 +11,10 @@ import net.minecraft.world.entity.player.Player;
 public class MatScreens {
     public static void open(Player player, MatMode mode) {
         if (player == null) return;
+        if (mode == MatMode.QUEST) {
+            GuiMatQuestBook.displayGui(player);
+        } else {
+            Minecraft.getInstance().setScreen(new GuiMatPlaceholder(player, mode));
+        }
     }
 }

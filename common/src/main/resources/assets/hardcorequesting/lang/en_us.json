@@ -115,6 +115,8 @@
   "hqm.mat.mode.crafting": "Crafting",
   "hqm.mat.mode.tracking": "Tracking",
   "hqm.mat.mode.storage": "Storage",
+  "hqm.mat.wip": "Work in progress",
+  "container.hardcorequesting.mat.crafting": "Crafting",
   "_comment": "======================================",
   "_comment": "QUESTS",
   "_comment": "======================================",

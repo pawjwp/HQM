@@ -1,5 +1,7 @@
 package hardcorequesting.common.items.mat;
 
+import hardcorequesting.common.config.HQMConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,5 +59,17 @@ public enum MatMode {
     // Fill color of the mode's tablet screen (and tab fill), 0xRRGGBB.
     public int getOverlayColor() {
         return overlayColor;
+    }
+
+    // Whether this mode is turned on in the config.
+    public boolean isEnabled() {
+        HQMConfig.MAT cfg = HQMConfig.getInstance().MAT;
+        return switch (this) {
+            case DEFAULT -> cfg.ENABLE_DEFAULT;
+            case QUEST -> cfg.ENABLE_QUEST;
+            case CRAFTING -> cfg.ENABLE_CRAFTING;
+            case TRACKING -> cfg.ENABLE_TRACKING;
+            case STORAGE -> cfg.ENABLE_STORAGE;
+        };
     }
 }

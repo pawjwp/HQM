@@ -63,6 +63,9 @@ public class HQMConfig {
     @Comment("Settings related to item viewer integration (JEI/EMI)")
     //@Name("Integration settings")
     public Integration Integration = new Integration();
+    @Comment("Settings related to the Multipurpose Assistance Terminal (MAT)")
+    //@Name("MAT settings")
+    public MAT MAT = new MAT();
     
     public static int OVERLAY_XPOS;
     
@@ -310,6 +313,21 @@ public class HQMConfig {
         //@Name("Show JEI sidebar")
         @Comment("Set to true to show JEI's item list sidebar next to the quest book. Has no effect on EMI, which never shows its sidebar here.")
         public boolean SHOW_JEI_SIDEBAR = false;
+    }
+
+    public static class MAT {
+        @Comment("Enable the Multipurpose Assistance Terminal (MAT). When disabled, the item is non-functional.")
+        public boolean ENABLE_MAT = true;
+        @Comment("Enable the Default mode tab")
+        public boolean ENABLE_DEFAULT = true;
+        @Comment("Enable the Quest mode tab")
+        public boolean ENABLE_QUEST = true;
+        @Comment("Enable the Crafting mode tab")
+        public boolean ENABLE_CRAFTING = true;
+        @Comment("Enable the Tracking mode tab")
+        public boolean ENABLE_TRACKING = true;
+        @Comment("Enable the Storage mode tab")
+        public boolean ENABLE_STORAGE = true;
     }
     
     public static class Interface {

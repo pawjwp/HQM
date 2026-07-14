@@ -33,4 +33,29 @@ public enum MatMode {
         this.baseColor = baseColor;
         this.overlayColor = overlayColor;
     }
+
+    public int getId() {
+        return id;
+    }
+
+    // Translation key for the mode name ("Default", "Questing", "Crafting", etc.)
+    // This is used for the item name, tab name, and keybind name.
+    public String getNameKey() {
+        return nameKey;
+    }
+
+    // Name (under textures/gui) of this mode's screen background.
+    public String getBackgroundName() {
+        return backgroundName;
+    }
+
+    // Border/outline color of the mode's tablet screen (and tab border), 0xRRGGBB.
+    public int getBaseColor() {
+        return baseColor;
+    }
+
+    // Fill color of the mode's tablet screen (and tab fill), 0xRRGGBB.
+    public int getOverlayColor() {
+        return overlayColor;
+    }
 }

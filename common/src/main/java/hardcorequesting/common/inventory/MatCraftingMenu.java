@@ -7,7 +7,9 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-// A retextured copy of the vanilla CraftingMenu with a tab bar
+/**
+ * A retextured copy of the vanilla CraftingMenu with a tab bar
+ */
 public class MatCraftingMenu extends CraftingMenu {
     public MatCraftingMenu(int containerId, Inventory playerInventory) {
         super(containerId, playerInventory);

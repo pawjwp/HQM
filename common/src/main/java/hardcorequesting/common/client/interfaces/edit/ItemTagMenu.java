@@ -24,8 +24,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-// A menu to pick the specific tag on an item task with tag precision.
-// Includes a list with all tags the selected item belongs to.
+/**
+ * A menu to pick the specific tag on an item task with tag precision.
+ * Includes a list with all tags the selected item belongs to.
+ */
 public class ItemTagMenu extends GuiEditMenu {
 
     private static final int START_X = 20;

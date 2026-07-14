@@ -15,8 +15,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 
-// MAT (Multipurpose Assistance Terminal) item
-// ENABLE_MAT must be enabled to use it
+/**
+ * MAT (Multipurpose Assistance Terminal) item
+ * ENABLE_MAT must be enabled to use it
+ */
 public class MatItem extends Item {
     private static final String TAG_MODE = "Mode";
 

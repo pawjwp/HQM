@@ -15,7 +15,9 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-// Functions for getting/setting/opening the MAT mode
+/**
+ * Functions for getting/setting/opening the MAT mode
+ */
 public class MatHandler {
 
     public static boolean hasMat(Player player) {

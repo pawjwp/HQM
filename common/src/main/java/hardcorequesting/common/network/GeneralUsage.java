@@ -2,9 +2,11 @@ package hardcorequesting.common.network;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.GuiReward;
+import hardcorequesting.common.client.interfaces.mat.MatScreens;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -79,6 +81,12 @@ public enum GeneralUsage {
                 player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
             }
         }
+    },
+    MAT_OPEN {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            MatScreens.open(player, MatMode.fromId(nbt.getInt("Mode")));
+        }
     };
     
     // server -> client
@@ -86,6 +94,13 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putBoolean("OP", op);
         BOOK_OPEN.sendMessageToPlayer(nbt, player);
+    }
+
+    // server -> client
+    public static void sendOpenMat(Player player, MatMode mode) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("Mode", mode.getId());
+        MAT_OPEN.sendMessageToPlayer(nbt, player);
     }
     
     // client -> server

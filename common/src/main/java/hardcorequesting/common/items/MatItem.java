@@ -1,6 +1,7 @@
 package hardcorequesting.common.items;
 
 import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMode;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -50,6 +51,7 @@ public class MatItem extends Item {
                         0.4F, 0.5F + 0.1F * mode.getId());
             } else {
                 // Open MAT if not holding shift
+                MatHandler.openMatMode(player, getMode(stack));
             }
             return InteractionResultHolder.success(stack);
         }

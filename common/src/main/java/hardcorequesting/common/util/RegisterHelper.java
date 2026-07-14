@@ -2,6 +2,7 @@ package hardcorequesting.common.util;
 
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
+import hardcorequesting.common.inventory.ModMenus;
 import hardcorequesting.common.items.ModCreativeTabs;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.crafting.ModRecipes;
@@ -34,6 +35,7 @@ public class RegisterHelper {
         ModBlocks.init();
         ModBlocks.registerTileEntities();
         ModItems.init();
+        ModMenus.init();
         ModRecipes.init();
     }
     

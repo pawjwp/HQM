@@ -8,7 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 @Environment(EnvType.CLIENT)
 public enum BookTheme {
     DEFAULT("book", "questmap", false, 256),
-    MAT("mat", "mat_questmap", true, 512);
+    MAT("mat_mode_questing", "mat_questmap", true, 512);
 
     // Texture for the background image
     public final ResourceLocation background;

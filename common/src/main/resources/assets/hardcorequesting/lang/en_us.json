@@ -92,6 +92,7 @@
   "item.hardcorequesting.enabled_quest_book": "Quest Book - OP Edition",
   "item.hqm:quest_book_1.useAs": "Use book as: %s",
   "item.hqm:quest_book_1.invalid": "Invalid book!",
+  "item.hardcorequesting.mat": "Multipurpose Assistance Terminal (%s Mode)",
   "item.hardcorequesting.quarterheart": "Quarter of a heart",
   "item.hardcorequesting.halfheart": "Half a heart",
   "item.hardcorequesting.threequartsheart": "Three quarters of a heart",

@@ -72,4 +72,29 @@ public enum MatMode {
             case STORAGE -> cfg.ENABLE_STORAGE;
         };
     }
+
+    // The next enabled mode after this one, wrapping around. Falls back to this mode if no others are enabled.
+    public MatMode nextEnabled() {
+        MatMode[] values = values();
+        for (int i = 1; i <= values.length; i++) {
+            MatMode candidate = values[(ordinal() + i) % values.length];
+            if (candidate.isEnabled()) return candidate;
+        }
+        return this;
+    }
+
+    public static MatMode fromId(int id) {
+        for (MatMode mode : values()) {
+            if (mode.id == id) return mode;
+        }
+        return DEFAULT;
+    }
+
+    public static List<MatMode> enabledModes() {
+        List<MatMode> modes = new ArrayList<>();
+        for (MatMode mode : values()) {
+            if (mode.isEnabled()) modes.add(mode);
+        }
+        return modes;
+    }
 }

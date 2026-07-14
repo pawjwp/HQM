@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 public class ModItems {
     public static Supplier<QuestBookItem> book;
     public static Supplier<QuestBookItem> enabledBook;
+    public static Supplier<MatItem> mat;
     public static Supplier<BagItem> basicBag;
     public static Supplier<BagItem> goodBag;
     public static Supplier<BagItem> greaterBag;
@@ -25,6 +26,7 @@ public class ModItems {
     public static void init() {
         book = RegisterHelper.registerItem("quest_book", () -> new QuestBookItem(false));
         enabledBook = RegisterHelper.registerItem("enabled_quest_book", () -> new QuestBookItem(true));
+        mat = RegisterHelper.registerItem("mat", () -> new MatItem());
         basicBag = RegisterHelper.registerItem("basic_bag", () -> new BagItem(BagTier.BASIC));
         goodBag = RegisterHelper.registerItem("good_bag", () -> new BagItem(BagTier.GOOD));
         greaterBag = RegisterHelper.registerItem("greater_bag", () -> new BagItem(BagTier.GREATER));

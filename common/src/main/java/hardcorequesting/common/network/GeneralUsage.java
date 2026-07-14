@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.mat.MatScreens;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
@@ -87,6 +88,17 @@ public enum GeneralUsage {
         public void receiveData(Player player, CompoundTag nbt) {
             MatScreens.open(player, MatMode.fromId(nbt.getInt("Mode")));
         }
+    },
+    OPEN_MAT_MODE {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (!MatHandler.hasMat(player)) return;
+            MatMode mode = MatMode.fromId(nbt.getInt("Mode"));
+            if (nbt.getBoolean("SetDefault")) {
+                MatHandler.setDefaultMode(player, mode);
+            }
+            MatHandler.openMatMode(player, mode);
+        }
     };
     
     // server -> client
@@ -101,6 +113,15 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("Mode", mode.getId());
         MAT_OPEN.sendMessageToPlayer(nbt, player);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendOpenMatMode(MatMode mode, boolean setDefault) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("Mode", mode.getId());
+        nbt.putBoolean("SetDefault", setDefault);
+        OPEN_MAT_MODE.sendMessageToServer(nbt);
     }
     
     // client -> server

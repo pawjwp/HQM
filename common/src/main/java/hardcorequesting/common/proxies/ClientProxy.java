@@ -2,9 +2,12 @@ package hardcorequesting.common.proxies;
 
 import dev.architectury.event.events.client.ClientLifecycleEvent;
 import dev.architectury.registry.client.rendering.ColorHandlerRegistry;
+import dev.architectury.registry.menu.MenuRegistry;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.QuestBookKeyHandler;
 import hardcorequesting.common.client.interfaces.graphic.task.*;
+import hardcorequesting.common.client.interfaces.mat.MatCraftingScreen;
+import hardcorequesting.common.inventory.ModMenus;
 import hardcorequesting.common.items.MatItem;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.mat.MatMode;
@@ -42,6 +45,7 @@ public class ClientProxy extends CommonProxy {
             MatMode mode = MatItem.getMode(stack);
             return 0xFF000000 | (tintIndex == 1 ? mode.getBaseColor() : mode.getOverlayColor());
         }, ModItems.mat.get());
+        MenuRegistry.registerScreenFactory(ModMenus.matCrafting.get(), MatCraftingScreen::new);
     }
 
     // Has to be done after our task types have been initialized, so we do this at the client setup event

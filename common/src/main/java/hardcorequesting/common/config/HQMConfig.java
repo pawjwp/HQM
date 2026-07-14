@@ -328,6 +328,8 @@ public class HQMConfig {
         public boolean ENABLE_TRACKING = true;
         @Comment("Enable the Storage mode tab")
         public boolean ENABLE_STORAGE = true;
+        @Comment("If true, switching tabs in the MAT UI will also change the mode currently selected on the MAT item")
+        public boolean TABS_SWITCH_DEFAULT_MODE = false;
     }
     
     public static class Interface {

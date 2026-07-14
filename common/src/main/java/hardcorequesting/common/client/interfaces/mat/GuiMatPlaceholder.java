@@ -19,11 +19,13 @@ import net.minecraft.world.entity.player.Player;
 @Environment(EnvType.CLIENT)
 public class GuiMatPlaceholder extends GuiBase {
     private final MatMode mode;
+    private final MatTabBar tabBar;
     private final ResourceLocation background;
 
     public GuiMatPlaceholder(Player player, MatMode mode) {
         super(CommonComponents.EMPTY);
         this.mode = mode;
+        this.tabBar = new MatTabBar(mode, GuiQuestBook.TEXTURE_WIDTH);
         this.mapTexture = BookTheme.MAT.map;
         this.background = ResourceHelper.getResource(mode.getBackgroundName());
     }
@@ -45,6 +47,18 @@ public class GuiMatPlaceholder extends GuiBase {
                 1F, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT, HQMConfig.TEXT_NORMAL);
         drawCenteredString(graphics, Translator.translatable("hqm.mat.wip"), 0, font.lineHeight,
                 1F, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT, HQMConfig.TEXT_HINT);
+
+        // Render tab bar
+        tabBar.render(graphics, left, top, mouseX, mouseY);
+        tabBar.renderTooltip(graphics, left, top, mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (tabBar.mouseClicked(left, top, mouseX, mouseY)) {
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override

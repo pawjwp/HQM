@@ -20,6 +20,7 @@ public class MatCraftingScreen extends CraftingScreen {
     private static final int SHEET_SIZE = 256;
     // Distance from the panel top to the start of the vanilla screen
     private static final int HEADER_H = 34;
+    private final MatTabBar tabBar = new MatTabBar(MatMode.CRAFTING, PANEL_W);
 
     public MatCraftingScreen(CraftingMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -49,5 +50,16 @@ public class MatCraftingScreen extends CraftingScreen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
+        // Render tab bar
+        tabBar.render(graphics, panelLeft(), panelTop(), mouseX, mouseY);
+        tabBar.renderTooltip(graphics, panelLeft(), panelTop(), mouseX, mouseY);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (tabBar.mouseClicked(panelLeft(), panelTop(), mouseX, mouseY)) {
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 }

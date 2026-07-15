@@ -2,6 +2,7 @@ package hardcorequesting.common.network;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.GuiReward;
+import hardcorequesting.common.client.interfaces.MatUnlockToast;
 import hardcorequesting.common.client.interfaces.mat.MatScreens;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
@@ -119,6 +120,15 @@ public enum GeneralUsage {
             mat.selectedLocation = mat.selectedLocation == index ? -1 : index;
             if (player instanceof ServerPlayer serverPlayer) sendMatDataSync(serverPlayer);
         }
+    },
+    MAT_UNLOCK_TOAST {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            ItemStack icon = ItemStack.of(nbt.getCompound("Icon"));
+            Component title = Component.Serializer.fromJson(nbt.getString("Title"));
+            Component message = nbt.contains("Message") ? Component.Serializer.fromJson(nbt.getString("Message")) : null;
+            MatUnlockToast.show(icon, title, message);
+        }
     };
     
     // server -> client
@@ -146,6 +156,15 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.put("Data", mat.toNBT());
         MAT_DATA_SYNC.sendMessageToPlayer(nbt, player);
+    }
+
+    // server -> client
+    public static void sendMatUnlockToast(ServerPlayer player, ItemStack icon, Component title, Component message) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.put("Icon", icon.save(new CompoundTag()));
+        nbt.putString("Title", Component.Serializer.toJson(title));
+        if (message != null) nbt.putString("Message", Component.Serializer.toJson(message));
+        MAT_UNLOCK_TOAST.sendMessageToPlayer(nbt, player);
     }
 
     // client -> server

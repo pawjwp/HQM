@@ -330,6 +330,8 @@ public class HQMConfig {
         public boolean ENABLE_STORAGE = true;
         @Comment("If true, switching tabs in the MAT UI will also change the mode currently selected on the MAT item")
         public boolean TABS_SWITCH_DEFAULT_MODE = false;
+        @Comment("Radius in blocks that are scanned for the MAT's life sign statistics")
+        public int LIFE_SIGNS_RADIUS = 64;
     }
     
     public static class Interface {

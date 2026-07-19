@@ -40,6 +40,13 @@ public class LocationResolver {
         });
     }
 
+    // Turns a biome command argument into a predicate matching that biome key/tag.
+    public static Predicate<Holder<Biome>> biomePredicate(ResourceOrTagKeyArgument.Result<Biome> biome) {
+        return biome.unwrap().map(
+                (ResourceKey<Biome> key) -> holder -> holder.is(key),
+                (TagKey<Biome> tag) -> holder -> holder.is(tag));
+    }
+
     // Based on LocateCommand's locateStructure function
     public static Optional<TrackedLocation> nearestStructure(ServerLevel serverlevel, HolderSet<Structure> holderset, BlockPos blockpos, String name) {
         Pair<BlockPos, Holder<Structure>> pair = serverlevel.getChunkSource().getGenerator().findNearestMapStructure(serverlevel, holderset, blockpos, MAX_STRUCTURE_SEARCH_RADIUS, false);

@@ -2,6 +2,9 @@ package hardcorequesting.common.items;
 
 
 import hardcorequesting.common.bag.BagTier;
+import hardcorequesting.common.items.datachip.LocationDataChipItem;
+import hardcorequesting.common.items.datachip.StatisticDataChipItem;
+import hardcorequesting.common.items.datachip.TutorialDataChipItem;
 import hardcorequesting.common.util.RegisterHelper;
 
 import java.util.function.Supplier;
@@ -10,6 +13,9 @@ public class ModItems {
     public static Supplier<QuestBookItem> book;
     public static Supplier<QuestBookItem> enabledBook;
     public static Supplier<MatItem> mat;
+    public static Supplier<TutorialDataChipItem> tutorialDataChip;
+    public static Supplier<StatisticDataChipItem> statisticDataChip;
+    public static Supplier<LocationDataChipItem> locationDataChip;
     public static Supplier<BagItem> basicBag;
     public static Supplier<BagItem> goodBag;
     public static Supplier<BagItem> greaterBag;
@@ -27,6 +33,9 @@ public class ModItems {
         book = RegisterHelper.registerItem("quest_book", () -> new QuestBookItem(false));
         enabledBook = RegisterHelper.registerItem("enabled_quest_book", () -> new QuestBookItem(true));
         mat = RegisterHelper.registerItem("mat", () -> new MatItem());
+        tutorialDataChip = RegisterHelper.registerItem("tutorial_data_chip", () -> new TutorialDataChipItem());
+        statisticDataChip = RegisterHelper.registerItem("statistic_data_chip", () -> new StatisticDataChipItem());
+        locationDataChip = RegisterHelper.registerItem("location_data_chip", () -> new LocationDataChipItem());
         basicBag = RegisterHelper.registerItem("basic_bag", () -> new BagItem(BagTier.BASIC));
         goodBag = RegisterHelper.registerItem("good_bag", () -> new BagItem(BagTier.GOOD));
         greaterBag = RegisterHelper.registerItem("greater_bag", () -> new BagItem(BagTier.GREATER));

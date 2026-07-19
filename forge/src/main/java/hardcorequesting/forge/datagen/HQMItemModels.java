@@ -29,6 +29,11 @@ public class HQMItemModels extends ItemModelProvider {
         baseItem("enabled_quest_book", "hqm_quest_book_op");
         baseItem("hqm_invalid_item", "hqm_invalid_item");
 
+        // Data chips
+        baseItem("tutorial_data_chip", "tutorial_data_chip");
+        baseItem("statistic_data_chip", "statistic_data_chip");
+        baseItem("location_data_chip", "location_data_chip");
+
         matModels();
     }
 

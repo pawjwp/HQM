@@ -30,6 +30,7 @@ public class CommandHandler {
         SUB_COMMANDS.put("enable", new EnableSubCommand());
         SUB_COMMANDS.put("version", new VersionSubCommand());
         SUB_COMMANDS.put("reset", new ResetPlayerSubCommand());
+        SUB_COMMANDS.put("mat", new MatSubCommand());
     }
     
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {

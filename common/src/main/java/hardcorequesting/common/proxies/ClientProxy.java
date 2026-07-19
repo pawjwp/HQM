@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.mat.MatCraftingScreen;
 import hardcorequesting.common.inventory.ModMenus;
 import hardcorequesting.common.items.MatItem;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.datachip.DataChipItem;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.PacketContext;
 import hardcorequesting.common.quests.Quest;
@@ -45,6 +46,14 @@ public class ClientProxy extends CommonProxy {
             MatMode mode = MatItem.getMode(stack);
             return 0xFF000000 | (tintIndex == 1 ? mode.getBaseColor() : mode.getOverlayColor());
         }, ModItems.mat.get());
+
+        // Data chips tint the same way but without using NBT
+        ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
+            if (tintIndex == 0) return 0xFFFFFFFF;
+            DataChipItem chip = (DataChipItem) stack.getItem();
+            return 0xFF000000 | (tintIndex == 1 ? chip.getBaseColor() : chip.getOverlayColor());
+        }, ModItems.tutorialDataChip.get(), ModItems.statisticDataChip.get(), ModItems.locationDataChip.get());
+
         MenuRegistry.registerScreenFactory(ModMenus.matCrafting.get(), MatCraftingScreen::new);
     }
 

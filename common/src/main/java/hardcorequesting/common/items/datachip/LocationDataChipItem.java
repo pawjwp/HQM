@@ -1,6 +1,7 @@
 package hardcorequesting.common.items.datachip;
 
 import hardcorequesting.common.items.mat.LocationResolver;
+import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.TrackedLocation;
 import net.fabricmc.api.EnvType;
@@ -22,6 +23,10 @@ import java.util.List;
  * NBT can also include the optional "Name" and "Dimension" fields.
  */
 public class LocationDataChipItem extends DataChipItem {
+
+    public LocationDataChipItem() {
+        super(MatMode.TRACKING);
+    }
 
     @Override
     protected boolean apply(ServerPlayer player, ItemStack stack) {

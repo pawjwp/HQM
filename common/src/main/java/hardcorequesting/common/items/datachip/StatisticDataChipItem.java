@@ -1,5 +1,6 @@
 package hardcorequesting.common.items.datachip;
 
+import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.StatKey;
 import net.fabricmc.api.EnvType;
@@ -17,6 +18,10 @@ import java.util.List;
  */
 
 public class StatisticDataChipItem extends DataChipItem {
+
+    public StatisticDataChipItem() {
+        super(MatMode.DEFAULT);
+    }
 
     @Override
     protected boolean apply(ServerPlayer player, ItemStack stack) {

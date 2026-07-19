@@ -29,10 +29,10 @@ public class HQMItemModels extends ItemModelProvider {
         baseItem("enabled_quest_book", "hqm_quest_book_op");
         baseItem("hqm_invalid_item", "hqm_invalid_item");
 
-        // Data chips
-        baseItem("tutorial_data_chip", "tutorial_data_chip");
-        baseItem("statistic_data_chip", "statistic_data_chip");
-        baseItem("location_data_chip", "location_data_chip");
+        // Data chips share the same three-layer model, recolored in ClientProxy
+        dataChipModel("tutorial_data_chip");
+        dataChipModel("statistic_data_chip");
+        dataChipModel("location_data_chip");
 
         matModels();
     }
@@ -44,6 +44,15 @@ public class HQMItemModels extends ItemModelProvider {
                 .texture("layer0", modLoc("item/mat"))
                 .texture("layer1", modLoc("item/mat_screen_base"))
                 .texture("layer2", modLoc("item/mat_screen_overlay"));
+    }
+
+    // Generate the MAT model, a three-layer file where the top two layers
+    // are recolored based on the current mode (see ClientProxy#setupMat)
+    private void dataChipModel(String name) {
+        withExistingParent(name, modLoc("item/base_item"))
+                .texture("layer0", modLoc("item/data_chip_plug"))
+                .texture("layer1", modLoc("item/data_chip_case_base"))
+                .texture("layer2", modLoc("item/data_chip_case_overlay"));
     }
 
     private void baseItem(String name, String texture) {

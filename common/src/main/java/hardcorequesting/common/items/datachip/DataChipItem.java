@@ -1,5 +1,6 @@
 package hardcorequesting.common.items.datachip;
 
+import hardcorequesting.common.items.mat.MatMode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
@@ -21,6 +22,24 @@ import java.util.List;
  */
 public abstract class DataChipItem extends Item {
     private final MatMode themeMode;
+
+    protected DataChipItem(MatMode themeMode) {
+        super(new Item.Properties().stacksTo(16));
+        this.themeMode = themeMode;
+    }
+
+    // The chip's texture is made of stacked tinted layers like the MAT and vanilla spawn eggs
+    public int getBaseColor() {
+        return themeMode.getBaseColor();
+    }
+
+    public int getOverlayColor() {
+        return themeMode.getOverlayColor();
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
         if (level.isClientSide || !(player instanceof ServerPlayer serverPlayer)) {
             return InteractionResultHolder.success(stack);
         }

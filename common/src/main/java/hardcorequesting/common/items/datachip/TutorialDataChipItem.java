@@ -1,5 +1,6 @@
 package hardcorequesting.common.items.datachip;
 
+import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,6 +14,10 @@ import java.util.List;
 
 // Unlocks the tutorial named by its NBT "Tutorial" id.
 public class TutorialDataChipItem extends DataChipItem {
+
+    public TutorialDataChipItem() {
+        super(MatMode.QUEST);
+    }
 
     @Override
     protected boolean apply(ServerPlayer player, ItemStack stack) {

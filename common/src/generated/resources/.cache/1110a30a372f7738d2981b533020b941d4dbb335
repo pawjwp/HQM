@@ -1,4 +1,4 @@
-// 1.20.1	2026-07-02T15:21:25.6606735	Item Models: hardcorequesting
+// 1.20.1	2026-07-19T18:35:55.8199563	Item Models: hardcorequesting
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/basic_bag.json
 61985e1ac52a80303379cd5befa9fc7a40dfbe72 assets/hardcorequesting/models/item/enabled_quest_book.json
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/epic_bag.json
@@ -9,9 +9,12 @@
 09fe72509a4dab2f18148630bdd31724734b7443 assets/hardcorequesting/models/item/hqm_invalid_item.json
 ea1ce32c9935d4147d2071b7cdb2432c4b20f5e9 assets/hardcorequesting/models/item/item_barrel.json
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/legendary_bag.json
+a93766ba3ca36de8ad599250a34dc6bcabcd260f assets/hardcorequesting/models/item/location_data_chip.json
 e47f13cb96dc55828a1972eb0595c2724bd22d57 assets/hardcorequesting/models/item/mat.json
 e87927d3f48c784ef26e50c542a6fb56160c29f1 assets/hardcorequesting/models/item/quarterheart.json
 9c9e81bf4a1c74a8509f747170fcb32f8bee37b5 assets/hardcorequesting/models/item/quest_book.json
 61413a1f69df64f7d10141218d9194a637a4a70f assets/hardcorequesting/models/item/quest_tracker.json
 432ba94f351708fad743e83df596fcf78e9e8940 assets/hardcorequesting/models/item/rottenheart.json
+a93766ba3ca36de8ad599250a34dc6bcabcd260f assets/hardcorequesting/models/item/statistic_data_chip.json
 a9f0c7b9899f78558cef9bff1b430d2074f4de3d assets/hardcorequesting/models/item/threequartsheart.json
+a93766ba3ca36de8ad599250a34dc6bcabcd260f assets/hardcorequesting/models/item/tutorial_data_chip.json

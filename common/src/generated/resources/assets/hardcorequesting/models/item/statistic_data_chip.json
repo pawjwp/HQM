@@ -1,0 +1,8 @@
+{
+  "parent": "hardcorequesting:item/base_item",
+  "textures": {
+    "layer0": "hardcorequesting:item/data_chip_plug",
+    "layer1": "hardcorequesting:item/data_chip_case_base",
+    "layer2": "hardcorequesting:item/data_chip_case_overlay"
+  }
+}

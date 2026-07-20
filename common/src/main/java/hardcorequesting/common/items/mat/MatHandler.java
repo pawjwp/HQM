@@ -8,7 +8,9 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.util.Translator;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -59,8 +61,22 @@ public class MatHandler {
                     (id, inventory, p) -> new MatCraftingMenu(id, inventory),
                     Component.translatable("container.hardcorequesting.mat.crafting")));
             case QUEST -> openQuest(player);
+            case DEFAULT -> openDefault(player);
             default -> GeneralUsage.sendOpenMat(player, mode);
         }
+    }
+
+    // Opens the Default mode, loading the statistics and preparing tutorial auto-play on first launch
+    private static void openDefault(Player player) {
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        CompoundTag payload = MatStats.buildStatsPayload(serverPlayer);
+        MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+        if (HQMConfig.getInstance().MAT.AUTO_PLAY_MAT_TUTORIAL && !mat.matTutorialSeen && mat.unlockedTutorials.contains("mat")) {
+            payload.putBoolean("AutoPlay", true);
+            mat.matTutorialSeen = true;
+            GeneralUsage.sendMatDataSync(serverPlayer);
+        }
+        GeneralUsage.sendOpenMat(player, MatMode.DEFAULT, payload);
     }
 
     private static void openQuest(Player player) {

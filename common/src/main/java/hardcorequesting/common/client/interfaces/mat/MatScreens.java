@@ -15,10 +15,13 @@ public class MatScreens {
     public static void open(Player player, MatMode mode, CompoundTag payload) {
         if (player == null) return;
         closeOpenContainer();
-        if (mode == MatMode.QUEST) {
-            GuiMatQuestBook.displayGui(player);
-        } else {
-            Minecraft.getInstance().setScreen(new GuiMatPlaceholder(player, mode));
+        switch (mode) {
+            case QUEST -> GuiMatQuestBook.displayGui(player);
+            case DEFAULT -> {
+                MatClientData.update(payload);
+                Minecraft.getInstance().setScreen(new GuiMatDefault(player));
+            }
+            default -> Minecraft.getInstance().setScreen(new GuiMatPlaceholder(player, mode));
         }
     }
 

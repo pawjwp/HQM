@@ -332,6 +332,8 @@ public class HQMConfig {
         public boolean TABS_SWITCH_DEFAULT_MODE = false;
         @Comment("Radius in blocks that are scanned for the MAT's life sign statistics")
         public int LIFE_SIGNS_RADIUS = 64;
+        @Comment("Auto-play the MAT introductory tutorial")
+        public boolean AUTO_PLAY_MAT_TUTORIAL = true;
     }
     
     public static class Interface {

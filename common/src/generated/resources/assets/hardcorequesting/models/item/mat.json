@@ -1,5 +1,238 @@
 {
   "parent": "hardcorequesting:item/base_item",
+  "overrides": [
+    {
+      "model": "hardcorequesting:item/mat_pointer_16",
+      "predicate": {
+        "minecraft:angle": 0.0,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_17",
+      "predicate": {
+        "minecraft:angle": 0.015625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_18",
+      "predicate": {
+        "minecraft:angle": 0.046875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_19",
+      "predicate": {
+        "minecraft:angle": 0.078125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_20",
+      "predicate": {
+        "minecraft:angle": 0.109375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_21",
+      "predicate": {
+        "minecraft:angle": 0.140625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_22",
+      "predicate": {
+        "minecraft:angle": 0.171875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_23",
+      "predicate": {
+        "minecraft:angle": 0.203125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_24",
+      "predicate": {
+        "minecraft:angle": 0.234375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_25",
+      "predicate": {
+        "minecraft:angle": 0.265625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_26",
+      "predicate": {
+        "minecraft:angle": 0.296875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_27",
+      "predicate": {
+        "minecraft:angle": 0.328125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_28",
+      "predicate": {
+        "minecraft:angle": 0.359375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_29",
+      "predicate": {
+        "minecraft:angle": 0.390625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_30",
+      "predicate": {
+        "minecraft:angle": 0.421875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_31",
+      "predicate": {
+        "minecraft:angle": 0.453125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_00",
+      "predicate": {
+        "minecraft:angle": 0.484375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_01",
+      "predicate": {
+        "minecraft:angle": 0.515625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_02",
+      "predicate": {
+        "minecraft:angle": 0.546875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_03",
+      "predicate": {
+        "minecraft:angle": 0.578125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_04",
+      "predicate": {
+        "minecraft:angle": 0.609375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_05",
+      "predicate": {
+        "minecraft:angle": 0.640625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_06",
+      "predicate": {
+        "minecraft:angle": 0.671875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_07",
+      "predicate": {
+        "minecraft:angle": 0.703125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_08",
+      "predicate": {
+        "minecraft:angle": 0.734375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_09",
+      "predicate": {
+        "minecraft:angle": 0.765625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_10",
+      "predicate": {
+        "minecraft:angle": 0.796875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_11",
+      "predicate": {
+        "minecraft:angle": 0.828125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_12",
+      "predicate": {
+        "minecraft:angle": 0.859375,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_13",
+      "predicate": {
+        "minecraft:angle": 0.890625,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_14",
+      "predicate": {
+        "minecraft:angle": 0.921875,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_15",
+      "predicate": {
+        "minecraft:angle": 0.953125,
+        "minecraft:tracking": 1.0
+      }
+    },
+    {
+      "model": "hardcorequesting:item/mat_pointer_16",
+      "predicate": {
+        "minecraft:angle": 0.984375,
+        "minecraft:tracking": 1.0
+      }
+    }
+  ],
   "textures": {
     "layer0": "hardcorequesting:item/mat",
     "layer1": "hardcorequesting:item/mat_screen_base",

@@ -1,0 +1,9 @@
+{
+  "parent": "hardcorequesting:item/base_item",
+  "textures": {
+    "layer0": "hardcorequesting:item/mat",
+    "layer1": "hardcorequesting:item/mat_screen_base",
+    "layer2": "hardcorequesting:item/mat_screen_overlay",
+    "layer3": "hardcorequesting:item/mat_pointer_04"
+  }
+}

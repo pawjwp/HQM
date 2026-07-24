@@ -8,11 +8,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -66,6 +68,10 @@ public interface AbstractPlatform {
     
     @Environment(EnvType.CLIENT)
     void registerOnClientTick(Consumer<Minecraft> consumer);
+
+    // Registers a model property
+    @Environment(EnvType.CLIENT)
+    void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function);
     
     void registerOnWorldTick(Consumer<Level> consumer);
 

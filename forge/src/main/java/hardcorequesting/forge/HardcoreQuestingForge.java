@@ -14,6 +14,10 @@ import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -210,6 +214,11 @@ public class HardcoreQuestingForge implements AbstractPlatform {
             if(event.phase == TickEvent.Phase.END)
                 consumer.accept(Minecraft.getInstance());
         });
+    }
+
+    @Override
+    public void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
+        ItemProperties.register(item, id, (ItemPropertyFunction) function);
     }
     
     @Override

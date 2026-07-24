@@ -17,6 +17,8 @@ import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestTicker;
 import hardcorequesting.common.quests.task.TaskType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.CompassItemPropertyFunction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 public class ClientProxy extends CommonProxy {
@@ -38,9 +40,9 @@ public class ClientProxy extends CommonProxy {
 
     private static void setupMat() {
         // Tints the MAT item similar to spawn egg tinting
-        // Layer 0 (mat.png) is untinted
         // Layer 1 (mat_screen_base.png) uses the mode's base color
         // Layer 2 (mat_screen_overlay.png) uses the mode's overlay color
+        // Layer 0 and 3 (mat.png and mat_pointer_XX.png) are untinted
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
             MatMode mode = MatItem.getMode(stack);
             return switch (tintIndex) {
@@ -49,6 +51,18 @@ public class ClientProxy extends CommonProxy {
                 default -> 0xFFFFFFFF;
             };
         }, ModItems.mat.get());
+
+        // The pointer layer rotates toward the tracked location when "tracking" is true
+        HardcoreQuestingCore.platform.registerModelProperty(ModItems.mat.get(), new ResourceLocation("angle"),
+                new CompassItemPropertyFunction((level, stack, entity) -> {
+                    if (!MatItem.hasTarget(stack)) return null;
+                    return MatItem.getTargetPosition(stack.getOrCreateTag());
+                }));
+        HardcoreQuestingCore.platform.registerModelProperty(ModItems.mat.get(), new ResourceLocation("tracking"),
+                (stack, level, entity, seed) -> {
+                    if (MatItem.hasTarget(stack)) return 1.0F;
+                    return 0.0F;
+                });
 
         // Data chips tint the same way, but with a set theme instead of using NBT
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {

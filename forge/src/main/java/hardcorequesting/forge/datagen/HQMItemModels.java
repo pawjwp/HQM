@@ -2,7 +2,10 @@ package hardcorequesting.forge.datagen;
 
 import hardcorequesting.common.HardcoreQuestingCore;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
+import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class HQMItemModels extends ItemModelProvider {
@@ -40,10 +43,34 @@ public class HQMItemModels extends ItemModelProvider {
     // Generate the MAT model, a three-layer file where the top two layers
     // are recolored based on the current mode (see ClientProxy#setupMat)
     private void matModels() {
-        withExistingParent("mat", modLoc("item/base_item"))
+        ItemModelBuilder base = withExistingParent("mat", modLoc("item/base_item"))
                 .texture("layer0", modLoc("item/mat"))
                 .texture("layer1", modLoc("item/mat_screen_base"))
                 .texture("layer2", modLoc("item/mat_screen_overlay"));
+
+        // Tracking mode has different textures based on direction
+        for (int i = 0; i <= 32; i++) {
+            int frame = (i + 16) & 31;
+            String name = String.format("mat_pointer_%02d", frame);
+            float angle = 0F;
+            if (i != 0) {
+                angle = (2F * i - 1F) / 64F;
+                pointerFrame(name);
+            }
+            base.override()
+                    .predicate(new ResourceLocation("tracking"), 1F)
+                    .predicate(new ResourceLocation("angle"), angle)
+                    .model(new ModelFile.UncheckedModelFile(modLoc("item/" + name)));
+        }
+    }
+
+    // A tracking pointer frame with three MAT layers and the pointer texture on top
+    private void pointerFrame(String name) {
+        withExistingParent(name, modLoc("item/base_item"))
+                .texture("layer0", modLoc("item/mat"))
+                .texture("layer1", modLoc("item/mat_screen_base"))
+                .texture("layer2", modLoc("item/mat_screen_overlay"))
+                .texture("layer3", modLoc("item/" + name));
     }
 
     // Generate the MAT model, a three-layer file where the top two layers

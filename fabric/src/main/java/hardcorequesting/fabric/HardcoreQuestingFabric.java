@@ -35,7 +35,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
+import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -155,6 +157,11 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void registerOnClientTick(Consumer<Minecraft> consumer) {
         ClientTickEvents.END_CLIENT_TICK.register(consumer::accept);
+    }
+
+    @Override
+    public void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
+        FabricModelPredicateProviderRegistry.register(item, id, function);
     }
     
     @Override

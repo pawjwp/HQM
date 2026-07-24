@@ -42,16 +42,22 @@ public class ClientProxy extends CommonProxy {
         // Layer 1 (mat_screen_base.png) uses the mode's base color
         // Layer 2 (mat_screen_overlay.png) uses the mode's overlay color
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
-            if (tintIndex == 0) return 0xFFFFFFFF;
             MatMode mode = MatItem.getMode(stack);
-            return 0xFF000000 | (tintIndex == 1 ? mode.getBaseColor() : mode.getOverlayColor());
+            return switch (tintIndex) {
+                case 1 -> 0xFF000000 | mode.getBaseColor();
+                case 2 -> 0xFF000000 | mode.getOverlayColor();
+                default -> 0xFFFFFFFF;
+            };
         }, ModItems.mat.get());
 
-        // Data chips tint the same way but without using NBT
+        // Data chips tint the same way, but with a set theme instead of using NBT
         ColorHandlerRegistry.registerItemColors((stack, tintIndex) -> {
-            if (tintIndex == 0) return 0xFFFFFFFF;
             DataChipItem chip = (DataChipItem) stack.getItem();
-            return 0xFF000000 | (tintIndex == 1 ? chip.getBaseColor() : chip.getOverlayColor());
+            return switch (tintIndex) {
+                case 1 -> 0xFF000000 | chip.getBaseColor();
+                case 2 -> 0xFF000000 | chip.getOverlayColor();
+                default -> 0xFFFFFFFF;
+            };
         }, ModItems.tutorialDataChip.get(), ModItems.statisticDataChip.get(), ModItems.locationDataChip.get());
 
         MenuRegistry.registerScreenFactory(ModMenus.matCrafting.get(), MatCraftingScreen::new);

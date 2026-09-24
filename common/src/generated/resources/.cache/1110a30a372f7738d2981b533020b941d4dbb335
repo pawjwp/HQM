@@ -1,4 +1,4 @@
-// 1.20.1	2026-07-23T22:38:46.1440785	Item Models: hardcorequesting
+// 1.20.1	2026-09-22T16:45:43.7656621	Item Models: hardcorequesting
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/basic_bag.json
 61985e1ac52a80303379cd5befa9fc7a40dfbe72 assets/hardcorequesting/models/item/enabled_quest_book.json
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/epic_bag.json
@@ -10,7 +10,7 @@
 ea1ce32c9935d4147d2071b7cdb2432c4b20f5e9 assets/hardcorequesting/models/item/item_barrel.json
 739e88fd053980a002313fae19490a0649131c37 assets/hardcorequesting/models/item/legendary_bag.json
 a93766ba3ca36de8ad599250a34dc6bcabcd260f assets/hardcorequesting/models/item/location_data_chip.json
-93eeda05497bc7e4824d7b41dc6bad09eab32bd1 assets/hardcorequesting/models/item/mat.json
+b54dcf6ae001d7eda99bcc9db794cfd8cbf3d327 assets/hardcorequesting/models/item/mat.json
 4b17dc394b37572a26aac09f6b4d38a7dc47b3ea assets/hardcorequesting/models/item/mat_pointer_00.json
 c776135991790f716d6053806f5c1667d26127b2 assets/hardcorequesting/models/item/mat_pointer_01.json
 1d42ca50dd6db1e5e036c25eee73eb53acdf50b3 assets/hardcorequesting/models/item/mat_pointer_02.json

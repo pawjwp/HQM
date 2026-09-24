@@ -50,7 +50,7 @@ public class HQMItemModels extends ItemModelProvider {
 
         // Tracking mode has different textures based on direction
         for (int i = 0; i <= 32; i++) {
-            int frame = (i + 16) & 31;
+            int frame = i & 31;
             String name = String.format("mat_pointer_%02d", frame);
             float angle = 0F;
             if (i != 0) {

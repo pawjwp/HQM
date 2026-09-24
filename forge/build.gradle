@@ -10,6 +10,23 @@ configurations {
     developmentForge.extendsFrom common
 }
 
+repositories {
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev"
+        content {
+            includeGroup "mezz.jei"
+        }
+    }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+        content {
+            includeGroup "dev.emi"
+        }
+    }
+}
+
 architectury {
     platformSetupLoomIde()
     forge()
@@ -38,6 +55,16 @@ dependencies {
     common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
         transitive = false
+    }
+
+    // Loads the item viewer set in dev_item_viewer
+    def viewer = project.dev_item_viewer
+    if (viewer == "jei") {
+        modLocalRuntime("mezz.jei:jei-1.20.1-forge:${project.jei_version}")
+    } else if (viewer == "emi") {
+        modLocalRuntime("dev.emi:emi-forge:${project.emi_version}")
+    } else if (viewer == "rei") {
+        modLocalRuntime("me.shedaniel:RoughlyEnoughItems-forge:${project.fabric_roughlyenoughitems}")
     }
 }
 

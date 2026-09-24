@@ -121,6 +121,7 @@ public class GuiQuestBook extends GuiBase {
     
     @Override
     public void removed() {
+        super.removed();
         SoundHandler.stopLoreMusic();
     }
     

@@ -43,6 +43,25 @@ public class GuiBase extends Screen {
         super(title);
     }
 
+    // Apply custom UI scale 
+    @Override
+    public void added() {
+        UIScale.apply();
+    }
+
+    // Restore previous UI scale
+    @Override
+    public void removed() {
+        UIScale.restore();
+    }
+
+    // Reapply UI scale on resizing a window
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        UIScale.apply();
+        super.resize(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
+    }
+
     public void drawRect(GuiGraphics graphics, ResourceLocation texture, int x, int y, int u, int v, int w, int h) {
         graphics.blit(texture, x + left, y + top, u, v, w, h);
     }

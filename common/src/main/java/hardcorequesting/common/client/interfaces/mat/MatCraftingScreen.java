@@ -2,9 +2,11 @@ package hardcorequesting.common.client.interfaces.mat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.UIScale;
 import hardcorequesting.common.items.mat.MatMode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.network.chat.Component;
@@ -61,5 +63,25 @@ public class MatCraftingScreen extends CraftingScreen {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    // Apply custom UI scale 
+    @Override
+    public void added() {
+        UIScale.apply();
+    }
+
+    // Restore previous UI scale
+    @Override
+    public void removed() {
+        super.removed();
+        UIScale.restore();
+    }
+
+    // Reapply UI scale on resizing a window
+    @Override
+    public void resize(Minecraft minecraft, int width, int height) {
+        UIScale.apply();
+        super.resize(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
     }
 }

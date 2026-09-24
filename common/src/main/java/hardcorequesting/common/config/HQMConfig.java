@@ -349,6 +349,10 @@ public class HQMConfig {
         //@Name("Quest Map Colours")
         @Comment("Colour settings for the quest map")
         public QuestMap QuestMap = new QuestMap();
+        //@Name("UI scale multiplier")
+        @Comment("EXPERIMENTAL: Scale multiplier at which the GUI is drawn when HQM GUIs are open." +
+                "This multiplier is applied to the vanilla GUI scale and clamped to valid values.")
+        public float UI_SCALE_MULTIPLIER = 1.0F;
 
         public static class Text {
             //@Name("Standard text")

@@ -54,13 +54,10 @@ public class ClientProxy extends CommonProxy {
 
         // The pointer layer rotates toward the tracked location when "tracking" is true
         HardcoreQuestingCore.platform.registerModelProperty(ModItems.mat.get(), new ResourceLocation("angle"),
-                new CompassItemPropertyFunction((level, stack, entity) -> {
-                    if (!MatItem.hasTarget(stack)) return null;
-                    return MatItem.getTargetPosition(stack.getOrCreateTag());
-                }));
+                new CompassItemPropertyFunction((level, stack, entity) -> MatItem.getTrackedTarget(entity)));
         HardcoreQuestingCore.platform.registerModelProperty(ModItems.mat.get(), new ResourceLocation("tracking"),
                 (stack, level, entity, seed) -> {
-                    if (MatItem.hasTarget(stack)) return 1.0F;
+                    if (MatItem.isTracking(stack, entity)) return 1.0F;
                     return 0.0F;
                 });
 

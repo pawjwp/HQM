@@ -3,7 +3,6 @@ package hardcorequesting.common.config;
 import blue.endless.jankson.Comment;
 import blue.endless.jankson.Jankson;
 import blue.endless.jankson.JsonGrammar;
-import blue.endless.jankson.api.SyntaxError;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.KeyboardHandler;
 import hardcorequesting.common.io.SaveHandler;
@@ -18,7 +17,8 @@ import java.util.Optional;
 
 public class HQMConfig {
     private static transient HQMConfig instance;
-    
+    private static transient long lastModified;
+
     @Comment("Settings related to hardcore mode")
     //@Name("Hardcore settings")
     public Hardcore Hardcore = new Hardcore();
@@ -137,19 +137,17 @@ public class HQMConfig {
     public static HQMConfig getInstance() {
         if (instance == null) {
             try {
-                Jankson jankson = Jankson.builder().build();
-                Path path = HardcoreQuestingCore.configDir.resolve("config.json5");
+                Path path = configPath();
                 if (!Files.exists(path.getParent()))
                     Files.createDirectories(path.getParent());
-                instance = SaveHandler.load(path).flatMap(s -> {
-                    try {
-                        return Optional.of(jankson.fromJson(s, HQMConfig.class));
-                    } catch (SyntaxError syntaxError) {
-                        syntaxError.printStackTrace();
-                    }
-                    return Optional.empty();
-                }).orElse(new HQMConfig());
-                SaveHandler.save(path, jankson.toJson(instance).toJson(JsonGrammar.JSON5));
+                Optional<String> text = SaveHandler.load(path);
+                Optional<HQMConfig> parsed = text.flatMap(HQMConfig::parse);
+                instance = parsed.orElse(new HQMConfig());
+                // If the file fails to parse, it will not be loaded and the old values are kept
+                if (text.isEmpty() || parsed.isPresent()) {
+                    SaveHandler.save(path, Jankson.builder().build().toJson(instance).toJson(JsonGrammar.JSON5));
+                }
+                lastModified = modifiedTime(path);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -165,7 +163,7 @@ public class HQMConfig {
             UNCOMPLETED_SELECTED_IN_BOUNDS_SET = Long.decode(getInstance().Interface.QuestSets.UNCOMPLETED_SELECTED_IN_BOUNDS_SET.toLowerCase()).intValue();
             UNCOMPLETED_UNSELECTED_IN_BOUNDS_SET = Long.decode(getInstance().Interface.QuestSets.UNCOMPLETED_UNSELECTED_IN_BOUNDS_SET.toLowerCase()).intValue();
             DISABLED_SET = Long.decode(getInstance().Interface.QuestSets.DISABLED_SET.toLowerCase()).intValue();
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             HardcoreQuestingCore.LOGGER.error("Unable to parse set colours", e);
         }
     }
@@ -177,7 +175,7 @@ public class HQMConfig {
             QUEST_COMPLETE = Long.decode(getInstance().Interface.Quests.QUEST_COMPLETE.toLowerCase()).intValue();
             QUEST_COMPLETE_REPEATABLE = Long.decode(getInstance().Interface.Quests.QUEST_COMPLETE_REPEATABLE.toLowerCase()).intValue();
             QUEST_AVAILABLE = Long.decode(getInstance().Interface.Quests.QUEST_AVAILABLE.toLowerCase()).intValue();
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             HardcoreQuestingCore.LOGGER.error("Unable to parse quest colours", e);
         }
     }
@@ -192,7 +190,7 @@ public class HQMConfig {
             TEXT_HOVERED = Long.decode(t.HOVERED.toLowerCase()).intValue();
             TEXT_SELECTED = Long.decode(t.SELECTED.toLowerCase()).intValue();
             TEXT_SELECTED_HOVERED = Long.decode(t.SELECTED_HOVERED.toLowerCase()).intValue();
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             HardcoreQuestingCore.LOGGER.error("Unable to parse text colours", e);
         }
     }
@@ -205,7 +203,7 @@ public class HQMConfig {
             MAP_SELECTED_MARKER = Long.decode(m.SELECTED_MARKER.toLowerCase()).intValue();
             MAP_SPECIAL_SELECTED_MARKER = Long.decode(m.SPECIAL_SELECTED_MARKER.toLowerCase()).intValue();
             MAP_LINE_THICKNESS = m.LINE_THICKNESS;
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             HardcoreQuestingCore.LOGGER.error("Unable to parse map colours", e);
         }
     }
@@ -224,6 +222,58 @@ public class HQMConfig {
         if (HardcoreQuestingCore.proxy.isClient()) {
             KeyboardHandler.clear();
             KeyboardHandler.initDefault();
+        }
+    }
+
+    // Reloads clientside options from the config when it has been updated
+    // The following sections are reloaded:
+    // - Interface
+    // - Integration
+    // - Editing
+    // - Loot
+    // - Keybind.TOGGLE
+    
+    public static void reloadClientOptions() {
+        Path path = configPath();
+        long modified = modifiedTime(path);
+        if (modified == lastModified) {
+            return;
+        }
+        lastModified = modified;
+        SaveHandler.load(path).flatMap(HQMConfig::parse).ifPresent(fresh -> {
+            HQMConfig config = getInstance();
+            config.Interface = fresh.Interface;
+            config.Integration = fresh.Integration;
+            config.Editing = fresh.Editing; // USE_EDITOR is only read at startup because it is non-cosmetic
+            config.Loot = fresh.Loot;
+            config.Keybind.TOGGLE = fresh.Keybind.TOGGLE;
+            config.MAT.SHOW_TRACKING_COORDINATES = fresh.MAT.SHOW_TRACKING_COORDINATES;
+            BagItem.displayGui = config.Loot.REWARD_INTERFACE;
+            parseSetColours();
+            parseQuestColours();
+            parseTextColours();
+            parseMapColours();
+        });
+    }
+
+    private static Optional<HQMConfig> parse(String text) {
+        try {
+            return Optional.of(Jankson.builder().build().fromJson(text, HQMConfig.class));
+        } catch (Exception e) {
+            HardcoreQuestingCore.LOGGER.error("Unable to parse config.json5, so its options were not loaded", e);
+            return Optional.empty();
+        }
+    }
+
+    private static Path configPath() {
+        return HardcoreQuestingCore.configDir.resolve("config.json5");
+    }
+
+    private static long modifiedTime(Path path) {
+        try {
+            return Files.getLastModifiedTime(path).toMillis();
+        } catch (IOException e) {
+            return 0;
         }
     }
     

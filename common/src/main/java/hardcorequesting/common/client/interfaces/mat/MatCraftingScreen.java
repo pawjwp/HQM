@@ -3,6 +3,7 @@ package hardcorequesting.common.client.interfaces.mat;
 import com.mojang.blaze3d.systems.RenderSystem;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.UIScale;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -26,6 +27,7 @@ public class MatCraftingScreen extends CraftingScreen {
 
     public MatCraftingScreen(CraftingMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
+        HQMConfig.reloadClientOptions();
     }
 
     private int panelLeft() {

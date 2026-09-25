@@ -5,7 +5,7 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.platform.forge.EventBuses;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.event.PlayerDeathEventListener;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
 import hardcorequesting.common.recipe.BookCatalystRecipeSerializer;
@@ -63,6 +63,7 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -108,7 +109,8 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         recipe.register(FMLJavaModLoadingContext.get().getModEventBus());
         tileEntityType.register(FMLJavaModLoadingContext.get().getModEventBus());
         menu.register(FMLJavaModLoadingContext.get().getModEventBus());
-        MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(event -> {
+        // Puts any quest books back into the dying player's inventory before they are dropped or collected
+        MinecraftForge.EVENT_BUS.<LivingDropsEvent>addListener(EventPriority.HIGH, event -> {
             if (event.getEntity() instanceof Player player) {
                 if (player instanceof FakePlayer
                     || event.isCanceled()
@@ -116,35 +118,14 @@ public class HardcoreQuestingForge implements AbstractPlatform {
                     || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
                     return;
                 }
-                
+
                 Iterator<ItemEntity> iter = event.getDrops().iterator();
                 while (iter.hasNext()) {
-                    ItemEntity entityItem = iter.next();
-                    ItemStack stack = entityItem.getItem();
-                    if (stack.is(ModItems.book.get())) {
-                        player.getInventory().add(stack);
+                    ItemStack stack = iter.next().getItem();
+                    if (PlayerDeathEventListener.isQuestBook(stack) && player.addItem(stack)) {
                         iter.remove();
                     }
                 }
-            }
-        });
-        MinecraftForge.EVENT_BUS.<PlayerEvent.Clone>addListener(event -> {
-            if (event.getEntity() == null || event.getEntity() instanceof FakePlayer
-                || !event.isWasDeath() || event.isCanceled()
-                || event.getEntity().level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)
-                || HQMConfig.getInstance().LOSE_QUEST_BOOK) {
-                return;
-            }
-    
-            ItemStack bookStack = new ItemStack(ModItems.book.get());
-            if (event.getOriginal().getInventory().contains(bookStack)) {
-                for (ItemStack stack : event.getOriginal().getInventory().items) {
-                    if (ItemStack.isSameItem(bookStack, stack)) {
-                        bookStack = stack.copy();
-                        break;
-                    }
-                }
-                event.getEntity().getInventory().add(bookStack);
             }
         });
     }

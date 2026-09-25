@@ -1,5 +1,6 @@
 package hardcorequesting.common;
 
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.registry.registries.RegistrarManager;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.commands.CommandHandler;
@@ -81,7 +82,10 @@ public class HardcoreQuestingCore {
             PlayerDeathEventListener.instance.onLivingDeath(livingEntity, source);
             EventTrigger.instance().onLivingDeath(livingEntity, source);
         });
-        
+        PlayerEvent.PLAYER_CLONE.register((oldPlayer, newPlayer, wonGame) -> {
+            PlayerDeathEventListener.instance.onPlayerClone(oldPlayer, newPlayer, wonGame);
+        });
+
         RegistrarManager registries = RegistrarManager.get(HardcoreQuestingCore.ID);
         registries.<TaskType<?>>builder(TaskType.REGISTRY_KEY.location()).syncToClients().build();
         TaskType.REGISTER.register();

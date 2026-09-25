@@ -37,7 +37,7 @@ public class HQMConfig {
     public boolean SPAWN_BOOK = false;
     
     //@Name("Lose quest book upon death")
-    @Comment("Loose the quest book when you die, if set to false it will stay in your inventory")
+    @Comment("Lose the quest book/MAT when you die. If set to false, they stay in your inventory.")
     public boolean LOSE_QUEST_BOOK = true;
     
     //@Name("All in party get rewards")

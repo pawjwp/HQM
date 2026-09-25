@@ -11,8 +11,6 @@ import dev.architectury.fluid.FluidStack;
 import dev.architectury.utils.GameInstance;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.blocks.ModBlocks;
-import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.platform.AbstractPlatform;
 import hardcorequesting.common.platform.NetworkManager;
 import hardcorequesting.common.recipe.BookCatalystRecipeSerializer;
@@ -63,7 +61,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -92,19 +89,6 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     public void onInitialize() {
         HardcoreQuestingCore.initialize(this);
 
-        //As of writing, architectury has misnamed these player parameters, with the first one called oldPlayer, while it actually is the second one that is the old player
-        PlayerEvent.PLAYER_CLONE.register((newPlayer, oldPlayer, wonGame) -> {
-            if (HQMConfig.getInstance().LOSE_QUEST_BOOK) return;
-            if (!wonGame && !oldPlayer.isSpectator() && !newPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
-                int invSize = oldPlayer.getInventory().getContainerSize();
-                for (int i = 0; i < invSize; i++) {
-                    ItemStack stack = oldPlayer.getInventory().getItem(i);
-                    if (stack.is(ModItems.book.get())) {
-                        newPlayer.getInventory().setItem(i, stack);
-                    }
-                }
-            }
-        });
         //noinspection UnstableApiUsage
         FluidStorage.SIDED.registerForBlockEntity((blockEntity, direction) -> ((BarrelBlockEntity) blockEntity).fluidTank, ModBlocks.typeBarrel.get());
     }

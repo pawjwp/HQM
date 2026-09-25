@@ -1,10 +1,15 @@
 package hardcorequesting.common.event;
 
+import dev.architectury.hooks.level.entity.PlayerHooks;
 import hardcorequesting.common.death.DeathType;
+import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
 
 public class PlayerDeathEventListener {
     public static PlayerDeathEventListener instance;
@@ -21,47 +26,27 @@ public class PlayerDeathEventListener {
         }
     }
 
-//    @SubscribeEvent(priority = EventPriority.HIGHEST)
-//    public void onPlayerDropItemsOnDeath(PlayerDropsEvent event) {
-//        if (event.getEntityPlayer() == null
-//            || event.getEntityPlayer() instanceof FakePlayer
-//            || event.isCanceled()
-//            || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
-//            || HQMConfig.LOSE_QUEST_BOOK) {
-//            return;
-//        }
-//        
-//        Iterator<EntityItem> iter = event.getDrops().iterator();
-//        while (iter.hasNext()) {
-//            EntityItem entityItem = iter.next();
-//            ItemStack stack = entityItem.getItem();
-//            if (!stack.isEmpty() && stack.getItem().equals(ModItems.book)) {
-//                event.getEntityPlayer().inventory.addItemStackToInventory(stack);
-//                iter.remove();
-//            }
-//        }
-//    }
+    // If this item is considered a quest book for the purposes of losing the quest book on death or not
+    public static boolean isQuestBook(ItemStack stack) {
+        return stack.is(ModItems.book.get()) || stack.is(ModItems.enabledBook.get()) || stack.is(ModItems.mat.get());
+    }
 
-//    @SubscribeEvent
-//    public void onPlayerRespawn(PlayerEvent.Clone event) {
-//        if (event.getEntityPlayer() == null
-//            || event.getEntityPlayer() instanceof FakePlayer
-//            || !event.isWasDeath()
-//            || event.isCanceled()
-//            || event.getEntityPlayer().world.getGameRules().getBoolean("keepInventory")
-//            || HQMConfig.LOSE_QUEST_BOOK) {
-//            return;
-//        }
-//        
-//        if (event.getOriginal().inventory.hasItemStack(new ItemStack(ModItems.book))) {
-//            ItemStack bookStack = new ItemStack(ModItems.book);
-//            for (ItemStack stack : event.getOriginal().inventory.mainInventory) {
-//                if (bookStack.isItemEqual(stack)) {
-//                    bookStack = stack.copy(); // Copy the actual stack
-//                    break;
-//                }
-//            }
-//            event.getEntityPlayer().inventory.addItemStackToInventory(bookStack);
-//        }
-//    }
+    // On death, move any quest book that would be dropped back into the player's inventory
+    public void onPlayerClone(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean wonGame) {
+        if (wonGame || PlayerHooks.isFake(newPlayer) || newPlayer.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
+            return;
+        }
+        Inventory oldInventory = oldPlayer.getInventory();
+        for (int i = 0; i < oldInventory.getContainerSize(); i++) {
+            ItemStack stack = oldInventory.getItem(i);
+            if (isQuestBook(stack)) {
+                if (newPlayer.getInventory().getItem(i).isEmpty()) {
+                    newPlayer.getInventory().setItem(i, stack);
+                } else {
+                    newPlayer.getInventory().placeItemBackInInventory(stack);
+                }
+                oldInventory.setItem(i, ItemStack.EMPTY);
+            }
+        }
+    }
 }

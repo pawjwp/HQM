@@ -17,12 +17,17 @@ public class QuestBookKeyHandler {
     public static KeyMapping openBook;
 
     public static void register() {
-        openBook = new KeyMapping("key.hqm.openBook", InputConstants.UNKNOWN.getValue(), CATEGORY);
-        KeyMappingRegistry.register(openBook);
+        openBook = register("key.hqm.openBook");
+    }
+
+    private static KeyMapping register(String name) {
+        KeyMapping mapping = new KeyMapping(name, InputConstants.UNKNOWN.getValue(), CATEGORY);
+        KeyMappingRegistry.register(mapping);
+        return mapping;
     }
 
     public static void handleTick(Minecraft mc) {
-        while (openBook.consumeClick()) {
+        while (openQuests.consumeClick()) {
             if (mc.screen instanceof GuiQuestBook) {
                 if (HQMConfig.getInstance().Keybind.TOGGLE) mc.setScreen(null);
             } else if (mc.screen == null && mc.player != null) {

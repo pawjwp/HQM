@@ -18,6 +18,7 @@ public class QuestBookKeyHandler {
     public static final String CATEGORY = "key.hqm.category";
     public static KeyMapping openQuests;
     public static KeyMapping openMatDefault;
+    public static KeyMapping openMatQuest;
     public static KeyMapping openMatCrafting;
     public static KeyMapping openMatTracking;
     public static KeyMapping openMatStorage;
@@ -25,6 +26,7 @@ public class QuestBookKeyHandler {
     public static void register() {
         openQuests = register("key.hqm.openQuests");
         openMatDefault = register("key.hqm.mat.default");
+        openMatQuest = register("key.hqm.mat.quest");
         openMatCrafting = register("key.hqm.mat.crafting");
         openMatTracking = register("key.hqm.mat.tracking");
         openMatStorage = register("key.hqm.mat.storage");
@@ -50,6 +52,7 @@ public class QuestBookKeyHandler {
         }
 
         handleModeKey(mc, openMatDefault, MatMode.DEFAULT);
+        handleModeKey(mc, openMatQuest, MatMode.QUEST);
         handleModeKey(mc, openMatCrafting, MatMode.CRAFTING);
         handleModeKey(mc, openMatTracking, MatMode.TRACKING);
         handleModeKey(mc, openMatStorage, MatMode.STORAGE);

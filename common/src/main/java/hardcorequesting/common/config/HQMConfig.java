@@ -326,7 +326,7 @@ public class HQMConfig {
     
     public static class Keybind {
         //@Name("Require book in inventory")
-        @Comment("Require the player to have a quest book in their inventory to open it with the keybind")
+        @Comment("Require the player to have a quest book or MAT in their inventory to open it with the keybind")
         public boolean REQUIRE_BOOK = false;
         //@Name("Toggle book with keybind")
         @Comment("Pressing the keybind while the book is already open closes it")

@@ -67,13 +67,18 @@ public enum GeneralUsage {
     REQUEST_BOOK_OPEN {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
+            // Opens the MAT to questing mode if the player has a MAT and ENABLE_MAT is true, otherwise opens the quest book
+            if (HQMConfig.getInstance().MAT.ENABLE_MAT && MatMode.QUEST.isEnabled() && MatHandler.hasMat(player)) {
+                MatHandler.openMatMode(player, MatMode.QUEST);
+                return;
+            }
             QuestingDataManager data = QuestingDataManager.getInstance();
             if (!data.isQuestActive()) {
                 player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
                 return;
             }
             if (HQMConfig.getInstance().Keybind.REQUIRE_BOOK
-                    && !player.getInventory().contains(new ItemStack(ModItems.book.get()))) {
+                    && !player.getInventory().hasAnyMatching(stack -> stack.is(ModItems.book.get()) || stack.is(ModItems.enabledBook.get()))) {
                 return;
             }
             EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
@@ -94,7 +99,7 @@ public enum GeneralUsage {
     OPEN_MAT_MODE {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            if (!MatHandler.hasMat(player)) return;
+            if (HQMConfig.getInstance().Keybind.REQUIRE_BOOK && !MatHandler.hasMat(player)) return;
             MatMode mode = MatMode.fromId(nbt.getInt("Mode"));
             if (nbt.getBoolean("SetDefault")) {
                 MatHandler.setDefaultMode(player, mode);

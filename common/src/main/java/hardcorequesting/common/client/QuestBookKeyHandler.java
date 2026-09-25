@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.GeneralUsage;
 import net.fabricmc.api.EnvType;
@@ -43,11 +42,7 @@ public class QuestBookKeyHandler {
             if (mc.screen instanceof GuiQuestBook) {
                 if (HQMConfig.getInstance().Keybind.TOGGLE) mc.setScreen(null);
             } else if (mc.screen == null && mc.player != null) {
-                if (matEnabled() && MatMode.QUEST.isEnabled() && MatHandler.hasMat(mc.player)) {
-                    GeneralUsage.sendOpenMatMode(MatMode.QUEST, false);
-                } else {
-                    GeneralUsage.REQUEST_BOOK_OPEN.sendMessageToServer(new CompoundTag());
-                }
+                GeneralUsage.REQUEST_BOOK_OPEN.sendMessageToServer(new CompoundTag());
             }
         }
 
@@ -60,13 +55,9 @@ public class QuestBookKeyHandler {
 
     private static void handleModeKey(Minecraft mc, KeyMapping mapping, MatMode mode) {
         while (mapping.consumeClick()) {
-            if (mc.screen == null && mc.player != null && matEnabled() && mode.isEnabled() && MatHandler.hasMat(mc.player)) {
+            if (mc.screen == null && mc.player != null) {
                 GeneralUsage.sendOpenMatMode(mode, false);
             }
         }
-    }
-
-    private static boolean matEnabled() {
-        return HQMConfig.getInstance().MAT.ENABLE_MAT;
     }
 }

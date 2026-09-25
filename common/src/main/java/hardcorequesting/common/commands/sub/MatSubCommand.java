@@ -6,13 +6,17 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.suggestion.SuggestionProvider;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.items.mat.LocationResolver;
+import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.StatKey;
 import hardcorequesting.common.items.mat.TrackedLocation;
+import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.DimensionArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
@@ -31,9 +35,13 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.ToIntFunction;
+import java.util.stream.Stream;
 
 /**
- * Grants MAT unlockables to a players via /hqm mat unlock <tutorial|statistic|location>
+ * Grants MAT unlockables to players via /hqm mat unlock <tutorial|statistic|location>
+ * Removes them via /hqm mat remove <tutorial|statistic|location>
  */
 public class MatSubCommand implements CommandHandler.SubCommand {
     private static final DynamicCommandExceptionType ERROR_STRUCTURE_INVALID =
@@ -51,13 +59,22 @@ public class MatSubCommand implements CommandHandler.SubCommand {
         int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, boolean silent, ServerLevel dimension) throws CommandSyntaxException;
     }
 
+    // Removes the requested option
+    private interface RemoveAction {
+        int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets) throws CommandSyntaxException;
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder.requires(source -> source.hasPermission(Commands.LEVEL_OWNERS))
                 .then(Commands.literal("unlock")
                         .then(tutorialBranch())
                         .then(statisticBranch())
-                        .then(locationBranch()));
+                        .then(locationBranch()))
+                .then(Commands.literal("remove")
+                        .then(removeTutorialBranch())
+                        .then(removeStatisticBranch())
+                        .then(removeLocationBranch()));
     }
 
     private ArgumentBuilder<CommandSourceStack, ?> tutorialBranch() {
@@ -161,6 +178,81 @@ public class MatSubCommand implements CommandHandler.SubCommand {
         return feedback(context, count);
     }
 
+    private ArgumentBuilder<CommandSourceStack, ?> removeTutorialBranch() {
+        return Commands.literal("tutorial")
+                .then(withTargets(Commands.literal("all"),
+                        (context, targets) -> removeFrom(context, targets, target -> MatUnlocks.removeTutorials(target, tutorial -> true))))
+                .then(withTargets(Commands.argument("id", StringArgumentType.string()).suggests(senderEntries(mat -> mat.unlockedTutorials.stream())),
+                        (context, targets) -> {
+                            String id = StringArgumentType.getString(context, "id");
+                            return removeFrom(context, targets, target -> MatUnlocks.removeTutorials(target, tutorial -> tutorial.equals(id)));
+                        }));
+    }
+
+    private ArgumentBuilder<CommandSourceStack, ?> removeStatisticBranch() {
+        return Commands.literal("statistic")
+                .then(withTargets(Commands.literal("all"),
+                        (context, targets) -> removeFrom(context, targets, target -> MatUnlocks.removeStats(target, stat -> true))))
+                .then(Commands.argument("statType", ResourceLocationArgument.id())
+                        .then(withTargets(Commands.argument("stat", ResourceLocationArgument.id()),
+                                (context, targets) -> {
+                                    String key = StatKey.vanillaKey(
+                                            ResourceLocationArgument.getId(context, "statType").toString(),
+                                            ResourceLocationArgument.getId(context, "stat").toString());
+                                    return removeStat(context, targets, key);
+                                })))
+                .then(Commands.literal("special")
+                        .then(withTargets(Commands.literal("life_signs_hostile"),
+                                (context, targets) -> removeStat(context, targets, StatKey.LIFE_SIGNS_HOSTILE)))
+                        .then(withTargets(Commands.literal("life_signs_neutral"),
+                                (context, targets) -> removeStat(context, targets, StatKey.LIFE_SIGNS_NEUTRAL)))
+                        .then(withTargets(Commands.literal("life_signs_friendly"),
+                                (context, targets) -> removeStat(context, targets, StatKey.LIFE_SIGNS_FRIENDLY))));
+    }
+
+    private int removeStat(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, String key) {
+        return removeFrom(context, targets, target -> MatUnlocks.removeStats(target, stat -> stat.equals(key)));
+    }
+
+    private ArgumentBuilder<CommandSourceStack, ?> removeLocationBranch() {
+        return Commands.literal("location")
+                .then(withTargets(Commands.literal("all"),
+                        (context, targets) -> removeFrom(context, targets, target -> MatUnlocks.removeLocations(target, location -> true))))
+                .then(withTargets(Commands.argument("name", StringArgumentType.string())
+                                .suggests(senderEntries(mat -> mat.locations.stream().map(location -> location.name()).distinct())),
+                        (context, targets) -> {
+                            String name = StringArgumentType.getString(context, "name");
+                            return removeFrom(context, targets, target -> MatUnlocks.removeLocations(target, location -> location.name().equals(name)));
+                        }));
+    }
+
+    // Runs the removal on each target, then reports how many targets lost at least entries
+    private int removeFrom(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, ToIntFunction<ServerPlayer> removal) {
+        int count = 0;
+        for (ServerPlayer target : targets) {
+            if (removal.applyAsInt(target) > 0) count++;
+        }
+        return removedFeedback(context, count);
+    }
+
+    // Suggests the user's own MAT entries
+    private static SuggestionProvider<CommandSourceStack> senderEntries(Function<MatPlayerData, Stream<String>> entries) {
+        return (context, builder) -> {
+            ServerPlayer player = context.getSource().getPlayer();
+            if (player == null) return builder.buildFuture();
+            MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+            return SharedSuggestionProvider.suggest(entries.apply(mat).map(entry -> StringArgumentType.escapeIfRequired(entry)), builder);
+        };
+    }
+
+    // Adds the optional targets argument, which defaults to the command sender
+    private <T extends ArgumentBuilder<CommandSourceStack, T>> T withTargets(T node, RemoveAction action) {
+        return node
+                .executes(context -> action.run(context, sender(context)))
+                .then(Commands.argument("targets", EntityArgument.players())
+                        .executes(context -> action.run(context, EntityArgument.getPlayers(context, "targets"))));
+    }
+
     private <T extends ArgumentBuilder<CommandSourceStack, T>> T withOptions(T node, UnlockAction action) {
         return node
                 .executes(context -> action.run(context, sender(context), false))
@@ -181,6 +273,15 @@ public class MatSubCommand implements CommandHandler.SubCommand {
             context.getSource().sendFailure(Component.translatable("hqm.mat.command.none"));
         } else {
             context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.unlocked", count), true);
+        }
+        return count;
+    }
+
+    private static int removedFeedback(CommandContext<CommandSourceStack> context, int count) {
+        if (count == 0) {
+            context.getSource().sendFailure(Component.translatable("hqm.mat.command.noneRemoved"));
+        } else {
+            context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.removed", count), true);
         }
         return count;
     }

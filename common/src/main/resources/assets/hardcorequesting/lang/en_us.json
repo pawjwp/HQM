@@ -142,6 +142,8 @@
   "hqm.mat.default.noTutorials": "No tutorials unlocked yet.",
   "hqm.mat.command.unlocked": "Unlocked MAT data for %s player(s).",
   "hqm.mat.command.none": "No new MAT data was unlocked.",
+  "hqm.mat.command.removed": "Removed MAT data from %s player(s).",
+  "hqm.mat.command.noneRemoved": "No matching MAT data was found to remove.",
   "hqm.mat.command.biome.invalid": "Invalid biome: %s",
   "container.hardcorequesting.mat.crafting": "Crafting",
   "_comment": "======================================",

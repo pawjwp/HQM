@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.architectury.fluid.FluidStack;
 import dev.architectury.hooks.fluid.FluidStackHooks;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.util.FluidUtils;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
@@ -41,6 +42,7 @@ public class GuiBase extends Screen {
     
     protected GuiBase(Component title) {
         super(title);
+        HQMConfig.reloadClientOptions();
     }
 
     // Apply custom UI scale 

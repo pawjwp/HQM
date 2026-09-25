@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.graphic;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.BookPage;
@@ -74,6 +75,8 @@ public class MainPageGraphic extends EditableGraphic {
     
         if (questLine.front != null) {
             gui.applyColor(0xFFFFFFFF);
+            RenderSystem.enableBlend();
+            RenderSystem.defaultBlendFunc();
             gui.drawRect(graphics, questLine.front, 20, 20, 0, 0, 140, 180);
         }
     }

@@ -2,11 +2,19 @@ package hardcorequesting.common.client.integration;
 
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.inventory.MatCraftingMenu;
+import hardcorequesting.common.inventory.ModMenus;
+import hardcorequesting.common.items.MatItem;
+import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.mat.MatMode;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
+import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.gui.handlers.IGlobalGuiHandler;
 import mezz.jei.api.gui.handlers.IGuiProperties;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
+import mezz.jei.api.registration.IRecipeCatalystRegistration;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
 import mezz.jei.api.runtime.IClickableIngredient;
 import mezz.jei.api.runtime.IIngredientManager;
 import net.minecraft.client.Minecraft;
@@ -22,6 +30,7 @@ import java.util.Optional;
  * An IScreenHandler is registered for the quest book, allowing keybinds to work.
  * This also draws the ingredient list if SHOW_JEI_SIDEBAR is enabled.
  * If it is disabled, it will hide the list by reporting the HQM menu as filling the entire screen.
+ * Also adds the MAT's Crafting mode as a crafting catalyst and fixes JEI's recipe transfer button for the crafting mode.
  * EMI loads this same plugin through its JEMI compatibility layer, querying the global handler directly.
  */
 @JeiPlugin
@@ -52,6 +61,21 @@ public class HQMJeiPlugin implements IModPlugin {
                 return Optional.empty();
             }
         });
+    }
+
+    @Override
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+        // Registers a recipe transfer handler for the crafting menu with the same slot/inventory layout as the vanilla crafting table
+        registration.addRecipeTransferHandler(MatCraftingMenu.class, ModMenus.matCrafting.get(), RecipeTypes.CRAFTING, 1, 9, 10, 36);
+    }
+
+    @Override
+    public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        if (HQMConfig.getInstance().MAT.ENABLE_MAT && MatMode.CRAFTING.isEnabled()) {
+            ItemStack mat = new ItemStack(ModItems.mat.get());
+            MatItem.setMode(mat, MatMode.CRAFTING);
+            registration.addRecipeCatalyst(mat, RecipeTypes.CRAFTING);
+        }
     }
 
     private static IGuiProperties getGuiProperties(GuiQuestBook screen) {

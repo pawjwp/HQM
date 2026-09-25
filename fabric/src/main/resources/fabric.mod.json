@@ -33,7 +33,7 @@
       "hardcorequesting.fabric.capabilities.ModCapabilities"
     ],
     "jei_mod_plugin": [
-      "hardcorequesting.common.fabric.client.integration.HQMJeiPlugin"
+      "hardcorequesting.common.client.integration.HQMJeiPlugin"
     ]
   },
   "mixins": [

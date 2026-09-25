@@ -100,6 +100,9 @@ processResources {
 
 shadowJar {
     relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
+    filesMatching("fabric.mod.json") {
+        filter { it.replace("hardcorequesting.common.client", "hardcorequesting.common.fabric.client") }
+    }
 
     configurations = [project.configurations.shadowCommon]
     archiveClassifier = "dev-shadow"

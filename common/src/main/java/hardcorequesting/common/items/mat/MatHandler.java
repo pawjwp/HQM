@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -58,7 +59,7 @@ public class MatHandler {
         }
         switch (mode) {
             case CRAFTING -> player.openMenu(new SimpleMenuProvider(
-                    (id, inventory, p) -> new MatCraftingMenu(id, inventory),
+                    (id, inventory, p) -> new MatCraftingMenu(id, inventory, ContainerLevelAccess.create(p.level(), p.blockPosition())),
                     Component.translatable("container.hardcorequesting.mat.crafting")));
             case QUEST -> openQuest(player);
             case DEFAULT -> openDefault(player);

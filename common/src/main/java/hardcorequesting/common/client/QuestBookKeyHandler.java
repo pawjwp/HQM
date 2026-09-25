@@ -16,14 +16,14 @@ import net.minecraft.nbt.CompoundTag;
 @Environment(EnvType.CLIENT)
 public class QuestBookKeyHandler {
     public static final String CATEGORY = "key.hqm.category";
-    public static KeyMapping openBook;
+    public static KeyMapping openQuests;
     public static KeyMapping openMatDefault;
     public static KeyMapping openMatCrafting;
     public static KeyMapping openMatTracking;
     public static KeyMapping openMatStorage;
 
     public static void register() {
-        openBook = register("key.hqm.openBook");
+        openQuests = register("key.hqm.openQuests");
         openMatDefault = register("key.hqm.mat.default");
         openMatCrafting = register("key.hqm.mat.crafting");
         openMatTracking = register("key.hqm.mat.tracking");
@@ -37,7 +37,7 @@ public class QuestBookKeyHandler {
     }
 
     public static void handleTick(Minecraft mc) {
-        while (openBook.consumeClick()) {
+        while (openQuests.consumeClick()) {
             if (mc.screen instanceof GuiQuestBook) {
                 if (HQMConfig.getInstance().Keybind.TOGGLE) mc.setScreen(null);
             } else if (mc.screen == null && mc.player != null) {

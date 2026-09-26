@@ -105,7 +105,7 @@ public class HQMConfig {
     
     public static int QUEST_AVAILABLE = 0x554286f4;
     
-    public static int TEXT_NORMAL = 0x404040;
+    public static int TEXT_NORMAL = 0x3f3f3f;
 
     public static int TEXT_HINT = 0x707070;
 
@@ -113,11 +113,11 @@ public class HQMConfig {
 
     public static int TEXT_ERROR = 0xff0000;
 
-    public static int TEXT_HOVERED = 0xaaaaaa;
+    public static int TEXT_HOVERED = 0x9f9f9f;
 
-    public static int TEXT_SELECTED = 0xc0c0c0;
+    public static int TEXT_SELECTED = 0x7f7f7f;
 
-    public static int TEXT_SELECTED_HOVERED = 0xd0d0d0;
+    public static int TEXT_SELECTED_HOVERED = 0xbfbfbf;
 
     public static int MAP_CONNECTING_LINE = 0xff404040;
 
@@ -406,8 +406,8 @@ public class HQMConfig {
 
         public static class Text {
             //@Name("Standard text")
-            @Comment("Use the HTML format, e.g.: #404040")
-            public String NORMAL = "#404040";
+            @Comment("Use the HTML format, e.g.: #3f3f3f")
+            public String NORMAL = "#3f3f3f";
             //@Name("Hint text")
             @Comment("Use the HTML format, e.g.: #707070")
             public String HINT = "#707070";
@@ -418,14 +418,14 @@ public class HQMConfig {
             @Comment("Use the HTML format, e.g.: #ff0000")
             public String ERROR = "#ff0000";
             //@Name("Hovered row")
-            @Comment("Use the HTML format, e.g.: #aaaaaa")
-            public String HOVERED = "#aaaaaa";
+            @Comment("Use the HTML format, e.g.: #9f9f9f")
+            public String HOVERED = "#9f9f9f";
             //@Name("Selected row")
-            @Comment("Use the HTML format, e.g.: #c0c0c0")
-            public String SELECTED = "#c0c0c0";
+            @Comment("Use the HTML format, e.g.: #7f7f7f")
+            public String SELECTED = "#7f7f7f";
             //@Name("Selected hovered row")
-            @Comment("Use the HTML format, e.g.: #d0d0d0")
-            public String SELECTED_HOVERED = "#d0d0d0";
+            @Comment("Use the HTML format, e.g.: #bfbfbf")
+            public String SELECTED_HOVERED = "#bfbfbf";
         }
 
         public static class QuestMap {

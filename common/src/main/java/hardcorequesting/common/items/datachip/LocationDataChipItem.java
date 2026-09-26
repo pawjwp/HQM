@@ -48,8 +48,7 @@ public class LocationDataChipItem extends DataChipItem {
 
         if (tag.contains("Coordinates")) {
             CompoundTag coords = tag.getCompound("Coordinates");
-            results.add(new TrackedLocation(name, target.dimension().location(),
-                    new BlockPos(coords.getInt("X"), coords.getInt("Y"), coords.getInt("Z"))));
+            results.add(TrackedLocation.discover(name, target, new BlockPos(coords.getInt("X"), coords.getInt("Y"), coords.getInt("Z"))));
         }
         if (tag.contains("Structure")) {
             LocationResolver.parseStructures(target, tag.getString("Structure"))

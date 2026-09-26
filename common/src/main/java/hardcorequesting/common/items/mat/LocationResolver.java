@@ -53,7 +53,7 @@ public class LocationResolver {
         if (pair == null) {
             return Optional.empty();
         } else {
-            return Optional.of(new TrackedLocation(name, serverlevel.dimension().location(), pair.getFirst()));
+            return Optional.of(TrackedLocation.discover(name, serverlevel, pair.getFirst()));
         }
     }
 
@@ -63,7 +63,7 @@ public class LocationResolver {
         if (pair == null) {
             return Optional.empty();
         } else {  
-            return Optional.of(new TrackedLocation(name, serverlevel.dimension().location(), pair.getFirst()));
+            return Optional.of(TrackedLocation.discover(name, serverlevel, pair.getFirst()));
         }
     }
 

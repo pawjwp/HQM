@@ -149,7 +149,7 @@ public class MatSubCommand implements CommandHandler.SubCommand {
         for (ServerPlayer target : targets) {
             ServerLevel level = target.serverLevel();
             if (dimension != null) level = dimension;
-            count += MatUnlocks.addLocations(target, List.of(new TrackedLocation(name, level.dimension().location(), pos)), !silent);
+            count += MatUnlocks.addLocations(target, List.of(TrackedLocation.discover(name, level, pos)), !silent);
         }
         return feedback(context, count);
     }

@@ -17,13 +17,13 @@ public abstract class SelectableList<T> implements Drawable, Clickable {
     private final GuiBase gui;
     private final ExtendedScrollBar<T> scrollBar;
 
-    public SelectableList(GuiBase gui, int x, int y, int width, int rowHeight, int visibleRows, ScrollBar.Size size, int scrollBarX) {
+    public SelectableList(GuiBase gui, int x, int y, int width, int rowHeight, int visibleRows, int scrollBarX) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.rowHeight = rowHeight;
         this.gui = gui;
-        this.scrollBar = new ExtendedScrollBar<>(gui, size, scrollBarX, y - 2, x, visibleRows, () -> getEntries());
+        this.scrollBar = new ExtendedScrollBar<>(gui, visibleRows * rowHeight, scrollBarX, y - 2, x, visibleRows, () -> getEntries());
     }
 
     @Override

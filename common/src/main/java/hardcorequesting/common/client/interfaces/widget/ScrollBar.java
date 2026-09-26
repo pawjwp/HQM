@@ -23,16 +23,26 @@ public class ScrollBar implements Drawable, Clickable {
     private final int y;
     private final int left;
     private final Size size;
-    
+    private final int length;
+
     private double scroll;
     private boolean isScrolling;
     private final GuiBase gui;
     
     public ScrollBar(GuiBase gui, Size size, int x, int y, int left) {
+        this(gui, size, size.length, x, y, left);
+    }
+
+    public ScrollBar(GuiBase gui, int length, int x, int y, int left) {
+        this(gui, Size.LONG, length, x, y, left);
+    }
+
+    private ScrollBar(GuiBase gui, Size size, int length, int x, int y, int left) {
         this.gui = gui;
         this.x = x;
         this.y = y;
         this.size = size;
+        this.length = length;
         this.left = left;
     }
     
@@ -49,7 +59,10 @@ public class ScrollBar implements Drawable, Clickable {
     @Environment(EnvType.CLIENT)
     public void render(GuiGraphics graphics, int mX, int mY) {
         if (isVisible()) {
-            this.gui.drawRect(graphics, gui.getMapTexture(), x, y, size.u, size.v, SCROLL_WIDTH, size.length);
+            // The scrollbar is drawn in two parts, inwards from the top and bottom of the sprite sheet to allow custom heights
+            int topHalf = length / 2;
+            this.gui.drawRect(graphics, gui.getMapTexture(), x, y, size.u, size.v, SCROLL_WIDTH, topHalf);
+            this.gui.drawRect(graphics, gui.getMapTexture(), x, y + topHalf, size.u, size.v + size.length - (length - topHalf), SCROLL_WIDTH, length - topHalf);
             this.gui.drawRect(graphics, gui.getMapTexture(), x + 1, (int) (y + 1 + scroll), SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
         }
     }
@@ -57,7 +70,7 @@ public class ScrollBar implements Drawable, Clickable {
     @Override
     @Environment(EnvType.CLIENT)
     public boolean onClick(int mX, int mY) {
-        if (isVisible() && this.gui.inBounds(x, y, SCROLL_WIDTH, size.length, mX, mY)) {
+        if (isVisible() && this.gui.inBounds(x, y, SCROLL_WIDTH, length, mX, mY)) {
             isScrolling = true;
             updateScroll(mY);
             return true;
@@ -92,7 +105,7 @@ public class ScrollBar implements Drawable, Clickable {
     }
     
     public float getScroll() {
-        return (float) scroll / (size.length - SCROLL_BAR_HEIGHT - 2);
+        return (float) scroll / (length - SCROLL_BAR_HEIGHT - 2);
     }
     
     public <T> List<T> getVisibleEntries(List<T> list, int visibleEntries) {
@@ -113,8 +126,8 @@ public class ScrollBar implements Drawable, Clickable {
         scroll = newScroll;
         if (scroll < 0) {
             scroll = 0;
-        } else if (scroll > size.length - SCROLL_BAR_HEIGHT - 2) {
-            scroll = size.length - SCROLL_BAR_HEIGHT - 2;
+        } else if (scroll > length - SCROLL_BAR_HEIGHT - 2) {
+            scroll = length - SCROLL_BAR_HEIGHT - 2;
         }
         if (scroll != old) {
             onUpdate();
@@ -127,7 +140,7 @@ public class ScrollBar implements Drawable, Clickable {
     
     @Environment(EnvType.CLIENT)
     public void onScroll(double mX, double mY, double scroll) {
-        if (isVisible() && this.gui.inBounds(left, y, x + SCROLL_WIDTH - left, size.length, mX, mY)) {
+        if (isVisible() && this.gui.inBounds(left, y, x + SCROLL_WIDTH - left, length, mX, mY)) {
             setScroll(this.scroll - scroll);
         }
     }

@@ -20,6 +20,13 @@ public class ExtendedScrollBar<T> extends ScrollBar {
         this.visibleRows = visibleRows;
         this.columns = columns;
     }
+
+    public ExtendedScrollBar(GuiBase gui, int length, int x, int y, int left, int visibleEntries, Supplier<List<T>> listSupplier) {
+        super(gui, length, x, y, left);
+        this.listSupplier = listSupplier;
+        this.visibleRows = visibleEntries;
+        this.columns = 1;
+    }
     
     @Override
     public boolean isVisible() {

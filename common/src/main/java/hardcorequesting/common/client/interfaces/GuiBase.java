@@ -389,6 +389,14 @@ public class GuiBase extends Screen {
         drawString(graphics, str, x + (width - (int) (font.width(str) * mult)) / 2, y + (height - (int) ((font.lineHeight - 2) * mult)) / 2, mult, color);
     }
     
+    // Returns the text cut off with "…" so it fits within the width, or unchanged if it already fits
+    public FormattedText trimToWidth(FormattedText text, int width) {
+        if (font.width(text) <= width) {
+            return text;
+        }
+        return FormattedText.composite(font.substrByWidth(text, width - font.width("…")), FormattedText.of("…"));
+    }
+
     public List<FormattedText> getLinesFromText(FormattedText str, float mult, int width) {
         if (str == null) {
             str = Translator.plain("Missing info");

@@ -10,6 +10,8 @@ import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatPlayerData;
+import hardcorequesting.common.items.mat.MatUnlocks;
+import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -126,6 +128,17 @@ public enum GeneralUsage {
             if (player instanceof ServerPlayer serverPlayer) sendMatDataSync(serverPlayer);
         }
     },
+    MAT_REMOVE_LOCATION {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (!(player instanceof ServerPlayer serverPlayer)) return;
+            MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+            int index = nbt.getInt("Index");
+            if (index < 0 || index >= mat.locations.size()) return;
+            TrackedLocation target = mat.locations.get(index);
+            MatUnlocks.removeLocations(serverPlayer, location -> location == target);
+        }
+    },
     MAT_UNLOCK_TOAST {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
@@ -194,6 +207,14 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("Index", index);
         MAT_SELECT_LOCATION.sendMessageToServer(nbt);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendMatRemoveLocation(int index) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("Index", index);
+        MAT_REMOVE_LOCATION.sendMessageToServer(nbt);
     }
     
     // client -> server

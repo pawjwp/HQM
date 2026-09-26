@@ -21,6 +21,7 @@ public class MatScreens {
                 MatClientData.update(payload);
                 Minecraft.getInstance().setScreen(new GuiMatDefault(player));
             }
+            case TRACKING -> Minecraft.getInstance().setScreen(new GuiMatTracking(player));
             default -> Minecraft.getInstance().setScreen(new GuiMatPlaceholder(player, mode));
         }
     }

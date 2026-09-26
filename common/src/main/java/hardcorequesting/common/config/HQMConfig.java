@@ -232,6 +232,7 @@ public class HQMConfig {
     // - Editing
     // - Loot
     // - Keybind.TOGGLE
+    // - MAT.SHOW_TRACKING_COORDINATES
     
     public static void reloadClientOptions() {
         Path path = configPath();
@@ -384,6 +385,8 @@ public class HQMConfig {
         public int LIFE_SIGNS_RADIUS = 64;
         @Comment("Auto-play the MAT introductory tutorial")
         public boolean AUTO_PLAY_MAT_TUTORIAL = true;
+        @Comment("Show exact coordinates/distances in the Tracking tab. When disabled, coordinates are disabled and distances are rounded.")
+        public boolean SHOW_TRACKING_COORDINATES = false;
     }
     
     public static class Interface {

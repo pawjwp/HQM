@@ -8,6 +8,9 @@ import hardcorequesting.common.client.interfaces.BookTheme;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
+import hardcorequesting.common.client.interfaces.widget.LargeButton;
+import hardcorequesting.common.client.interfaces.widget.SelectableList;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatPlayerData;
@@ -18,24 +21,48 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * The MAT's Default mode contains the player's unlocked tutorials on the left and their unlocked statistics on the right.
+ * The MAT's Default mode shows the unlocked tutorials on the left and statistics on the right
  */
 @Environment(EnvType.CLIENT)
 public class GuiMatDefault extends GuiBase {
-    private static final int COLUMN_TOP = 22;      // y of each column's header
-    private static final int LIST_TOP = 36;        // y of the first row under a header
-    private static final int ROW_HEIGHT = 12;
-    private static final int LEFT_COLUMN_X = 14;   // tutorials
-    private static final int RIGHT_COLUMN_X = 184; // statistics
-    private static final int COLUMN_WIDTH = 142;
+    private static final int HEADER_Y = 20;               // heading y on both sides
+    private static final int TEXT_Y = 35;                 // first line of text content on both sides
+    private static final int TUTORIAL_X = 20;             // x of the tutorial heading
+    private static final int TUTORIAL_WIDTH = 137;
+    private static final int TUTORIAL_ROW_HEIGHT = 24;
+    private static final int VISIBLE_TUTORIALS = 7;
+    private static final int TUTORIAL_SCROLL_X = 159;
+    private static final int STATUS_X = 10;               // a status line's offset from its row
+    private static final int STATUS_Y = 10;
+    private static final int PLAY_X = 36;                 // x of the play button
+    private static final int RESTART_X = 95;              // x of the restart button
+    private static final int BUTTON_Y = 200;              // y of both buttons
+    private static final int STAT_X = 176;                // x of the statistics heading
+    private static final int STAT_WIDTH = 142;
+    private static final int STAT_ROW_HEIGHT = 18;        // height of each statistic row (18 pixel icons)
+    private static final int VISIBLE_STATS = 9;
+    private static final int STAT_SCROLL_X = 320;
+    private static final int SCROLL_Y = 30;               // y of both scrollbars
+    private static final int SCROLL_LENGTH = 166;         // height of both scrollbars
+    private static final int STAT_ICON_X = STAT_X - 3;    // stat icons are a few pixels to the left of the stat heading
+    private static final int STAT_TEXT_X = 18;            // the text's offset from its row: against the icon, which few icons fill edge to edge, and centered on the row
+    private static final int STAT_TEXT_Y = 5;
+    private static final int STAT_Y = TEXT_Y-STAT_TEXT_Y;
+    private static final int STAT_VALUE_GAP = 4;          // the minimum gap between a statistic's name and value
 
     private final Player player;
     private final MatTabBar tabBar;
     private final ResourceLocation background;
+    private final SelectableList<String> tutorialList;
+    private final LargeButton playButton;
+    private final LargeButton restartButton;
+    private final ExtendedScrollBar<MatClientData.StatRow> statScroll;
+    private String selectedTutorial;
 
     public GuiMatDefault(Player player) {
         super(CommonComponents.EMPTY);
@@ -43,12 +70,76 @@ public class GuiMatDefault extends GuiBase {
         this.tabBar = new MatTabBar(MatMode.DEFAULT, GuiQuestBook.TEXTURE_WIDTH);
         this.mapTexture = BookTheme.MAT.map;
         this.background = ResourceHelper.getResource(MatMode.DEFAULT.getBackgroundName());
+
+        this.tutorialList = new SelectableList<>(this, TUTORIAL_X, TEXT_Y, TUTORIAL_WIDTH, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
+            @Override
+            protected List<String> getEntries() {
+                return matData().unlockedTutorials.stream().toList();
+            }
+
+            @Override
+            protected boolean isSelected(String tutorial) {
+                return tutorial.equals(selectedTutorial);
+            }
+
+            @Override
+            protected void drawRow(GuiGraphics graphics, String tutorial, int x, int y, int color) {
+                String status = "hqm.mat.default.notPlayed";
+                if (isCompleted(tutorial)) status = "hqm.mat.default.completed";
+                drawString(graphics, trimToWidth(Component.literal(tutorial), TUTORIAL_WIDTH), x, y, color);
+                drawString(graphics, Translator.translatable(status), x + STATUS_X, y + STATUS_Y, 0.7F, HQMConfig.TEXT_HINT);
+            }
+
+            // Cut off text shows the full name of the tutorial on hover
+            @Override
+            protected FormattedText getTooltip(String tutorial) {
+                if (getStringWidth(tutorial) > TUTORIAL_WIDTH) return Component.literal(tutorial);
+                return null;
+            }
+
+            @Override
+            protected void onRowClicked(String tutorial) {
+                selectedTutorial = tutorial;
+            }
+        };
+
+        this.playButton = new LargeButton(this, "hqm.mat.default.play", "hqm.mat.default.playUnavailable", PLAY_X, BUTTON_Y) {
+            @Override
+            public boolean isEnabled() {
+                return false;
+            }
+
+            @Override
+            public void onClick() {
+            }
+
+            @Override
+            protected FormattedText getName() {
+                if (isCompleted(selectedTutorial)) return Translator.translatable("hqm.mat.default.replay");
+                return Translator.translatable("hqm.mat.default.play");
+            }
+        };
+
+        this.restartButton = new LargeButton(this, "hqm.mat.default.restart", "hqm.mat.default.playUnavailable", RESTART_X, BUTTON_Y) {
+            @Override
+            public boolean isEnabled() {
+                return false;
+            }
+
+            @Override
+            public void onClick() {
+            }
+        };
+
+        this.statScroll = new ExtendedScrollBar<>(this, SCROLL_LENGTH, STAT_SCROLL_X, SCROLL_Y, STAT_ICON_X, VISIBLE_STATS, () -> MatClientData.stats());
     }
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         left = (width - GuiQuestBook.TEXTURE_WIDTH) / 2;
         top = (height - GuiQuestBook.TEXTURE_HEIGHT) / 2;
+        int x = mouseX - left;
+        int y = mouseY - top;
 
         applyColor(0xFFFFFFFF);
         RenderSystem.enableBlend();
@@ -56,42 +147,56 @@ public class GuiMatDefault extends GuiBase {
         graphics.blit(background, left, top, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT,
                 0, 0, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT, BookTheme.MAT.sheetSize, BookTheme.MAT.sheetSize);
 
-        renderTutorials(graphics);
+        renderTutorials(graphics, x, y);
         renderStatistics(graphics);
+        statScroll.render(graphics, x, y);
 
         tabBar.render(graphics, left, top, mouseX, mouseY);
+        tutorialList.renderTooltip(graphics, x, y);
+        playButton.renderTooltip(graphics, x, y);
+        restartButton.renderTooltip(graphics, x, y);
+        renderStatisticTooltip(graphics, x, y);
         tabBar.renderTooltip(graphics, left, top, mouseX, mouseY);
     }
 
-    private void renderTutorials(GuiGraphics graphics) {
-        drawString(graphics, Translator.translatable("hqm.mat.default.tutorials"), LEFT_COLUMN_X, COLUMN_TOP, HQMConfig.TEXT_NORMAL);
-        List<String> tutorials = matData().unlockedTutorials.stream().toList();
-        if (tutorials.isEmpty()) {
-            drawString(graphics, Translator.translatable("hqm.mat.default.noTutorials"), LEFT_COLUMN_X, LIST_TOP, HQMConfig.TEXT_HINT);
-            return;
+    // Draws the tutorial list
+    private void renderTutorials(GuiGraphics graphics, int mX, int mY) {
+        drawString(graphics, Translator.translatable("hqm.mat.default.tutorials"), TUTORIAL_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
+        if (matData().unlockedTutorials.isEmpty()) {
+            drawString(graphics, Translator.translatable("hqm.mat.default.noTutorials"), TUTORIAL_X, TEXT_Y, HQMConfig.TEXT_HINT);
         }
-        int y = LIST_TOP;
-        for (String id : tutorials) {
-            boolean completed = matData().completedTutorials.contains(id);
-            Component title = Component.literal(id);
-            drawString(graphics, title, LEFT_COLUMN_X, y, HQMConfig.TEXT_HINT);
-            if (completed) {
-                drawString(graphics, Component.literal("✔"), LEFT_COLUMN_X + COLUMN_WIDTH - 8, y, HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET);
-            }
-            y += ROW_HEIGHT;
+        tutorialList.render(graphics, mX, mY);
+        playButton.render(graphics, mX, mY);
+        restartButton.render(graphics, mX, mY);
+    }
+
+    // Draws the statistic list
+    private void renderStatistics(GuiGraphics graphics) {
+        drawString(graphics, Translator.translatable("hqm.mat.default.statistics"), STAT_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
+        List<MatClientData.StatRow> rows = statScroll.getVisibleEntries();
+        for (int i = 0; i < rows.size(); i++) {
+            MatClientData.StatRow row = rows.get(i);
+            int rowY = STAT_Y + i * STAT_ROW_HEIGHT;
+            row.icon().draw(this, graphics, STAT_ICON_X, rowY);
+            drawString(graphics, trimToWidth(row.title(), getNameWidth(row)), STAT_X + STAT_TEXT_X, rowY + STAT_TEXT_Y, HQMConfig.TEXT_NORMAL);
+            drawString(graphics, row.value(), STAT_X + STAT_WIDTH - getStringWidth(row.value()), rowY + STAT_TEXT_Y, HQMConfig.TEXT_HINT);
         }
     }
 
-    private void renderStatistics(GuiGraphics graphics) {
-        drawString(graphics, Translator.translatable("hqm.mat.default.statistics"), RIGHT_COLUMN_X, COLUMN_TOP, HQMConfig.TEXT_NORMAL);
-        List<MatClientData.StatRow> rows = MatClientData.stats();
-        int y = LIST_TOP;
-        for (MatClientData.StatRow row : rows) {
-            drawString(graphics, row.title(), RIGHT_COLUMN_X, y, HQMConfig.TEXT_NORMAL);
-            int valueWidth = getStringWidth(row.value());
-            drawString(graphics, row.value(), RIGHT_COLUMN_X + COLUMN_WIDTH - valueWidth, y, HQMConfig.TEXT_HINT);
-            y += ROW_HEIGHT;
+    // Cut off text shows the full name of the statistic on hover
+    private void renderStatisticTooltip(GuiGraphics graphics, int mX, int mY) {
+        List<MatClientData.StatRow> rows = statScroll.getVisibleEntries();
+        for (int i = 0; i < rows.size(); i++) {
+            MatClientData.StatRow row = rows.get(i);
+            if (inBounds(STAT_ICON_X, STAT_Y + i * STAT_ROW_HEIGHT, STAT_X + STAT_WIDTH - STAT_ICON_X, STAT_ROW_HEIGHT, mX, mY) && getStringWidth(row.title()) > getNameWidth(row)) {
+                renderTooltip(graphics, row.title(), mX + left, mY + top);
+            }
         }
+    }
+
+    // The width available for a statistic's name (minus the size of the icon and value)
+    private int getNameWidth(MatClientData.StatRow row) {
+        return STAT_WIDTH - STAT_TEXT_X - getStringWidth(row.value()) - STAT_VALUE_GAP;
     }
 
     @Override
@@ -99,7 +204,43 @@ public class GuiMatDefault extends GuiBase {
         if (tabBar.mouseClicked(left, top, mouseX, mouseY)) {
             return true;
         }
+        int x = (int) (mouseX - left);
+        int y = (int) (mouseY - top);
+        if (playButton.onClick(x, y) || restartButton.onClick(x, y) || tutorialList.onClick(x, y) || statScroll.onClick(x, y)) {
+            return true;
+        }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        int x = (int) (mouseX - left);
+        int y = (int) (mouseY - top);
+        if (tutorialList.onDrag(x, y) || statScroll.onDrag(x, y)) {
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        int x = (int) (mouseX - left);
+        int y = (int) (mouseY - top);
+        if (tutorialList.onRelease(x, y) || statScroll.onRelease(x, y)) {
+            return true;
+        }
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scroll) {
+        tutorialList.onScroll(mouseX - left, mouseY - top, scroll);
+        statScroll.onScroll(mouseX - left, mouseY - top, scroll);
+        return true;
+    }
+
+    private boolean isCompleted(String tutorial) {
+        return matData().completedTutorials.contains(tutorial);
     }
 
     private MatPlayerData matData() {

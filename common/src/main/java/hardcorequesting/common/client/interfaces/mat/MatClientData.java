@@ -23,7 +23,7 @@ public class MatClientData {
     // The play-time statistic is shown in Minecraft days rather than the vanilla time format.
     private static final String PLAY_TIME_KEY = StatKey.vanillaKey("minecraft:custom", Stats.PLAY_TIME.toString());
 
-    public record StatRow(Component title, Component value) {}
+    public record StatRow(Component title, Component value, MatStatIcons.Icon icon) {}
 
     private static List<StatRow> stats = new ArrayList<>();
     private static boolean autoPlay;
@@ -34,7 +34,7 @@ public class MatClientData {
         for (int i = 0; i < list.size(); i++) {
             CompoundTag entry = list.getCompound(i);
             String key = entry.getString("Key");
-            rows.add(new StatRow(StatKey.displayName(key), formatValue(key, entry.getLong("Value"))));
+            rows.add(new StatRow(StatKey.displayName(key), formatValue(key, entry.getLong("Value")), MatStatIcons.get(key)));
         }
         stats = rows;
         autoPlay = payload.getBoolean("AutoPlay");

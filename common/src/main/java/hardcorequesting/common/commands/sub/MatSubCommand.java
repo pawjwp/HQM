@@ -25,8 +25,10 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.biome.Biome;
@@ -48,6 +50,21 @@ public class MatSubCommand implements CommandHandler.SubCommand {
             new DynamicCommandExceptionType(object -> Component.translatable("commands.locate.structure.invalid", object));
     private static final DynamicCommandExceptionType ERROR_BIOME_INVALID =
             new DynamicCommandExceptionType(object -> Component.translatable("hqm.mat.command.biome.invalid", object));
+
+    // Suggests all possible statistic types including hqm:special
+    private static final SuggestionProvider<CommandSourceStack> STAT_TYPES = (context, builder) ->
+            SharedSuggestionProvider.suggestResource(Stream.concat(Stream.of(new ResourceLocation(StatKey.SPECIAL_TYPE)), BuiltInRegistries.STAT_TYPE.keySet().stream()), builder);
+
+    // Suggests the entries of the selected statistic type
+    private static final SuggestionProvider<CommandSourceStack> STATS = (context, builder) -> {
+        ResourceLocation type = ResourceLocationArgument.getId(context, "statType");
+        if (type.toString().equals(StatKey.SPECIAL_TYPE)) {
+            return SharedSuggestionProvider.suggest(StatKey.SPECIAL_STATS, builder);
+        }
+        return BuiltInRegistries.STAT_TYPE.getOptional(type)
+                .map(statType -> SharedSuggestionProvider.suggestResource(statType.getRegistry().keySet(), builder))
+                .orElseGet(() -> builder.buildFuture());
+    };
 
     // Unlocks the requested option
     private interface UnlockAction {
@@ -92,21 +109,9 @@ public class MatSubCommand implements CommandHandler.SubCommand {
 
     private ArgumentBuilder<CommandSourceStack, ?> statisticBranch() {
         return Commands.literal("statistic")
-                .then(Commands.argument("statType", ResourceLocationArgument.id())
-                        .then(withOptions(Commands.argument("stat", ResourceLocationArgument.id()),
-                                (context, targets, silent) -> {
-                                    String key = StatKey.vanillaKey(
-                                            ResourceLocationArgument.getId(context, "statType").toString(),
-                                            ResourceLocationArgument.getId(context, "stat").toString());
-                                    return unlockStat(context, targets, silent, key);
-                                })))
-                .then(Commands.literal("special")
-                        .then(withOptions(Commands.literal("life_signs_hostile"),
-                                (context, targets, silent) -> unlockStat(context, targets, silent, StatKey.LIFE_SIGNS_HOSTILE)))
-                        .then(withOptions(Commands.literal("life_signs_neutral"),
-                                (context, targets, silent) -> unlockStat(context, targets, silent, StatKey.LIFE_SIGNS_NEUTRAL)))
-                        .then(withOptions(Commands.literal("life_signs_friendly"),
-                                (context, targets, silent) -> unlockStat(context, targets, silent, StatKey.LIFE_SIGNS_FRIENDLY))));
+                .then(Commands.argument("statType", ResourceLocationArgument.id()).suggests(STAT_TYPES)
+                        .then(withOptions(Commands.argument("stat", ResourceLocationArgument.id()).suggests(STATS),
+                                (context, targets, silent) -> unlockStat(context, targets, silent, statKey(context)))));
     }
 
     private int unlockStat(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, boolean silent, String key) {
@@ -193,21 +198,13 @@ public class MatSubCommand implements CommandHandler.SubCommand {
         return Commands.literal("statistic")
                 .then(withTargets(Commands.literal("all"),
                         (context, targets) -> removeFrom(context, targets, target -> MatUnlocks.removeStats(target, stat -> true))))
-                .then(Commands.argument("statType", ResourceLocationArgument.id())
-                        .then(withTargets(Commands.argument("stat", ResourceLocationArgument.id()),
-                                (context, targets) -> {
-                                    String key = StatKey.vanillaKey(
-                                            ResourceLocationArgument.getId(context, "statType").toString(),
-                                            ResourceLocationArgument.getId(context, "stat").toString());
-                                    return removeStat(context, targets, key);
-                                })))
-                .then(Commands.literal("special")
-                        .then(withTargets(Commands.literal("life_signs_hostile"),
-                                (context, targets) -> removeStat(context, targets, StatKey.LIFE_SIGNS_HOSTILE)))
-                        .then(withTargets(Commands.literal("life_signs_neutral"),
-                                (context, targets) -> removeStat(context, targets, StatKey.LIFE_SIGNS_NEUTRAL)))
-                        .then(withTargets(Commands.literal("life_signs_friendly"),
-                                (context, targets) -> removeStat(context, targets, StatKey.LIFE_SIGNS_FRIENDLY))));
+                .then(Commands.argument("statType", ResourceLocationArgument.id()).suggests(STAT_TYPES)
+                        .then(withTargets(Commands.argument("stat", ResourceLocationArgument.id()).suggests(STATS),
+                                (context, targets) -> removeStat(context, targets, statKey(context)))));
+    }
+    
+    private static String statKey(CommandContext<CommandSourceStack> context) {
+        return StatKey.keyOf(ResourceLocationArgument.getId(context, "statType").toString(), ResourceLocationArgument.getId(context, "stat").toString());
     }
 
     private int removeStat(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, String key) {

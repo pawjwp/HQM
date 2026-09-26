@@ -11,6 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.List;
+
 /**
  * Functions for the MAT statistic keys, used in the MAT's statistic screen.
  * Each key is either a vanilla stat or one of HQM's custom stats.
@@ -19,8 +21,19 @@ public final class StatKey {
     public static final String LIFE_SIGNS_HOSTILE = "hqm:life_signs_hostile";
     public static final String LIFE_SIGNS_NEUTRAL = "hqm:life_signs_neutral";
     public static final String LIFE_SIGNS_FRIENDLY = "hqm:life_signs_friendly";
+    // The statistic type for HQM's custom stats
+    public static final String SPECIAL_TYPE = "hqm:special";
+    public static final List<String> SPECIAL_STATS = List.of(LIFE_SIGNS_HOSTILE, LIFE_SIGNS_NEUTRAL, LIFE_SIGNS_FRIENDLY);
 
     private StatKey() {}
+
+    // The statistic key as a type and a statistic
+    public static String keyOf(String typeId, String statId) {
+        if (typeId.equals(SPECIAL_TYPE)) {
+            return statId;
+        }
+        return vanillaKey(typeId, statId);
+    }
 
     public static boolean isLifeSign(String key) {
         return key.equals(LIFE_SIGNS_HOSTILE) || key.equals(LIFE_SIGNS_NEUTRAL) || key.equals(LIFE_SIGNS_FRIENDLY);

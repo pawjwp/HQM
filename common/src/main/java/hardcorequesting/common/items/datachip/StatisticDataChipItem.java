@@ -44,7 +44,7 @@ public class StatisticDataChipItem extends DataChipItem {
             return null;
         }
         if (tag.contains("StatType")) {
-            return StatKey.vanillaKey(tag.getString("StatType"), stat);
+            return StatKey.keyOf(tag.getString("StatType"), stat);
         }
         return stat;
     }

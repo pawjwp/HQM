@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.mat;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import hardcorequesting.common.client.interfaces.BookTheme;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
 import hardcorequesting.common.client.interfaces.UIScale;
 import hardcorequesting.common.config.HQMConfig;
@@ -20,7 +21,6 @@ import net.minecraft.world.inventory.CraftingMenu;
 public class MatCraftingScreen extends CraftingScreen {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource(MatMode.CRAFTING.getBackgroundName());
     private static final int PANEL_W = 176, PANEL_H = 200;
-    private static final int SHEET_SIZE = 256;
     // Distance from the panel top to the start of the vanilla screen
     private static final int HEADER_H = 34;
     private final MatTabBar tabBar = new MatTabBar(MatMode.CRAFTING, PANEL_W);
@@ -43,7 +43,7 @@ public class MatCraftingScreen extends CraftingScreen {
         // Allow transparent pixels
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        graphics.blit(BG_TEXTURE, panelLeft(), panelTop(), PANEL_W, PANEL_H, 0, 0, PANEL_W, PANEL_H, SHEET_SIZE, SHEET_SIZE);
+        graphics.blit(BG_TEXTURE, panelLeft(), panelTop(), PANEL_W, PANEL_H, 0, 0, PANEL_W, PANEL_H, BookTheme.MAT.sheetSize, BookTheme.MAT.sheetSize);
     }
 
     @Override

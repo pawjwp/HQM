@@ -6,6 +6,7 @@ import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.WidgetSprites;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,8 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class LargeButton implements Drawable, Clickable {
     
-    private static final int BUTTON_SRC_X = 54;
-    private static final int BUTTON_SRC_Y = 235;
     private static final int BUTTON_WIDTH = 57;
     private static final int BUTTON_HEIGHT = 18;
     
@@ -72,7 +71,14 @@ public abstract class LargeButton implements Drawable, Clickable {
         if (isVisible()) {
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             boolean enabled = isEnabled();
-            this.gui.drawRect(graphics, gui.getMapTexture(), x, y, BUTTON_SRC_X + (enabled && inButtonBounds(mX, mY) ? BUTTON_WIDTH : 0), BUTTON_SRC_Y, BUTTON_WIDTH, BUTTON_HEIGHT);
+            WidgetSprites sprites = this.gui.getWidgetSprites();
+            WidgetSprites.UV sprite = sprites.button();
+            if (!enabled && sprites.disabledButton() != null) {
+                sprite = sprites.disabledButton();
+            } else if (enabled && inButtonBounds(mX, mY)) {
+                sprite = sprites.hoveredButton();
+            }
+            this.gui.drawRect(graphics, sprites.texture(), x, y, sprite.u(), sprite.v(), BUTTON_WIDTH, BUTTON_HEIGHT, sprites.textureSize());
             this.gui.drawCenteredString(graphics, getName(), x, y, 0.7F, BUTTON_WIDTH, BUTTON_HEIGHT, enabled ? HQMConfig.TEXT_NORMAL : 0xA0A070);
         }
     }

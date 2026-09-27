@@ -8,6 +8,7 @@ import hardcorequesting.common.client.interfaces.BookTheme;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.WidgetSprites;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.SelectableList;
@@ -70,6 +71,7 @@ public class GuiMatDefault extends GuiBase {
         this.tabBar = new MatTabBar(MatMode.DEFAULT, GuiQuestBook.TEXTURE_WIDTH);
         this.mapTexture = BookTheme.MAT.map;
         this.background = ResourceHelper.getResource(MatMode.DEFAULT.getBackgroundName());
+        this.widgetSprites = WidgetSprites.fromMatMode(background);
 
         this.tutorialList = new SelectableList<>(this, TUTORIAL_X, TEXT_Y, TUTORIAL_WIDTH, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
             @Override

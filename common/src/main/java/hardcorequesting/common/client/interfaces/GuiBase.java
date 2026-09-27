@@ -39,6 +39,8 @@ public class GuiBase extends Screen {
     protected static final int ITEM_SRC_Y = 235;
     protected int left, top;
     protected ResourceLocation mapTexture = MAP_TEXTURE;
+    // The sprites that scrollbars and large buttons use, defaulting to the theme's texture
+    protected WidgetSprites widgetSprites = WidgetSprites.fromTheme(MAP_TEXTURE);
     
     protected GuiBase(Component title) {
         super(title);
@@ -66,6 +68,10 @@ public class GuiBase extends Screen {
 
     public void drawRect(GuiGraphics graphics, ResourceLocation texture, int x, int y, int u, int v, int w, int h) {
         graphics.blit(texture, x + left, y + top, u, v, w, h);
+    }
+
+    public void drawRect(GuiGraphics graphics, ResourceLocation texture, int x, int y, int u, int v, int w, int h, int textureSize) {
+        graphics.blit(texture, x + left, y + top, u, v, w, h, textureSize, textureSize);
     }
     
     public void drawRect(GuiGraphics graphics, int x, int y, int u, int v, int w, int h, RenderRotation rotation) {
@@ -269,6 +275,10 @@ public class GuiBase extends Screen {
     
     public ResourceLocation getMapTexture() {
         return mapTexture;
+    }
+
+    public WidgetSprites getWidgetSprites() {
+        return widgetSprites;
     }
 
     public int getLeft() {

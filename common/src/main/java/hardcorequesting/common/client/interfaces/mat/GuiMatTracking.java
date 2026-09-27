@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.BookTheme;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.WidgetSprites;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.SelectableList;
 import hardcorequesting.common.config.HQMConfig;
@@ -91,6 +92,7 @@ public class GuiMatTracking extends GuiBase {
         this.tabBar = new MatTabBar(MatMode.TRACKING, GuiQuestBook.TEXTURE_WIDTH);
         this.mapTexture = BookTheme.MAT.map;
         this.background = ResourceHelper.getResource(MatMode.TRACKING.getBackgroundName());
+        this.widgetSprites = WidgetSprites.fromMatMode(background);
 
         this.locationList = new SelectableList<>(this, LIST_X, TEXT_Y, LIST_WIDTH, ROW_HEIGHT, VISIBLE_ROWS, LIST_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
             @Override

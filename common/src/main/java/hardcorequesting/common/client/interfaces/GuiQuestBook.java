@@ -89,6 +89,7 @@ public class GuiQuestBook extends GuiBase {
         this.isOpBook = isOpBook;
         this.theme = theme;
         this.mapTexture = theme.map;
+        this.widgetSprites = WidgetSprites.fromTheme(theme.map);
         this.background = theme.background;
     }
     

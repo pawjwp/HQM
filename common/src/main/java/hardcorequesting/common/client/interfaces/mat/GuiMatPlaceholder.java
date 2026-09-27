@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.BookTheme;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.WidgetSprites;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.util.Translator;
@@ -28,6 +29,7 @@ public class GuiMatPlaceholder extends GuiBase {
         this.tabBar = new MatTabBar(mode, GuiQuestBook.TEXTURE_WIDTH);
         this.mapTexture = BookTheme.MAT.map;
         this.background = ResourceHelper.getResource(mode.getBackgroundName());
+        this.widgetSprites = WidgetSprites.fromMatMode(background);
     }
 
     @Override

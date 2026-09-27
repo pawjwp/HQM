@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
+import hardcorequesting.common.client.interfaces.WidgetSprites;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,8 +17,6 @@ public class ScrollBar implements Drawable, Clickable {
     private static final int SCROLL_WIDTH = 7;
     private static final int SCROLL_BAR_WIDTH = 5;
     private static final int SCROLL_BAR_HEIGHT = 6;
-    private static final int SCROLL_BAR_SRC_X = 250;
-    private static final int SCROLL_BAR_SRC_Y = 167;
     
     private final int x;
     private final int y;
@@ -59,11 +58,19 @@ public class ScrollBar implements Drawable, Clickable {
     @Environment(EnvType.CLIENT)
     public void render(GuiGraphics graphics, int mX, int mY) {
         if (isVisible()) {
+            WidgetSprites sprites = this.gui.getWidgetSprites();
             // The scrollbar is drawn in two parts, inwards from the top and bottom of the sprite sheet to allow custom heights
+            // Long and custom-length scrollbars use the screen's widget sprites, while the other scrollbar sizes use the theme's map texture
             int topHalf = length / 2;
-            this.gui.drawRect(graphics, gui.getMapTexture(), x, y, size.u, size.v, SCROLL_WIDTH, topHalf);
-            this.gui.drawRect(graphics, gui.getMapTexture(), x, y + topHalf, size.u, size.v + size.length - (length - topHalf), SCROLL_WIDTH, length - topHalf);
-            this.gui.drawRect(graphics, gui.getMapTexture(), x + 1, (int) (y + 1 + scroll), SCROLL_BAR_SRC_X, SCROLL_BAR_SRC_Y, SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT);
+            if (size == Size.LONG) {
+                WidgetSprites.UV track = sprites.longTrack();
+                this.gui.drawRect(graphics, sprites.texture(), x, y, track.u(), track.v(), SCROLL_WIDTH, topHalf, sprites.textureSize());
+                this.gui.drawRect(graphics, sprites.texture(), x, y + topHalf, track.u(), track.v() + size.length - (length - topHalf), SCROLL_WIDTH, length - topHalf, sprites.textureSize());
+            } else {
+                this.gui.drawRect(graphics, gui.getMapTexture(), x, y, size.u, size.v, SCROLL_WIDTH, topHalf);
+                this.gui.drawRect(graphics, gui.getMapTexture(), x, y + topHalf, size.u, size.v + size.length - (length - topHalf), SCROLL_WIDTH, length - topHalf);
+            }
+            this.gui.drawRect(graphics, sprites.texture(), x + 1, (int) (y + 1 + scroll), sprites.handle().u(), sprites.handle().v(), SCROLL_BAR_WIDTH, SCROLL_BAR_HEIGHT, sprites.textureSize());
         }
     }
     

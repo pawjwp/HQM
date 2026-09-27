@@ -5,6 +5,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,6 +25,12 @@ public class MatPlayerData {
     public final List<TrackedLocation> locations = new ArrayList<>(); // locations, insertion order
     public int selectedLocation = -1; // start with no selected location
     public ItemStack dockedTerminal = ItemStack.EMPTY;
+
+    @Nullable
+    public TrackedLocation getSelectedLocation() {
+        if (selectedLocation < 0 || selectedLocation >= locations.size()) return null;
+        return locations.get(selectedLocation);
+    }
 
     public CompoundTag toNBT() {
         CompoundTag tag = new CompoundTag();

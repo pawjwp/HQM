@@ -8,6 +8,7 @@ import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.mat.MatHandler;
+import hardcorequesting.common.items.mat.MatMaps;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.items.mat.MatUnlocks;
@@ -139,6 +140,12 @@ public enum GeneralUsage {
             MatUnlocks.removeLocations(serverPlayer, location -> location == target);
         }
     },
+    MAT_REQUEST_MAP {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (player instanceof ServerPlayer serverPlayer) MatMaps.sendMap(serverPlayer, nbt.getInt("Index"));
+        }
+    },
     MAT_UNLOCK_TOAST {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
@@ -215,6 +222,14 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("Index", index);
         MAT_REMOVE_LOCATION.sendMessageToServer(nbt);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendMatRequestMap(int index) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("Index", index);
+        MAT_REQUEST_MAP.sendMessageToServer(nbt);
     }
     
     // client -> server

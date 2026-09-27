@@ -2,8 +2,8 @@ package hardcorequesting.common.items;
 
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatHandler;
+import hardcorequesting.common.items.mat.MatMaps;
 import hardcorequesting.common.items.mat.MatMode;
-import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.quests.QuestingDataManager;
 import net.minecraft.core.GlobalPos;
@@ -11,6 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -68,6 +69,14 @@ public class MatItem extends Item {
         return super.use(world, player, hand);
     }
 
+    // Fills in the map while the MAT is carried
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if (!level.isClientSide && entity instanceof ServerPlayer player && HQMConfig.getInstance().MAT.ENABLE_MAT && getMode(stack) == MatMode.TRACKING) {
+            MatMaps.explore(player, stack);
+        }
+    }
+
     // If the MAT is in tracking mode and the pointer is visible
     public static boolean isTracking(ItemStack stack, Entity holder) {
         return getMode(stack) == MatMode.TRACKING && selectedLocation(holder) != null;
@@ -86,9 +95,7 @@ public class MatItem extends Item {
         if (!(holder instanceof Player player)) return null;
         // Don't initialize questing data just from trying to render the MAT
         if (!QuestingDataManager.getInstance().hasData(player)) return null;
-        MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
-        if (mat.selectedLocation < 0 || mat.selectedLocation >= mat.locations.size()) return null;
-        return mat.locations.get(mat.selectedLocation);
+        return QuestingDataManager.getInstance().getQuestingData(player).matData.getSelectedLocation();
     }
 
     @Override

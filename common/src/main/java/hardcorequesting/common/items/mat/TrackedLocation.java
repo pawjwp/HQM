@@ -13,15 +13,19 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A position that stores a name, dimension, and coordinates to be used by the MAT in tracking mode
- * The biome at the location and the time it was discovered are stored as well.
+ * The biome at the location, the time it was discovered, and the connected map are stored as well.
  */
-public record TrackedLocation(String name, ResourceLocation dimension, BlockPos pos, @Nullable ResourceLocation biome, long discoveredTime) {
+public record TrackedLocation(String name, ResourceLocation dimension, BlockPos pos, @Nullable ResourceLocation biome, long discoveredTime, int mapId) {
 
     // A newly found location records the biome and current time
     public static TrackedLocation discover(String name, ServerLevel level, BlockPos pos) {
         ResourceLocation biome = level.getUncachedNoiseBiome(QuartPos.fromBlock(pos.getX()), QuartPos.fromBlock(pos.getY()), QuartPos.fromBlock(pos.getZ()))
                 .unwrapKey().map(key -> key.location()).orElse(null);
-        return new TrackedLocation(name, level.dimension().location(), pos, biome, level.getDayTime());
+        return new TrackedLocation(name, level.dimension().location(), pos, biome, level.getDayTime(), -1);
+    }
+
+    public TrackedLocation withMapId(int mapId) {
+        return new TrackedLocation(name, dimension, pos, biome, discoveredTime, mapId);
     }
 
     public CompoundTag toNBT() {
@@ -33,6 +37,7 @@ public record TrackedLocation(String name, ResourceLocation dimension, BlockPos 
         tag.putInt("Z", pos.getZ());
         if (biome != null) tag.putString("Biome", biome.toString());
         tag.putLong("DiscoveredTime", discoveredTime);
+        tag.putInt("MapId", mapId);
         return tag;
     }
 
@@ -41,12 +46,15 @@ public record TrackedLocation(String name, ResourceLocation dimension, BlockPos 
         if (tag.contains("Biome")) biome = new ResourceLocation(tag.getString("Biome"));
         long discoveredTime = -1;
         if (tag.contains("DiscoveredTime")) discoveredTime = tag.getLong("DiscoveredTime");
+        int mapId = -1;
+        if (tag.contains("MapId")) mapId = tag.getInt("MapId");
         return new TrackedLocation(
                 tag.getString("Name"),
                 new ResourceLocation(tag.getString("Dimension")),
                 new BlockPos(tag.getInt("X"), tag.getInt("Y"), tag.getInt("Z")),
                 biome,
-                discoveredTime);
+                discoveredTime,
+                mapId);
     }
 
     public JsonElement toJson() {
@@ -60,6 +68,7 @@ public record TrackedLocation(String name, ResourceLocation dimension, BlockPos 
                     if (biome != null) builder.add("biome", biome.toString());
                 })
                 .add("discoveredTime", discoveredTime)
+                .add("mapId", mapId)
                 .build();
     }
 
@@ -71,6 +80,7 @@ public record TrackedLocation(String name, ResourceLocation dimension, BlockPos 
                 new ResourceLocation(GsonHelper.getAsString(object, "dimension")),
                 new BlockPos(GsonHelper.getAsInt(object, "x"), GsonHelper.getAsInt(object, "y"), GsonHelper.getAsInt(object, "z")),
                 biome,
-                GsonHelper.getAsLong(object, "discoveredTime", -1));
+                GsonHelper.getAsLong(object, "discoveredTime", -1),
+                GsonHelper.getAsInt(object, "mapId", -1));
     }
 }

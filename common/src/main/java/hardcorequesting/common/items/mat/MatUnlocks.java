@@ -76,10 +76,7 @@ public class MatUnlocks {
     // Removes the matching locations, keeping the tracked selection on the same location if it wasn't removed
     public static int removeLocations(ServerPlayer player, Predicate<TrackedLocation> filter) {
         MatPlayerData mat = data(player);
-        TrackedLocation tracked = null;
-        if (mat.selectedLocation >= 0 && mat.selectedLocation < mat.locations.size()) {
-            tracked = mat.locations.get(mat.selectedLocation);
-        }
+        TrackedLocation tracked = mat.getSelectedLocation();
         int before = mat.locations.size();
         mat.locations.removeIf(filter);
         mat.selectedLocation = mat.locations.indexOf(tracked);

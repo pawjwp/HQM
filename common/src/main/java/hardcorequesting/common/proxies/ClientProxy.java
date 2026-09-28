@@ -7,6 +7,7 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.QuestBookKeyHandler;
 import hardcorequesting.common.client.interfaces.graphic.task.*;
 import hardcorequesting.common.client.interfaces.mat.MatCraftingScreen;
+import hardcorequesting.common.client.tutorial.TutorialPlayer;
 import hardcorequesting.common.inventory.ModMenus;
 import hardcorequesting.common.items.MatItem;
 import hardcorequesting.common.items.ModItems;
@@ -28,6 +29,7 @@ public class ClientProxy extends CommonProxy {
         super.init();
         Quest.clientTicker = new QuestTicker();
         QuestBookKeyHandler.register();
+        TutorialPlayer.register();
         HardcoreQuestingCore.platform.registerOnClientTick(minecraftClient -> {
             Quest.clientTicker.tick(minecraftClient.level, true);
             QuestBookKeyHandler.handleTick(minecraftClient);

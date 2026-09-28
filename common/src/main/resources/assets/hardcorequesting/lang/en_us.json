@@ -144,6 +144,7 @@
   "hqm.mat.default.notPlayed": "Not played yet",
   "hqm.mat.default.play": "Play",
   "hqm.mat.default.replay": "Replay",
+  "hqm.mat.default.pause": "Pause",
   "hqm.mat.default.restart": "Restart",
   "hqm.mat.default.playUnavailable": "Unavailable",
   "hqm.mat.tracking.locations": "Locations",

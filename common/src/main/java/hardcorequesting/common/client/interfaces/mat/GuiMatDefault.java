@@ -12,10 +12,12 @@ import hardcorequesting.common.client.interfaces.WidgetSprites;
 import hardcorequesting.common.client.interfaces.widget.ExtendedScrollBar;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.client.interfaces.widget.SelectableList;
+import hardcorequesting.common.client.tutorial.TutorialPlayer;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.tutorial.TutorialManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -105,20 +107,30 @@ public class GuiMatDefault extends GuiBase {
             }
         };
 
+        // Plays the selected tutorial, replacing any running tutorials, or stops playing if this tutorial is active
         this.playButton = new LargeButton(this, "hqm.mat.default.play", "hqm.mat.default.playUnavailable", PLAY_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
-                return false;
+                return TutorialManager.getInstance().tutorials.containsKey(selectedTutorial);
             }
 
             @Override
             public void onClick() {
+                if (isPlaying(selectedTutorial)) TutorialPlayer.pause();
+                else TutorialPlayer.start(TutorialManager.getInstance().tutorials.get(selectedTutorial));
             }
 
             @Override
             protected FormattedText getName() {
+                if (isPlaying(selectedTutorial)) return Translator.translatable("hqm.mat.default.pause");
                 if (isCompleted(selectedTutorial)) return Translator.translatable("hqm.mat.default.replay");
                 return Translator.translatable("hqm.mat.default.play");
+            }
+
+            @Override
+            protected FormattedText getDescription() {
+                if (isEnabled()) return null;
+                return super.getDescription();
             }
         };
 
@@ -134,6 +146,7 @@ public class GuiMatDefault extends GuiBase {
         };
 
         this.statScroll = new ExtendedScrollBar<>(this, SCROLL_LENGTH, STAT_SCROLL_X, SCROLL_Y, STAT_ICON_X, VISIBLE_STATS, () -> MatClientData.stats());
+        this.selectedTutorial = TutorialPlayer.getPlayingId(); // the active tutorial is selected when opening the screen
     }
 
     @Override
@@ -243,6 +256,10 @@ public class GuiMatDefault extends GuiBase {
 
     private boolean isCompleted(String tutorial) {
         return matData().completedTutorials.contains(tutorial);
+    }
+
+    private boolean isPlaying(String tutorial) {
+        return tutorial != null && tutorial.equals(TutorialPlayer.getPlayingId());
     }
 
     private MatPlayerData matData() {

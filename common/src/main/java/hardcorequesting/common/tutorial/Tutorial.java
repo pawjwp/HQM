@@ -13,7 +13,7 @@ public record Tutorial(String id, String title, String description, List<Step> s
     public record TextBox(String text, String anchor, Side side, int offsetX, int offsetY, int width) {
     }
 
-    // What part of a text box is placed on the anchor point
+    // Where a text box is placed relative to its anchor point
     public enum Side {
         ABOVE, BELOW, LEFT, RIGHT, CENTER
     }

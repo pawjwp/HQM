@@ -17,10 +17,12 @@ import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.tutorial.Tutorial;
 import hardcorequesting.common.tutorial.TutorialManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -40,8 +42,10 @@ public class GuiMatDefault extends GuiBase {
     private static final int TUTORIAL_ROW_HEIGHT = 24;
     private static final int VISIBLE_TUTORIALS = 7;
     private static final int TUTORIAL_SCROLL_X = 159;
-    private static final int STATUS_X = 10;               // a status line's offset from its row
-    private static final int STATUS_Y = 10;
+    private static final int DESCRIPTION_X = 10;          // a description's offset from its row
+    private static final int DESCRIPTION_Y = 10;
+    private static final float DESCRIPTION_SCALE = 0.7F;
+    private static final int DESCRIPTION_WIDTH = (int) ((TUTORIAL_WIDTH - DESCRIPTION_X) / DESCRIPTION_SCALE); // the row's width past the offset, in unscaled font pixels
     private static final int PLAY_X = 36;                 // x of the play button
     private static final int RESTART_X = 95;              // x of the restart button
     private static final int BUTTON_Y = 200;              // y of both buttons
@@ -86,19 +90,36 @@ public class GuiMatDefault extends GuiBase {
                 return tutorial.equals(selectedTutorial);
             }
 
+            // Shows a tutorial's title/description
             @Override
-            protected void drawRow(GuiGraphics graphics, String tutorial, int x, int y, int color) {
-                String status = "hqm.mat.default.notPlayed";
-                if (isCompleted(tutorial)) status = "hqm.mat.default.completed";
-                drawString(graphics, trimToWidth(Component.literal(tutorial), TUTORIAL_WIDTH), x, y, color);
-                drawString(graphics, Translator.translatable(status), x + STATUS_X, y + STATUS_Y, 0.7F, HQMConfig.TEXT_HINT);
+            protected void drawRow(GuiGraphics graphics, String id, int x, int y, int color) {
+                Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
+
+                // Default title to tutorial ID and description to "unavailable text"
+                FormattedText title = Component.literal(id);
+                FormattedText description = Translator.translatable("hqm.mat.default.unavailable");
+
+                // Set title and description
+                if (tutorial != null) {
+                    title = Component.literal(tutorial.title());
+                    description = Component.literal(tutorial.description());
+                } else if (!isSelected(id)) {
+                    color = HQMConfig.TEXT_HINT;
+                }
+                drawString(graphics, trimToWidth(title, TUTORIAL_WIDTH), x, y, color);
+                drawString(graphics, trimToWidth(description, DESCRIPTION_WIDTH), x + DESCRIPTION_X, y + DESCRIPTION_Y, DESCRIPTION_SCALE, HQMConfig.TEXT_HINT);
             }
 
-            // Cut off text shows the full name of the tutorial on hover
+            // Cut off text shows the full title and description of the tutorial on hover
             @Override
-            protected FormattedText getTooltip(String tutorial) {
-                if (getStringWidth(tutorial) > TUTORIAL_WIDTH) return Component.literal(tutorial);
-                return null;
+            protected FormattedText getTooltip(String id) {
+                Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
+                if (tutorial == null) {
+                    if (getStringWidth(id) > TUTORIAL_WIDTH) return Component.literal(id);
+                    return null;
+                }
+                if (getStringWidth(tutorial.title()) <= TUTORIAL_WIDTH && getStringWidth(tutorial.description()) <= DESCRIPTION_WIDTH) return null;
+                return Component.literal(tutorial.title() + "\n").append(Component.literal(tutorial.description()).withStyle(ChatFormatting.GRAY));
             }
 
             @Override
@@ -108,7 +129,7 @@ public class GuiMatDefault extends GuiBase {
         };
 
         // Plays the selected tutorial, replacing any running tutorials, or stops playing if this tutorial is active
-        this.playButton = new LargeButton(this, "hqm.mat.default.play", "hqm.mat.default.playUnavailable", PLAY_X, BUTTON_Y) {
+        this.playButton = new LargeButton(this, "hqm.mat.default.play", "hqm.mat.default.unavailable", PLAY_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
                 return TutorialManager.getInstance().tutorials.containsKey(selectedTutorial);
@@ -134,7 +155,7 @@ public class GuiMatDefault extends GuiBase {
             }
         };
 
-        this.restartButton = new LargeButton(this, "hqm.mat.default.restart", "hqm.mat.default.playUnavailable", RESTART_X, BUTTON_Y) {
+        this.restartButton = new LargeButton(this, "hqm.mat.default.restart", "hqm.mat.default.unavailable", RESTART_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
                 return false;

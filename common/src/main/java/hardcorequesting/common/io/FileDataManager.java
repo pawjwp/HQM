@@ -13,7 +13,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 public class FileDataManager implements DataReader, DataWriter {
@@ -79,7 +81,26 @@ public class FileDataManager implements DataReader, DataWriter {
             return Stream.empty();
         }
     }
-    
+
+    // Also creates the subfolder when it doesn't exist, so pack authors can see where its files go
+    @Override
+    public Map<String, String> readFolder(String folder) {
+        Path directory = path.resolve(folder);
+        Map<String, String> files = new TreeMap<>();
+        try {
+            Files.createDirectories(directory);
+            try (DirectoryStream<Path> stream = Files.newDirectoryStream(directory, "*.json")) {
+                for (Path file : stream) {
+                    Optional<String> text = SaveHandler.load(file);
+                    if (text.isPresent()) files.put(file.getFileName().toString(), text.get());
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Failed to read the '{}' folder.", folder, e);
+        }
+        return files;
+    }
+
     @Override
     public void write(String name, String text) {
         SaveHandler.save(path.resolve(name), text);

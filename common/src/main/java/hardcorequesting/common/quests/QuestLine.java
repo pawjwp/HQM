@@ -16,6 +16,7 @@ import hardcorequesting.common.network.message.PlayerDataSyncMessage;
 import hardcorequesting.common.network.message.TeamStatsMessage;
 import hardcorequesting.common.reputation.ReputationManager;
 import hardcorequesting.common.team.TeamManager;
+import hardcorequesting.common.tutorial.TutorialManager;
 import hardcorequesting.common.util.SaveHelper;
 import hardcorequesting.common.util.WrappedText;
 import net.fabricmc.api.EnvType;
@@ -39,6 +40,7 @@ public class QuestLine {
     public final DeathStatsManager deathStatsManager;
     public final QuestSetsManager questSetsManager;
     public final TeamManager teamManager;
+    public final TutorialManager tutorialManager;
     public final Serializable descriptionManager;
     
     private WrappedText mainDescription = WrappedText.create("No description");
@@ -54,6 +56,7 @@ public class QuestLine {
         this.deathStatsManager = new DeathStatsManager();
         this.questSetsManager = new QuestSetsManager();
         this.teamManager = new TeamManager();
+        this.tutorialManager = new TutorialManager();
         this.descriptionManager = new Serializable() {
             @Override
             public boolean isData() {
@@ -84,6 +87,7 @@ public class QuestLine {
         add(this.reputationManager);
         add(this.groupTierManager);
         add(this.questSetsManager);
+        add(this.tutorialManager);
         add(this.teamManager);
         add(this.questingDataManager.data);
     }

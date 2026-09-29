@@ -13,6 +13,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -73,6 +74,11 @@ public class TutorialPlayer {
                 if (TutorialAnchors.resolve(textBox.anchor()) == null) {
                     HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses the unknown anchor %s, so that text box is hidden", tutorial.id(), textBox.anchor());
                 }
+                for (String screen : textBox.screens()) {
+                    if (!TutorialScreens.isKnownScreen(screen)) {
+                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s, so that text box is not shown", tutorial.id(), screen);
+                    }
+                }
             }
         }
         TutorialPlayer.tutorial = tutorial;
@@ -119,9 +125,14 @@ public class TutorialPlayer {
 
     @Nullable
     private static Layout layout(Tutorial.TextBox textBox) {
+        Screen screen = Minecraft.getInstance().screen;
+        Font font = Minecraft.getInstance().font;
+
+        // Null when the text box isn't shown, when its anchor can't be found, or if its screen isn't open
+        if (!textBox.screens().isEmpty() && textBox.screens().stream().noneMatch(name -> TutorialScreens.matches(name, screen))) return null;
+        
         Rect2i anchor = TutorialAnchors.resolve(textBox.anchor());
         if (anchor == null) return null;
-        Font font = Minecraft.getInstance().font;
         
         // Each text box is as wide and tall as it needs to be to fit all lines (and line width is limited by configured size)
         List<FormattedCharSequence> lines = font.split(FormattedText.of(textBox.text()), textBox.width());

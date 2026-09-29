@@ -48,13 +48,18 @@ public class TutorialAdapter {
             offsetX = offset.get(0).getAsInt();
             offsetY = offset.get(1).getAsInt();
         }
+        List<String> screens = new ArrayList<>();
+        for (JsonElement screen : GsonHelper.getAsJsonArray(json, "screens", new JsonArray())) {
+            screens.add(screen.getAsString());
+        }
         return new Tutorial.TextBox(
             GsonHelper.getAsString(json, "text"),
             GsonHelper.getAsString(json, "anchor", DEFAULT_ANCHOR),
             Tutorial.Side.valueOf(GsonHelper.getAsString(json, "side", "center").toUpperCase(Locale.ROOT)),
             offsetX,
             offsetY,
-            GsonHelper.getAsInt(json, "width", DEFAULT_WIDTH)
+            GsonHelper.getAsInt(json, "width", DEFAULT_WIDTH),
+            screens
         );
     }
 }

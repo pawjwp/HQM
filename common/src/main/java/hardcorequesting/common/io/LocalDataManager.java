@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class LocalDataManager implements DataReader {
@@ -17,6 +18,15 @@ public class LocalDataManager implements DataReader {
     
     public void provide(String path, String str) {
         tempPaths.put(path, str);
+    }
+
+    @Override
+    public Map<String, String> readFolder(String folder) {
+        Map<String, String> files = new TreeMap<>();
+        for (Map.Entry<String, String> entry : tempPaths.entrySet()) {
+            if (entry.getKey().startsWith(folder + "/")) files.put(entry.getKey().substring(folder.length() + 1), entry.getValue());
+        }
+        return files;
     }
     
     @Override

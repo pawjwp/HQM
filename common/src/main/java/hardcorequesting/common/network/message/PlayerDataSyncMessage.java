@@ -24,6 +24,7 @@ public class PlayerDataSyncMessage implements IMessage {
     
     private String reputations, bags, mainDescription;
     private Map<String, String> questsSets;
+    private Map<String, String> tutorials;
     
     private boolean questing;
     private boolean hardcore;
@@ -48,6 +49,7 @@ public class PlayerDataSyncMessage implements IMessage {
         this.teams = questLine.teamManager.saveToString(player);
         this.deaths = questLine.deathStatsManager.saveToString();
         this.data = questLine.questingDataManager.data.saveToString(player);
+        this.tutorials = questLine.tutorialManager.files;
     }
     
     @Override
@@ -68,6 +70,13 @@ public class PlayerDataSyncMessage implements IMessage {
         this.teams = SyncUtil.readLargeString(buf);
         this.deaths = SyncUtil.readLargeString(buf);
         this.data = SyncUtil.readLargeString(buf);
+
+        int tutorialCount = buf.readInt();
+        this.tutorials = Maps.newLinkedHashMap();
+        for (int i = 0; i < tutorialCount; i++) {
+            String fileName = SyncUtil.readLargeString(buf);
+            this.tutorials.put(fileName, SyncUtil.readLargeString(buf));
+        }
     }
     
     @Override
@@ -86,6 +95,12 @@ public class PlayerDataSyncMessage implements IMessage {
         SyncUtil.writeLargeString(this.teams, buf);
         SyncUtil.writeLargeString(this.deaths, buf);
         SyncUtil.writeLargeString(this.data, buf);
+
+        buf.writeInt(this.tutorials.size());
+        for (Map.Entry<String, String> entry : this.tutorials.entrySet()) {
+            SyncUtil.writeLargeString(entry.getKey(), buf);
+            SyncUtil.writeLargeString(entry.getValue(), buf);
+        }
     }
     
     public static class Handler implements IMessageHandler<PlayerDataSyncMessage, IMessage> {
@@ -111,7 +126,11 @@ public class PlayerDataSyncMessage implements IMessage {
             for (Map.Entry<String, String> entry : message.questsSets.entrySet()) {
                 data.provide("sets/" + entry.getKey() + ".json", entry.getValue());
             }
+            for (Map.Entry<String, String> entry : message.tutorials.entrySet()) {
+                data.provide("tutorials/" + entry.getKey(), entry.getValue());
+            }
             questLine.questSetsManager.load(data);
+            questLine.tutorialManager.load(data);
             
             questLine.setMainDescription(WrappedText.fromJson(SaveHandler.JSON_PARSER.parse(message.mainDescription), "No description", false));
             questLine.reputationManager.clearAndLoad(message.reputations);

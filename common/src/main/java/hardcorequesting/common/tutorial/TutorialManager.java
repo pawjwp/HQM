@@ -12,6 +12,7 @@ import java.util.Map;
 
 public class TutorialManager implements Serializable {
     public final Map<String, Tutorial> tutorials = new LinkedHashMap<>();
+    public final Map<String, String> files = new LinkedHashMap<>();
 
     public static TutorialManager getInstance() {
         return QuestLine.getActiveQuestLine().tutorialManager;
@@ -30,11 +31,13 @@ public class TutorialManager implements Serializable {
     @Override
     public void load(DataReader reader) {
         tutorials.clear();
+        files.clear();
         for (Map.Entry<String, String> file : reader.readFolder("tutorials").entrySet()) {
             String fileName = file.getKey();
             String id = fileName.substring(0, fileName.length() - ".json".length());
             try {
                 tutorials.put(id, TutorialAdapter.read(id, file.getValue()));
+                files.put(fileName, file.getValue());
             } catch (RuntimeException e) {
                 HardcoreQuestingCore.LOGGER.warn("Skipped tutorial %s: %s", fileName, e.getMessage());
             }

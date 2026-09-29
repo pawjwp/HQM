@@ -56,6 +56,12 @@ public class QuestingAdapter {
             return object()
                     .add("unlockedTutorials", stringArray(mat.unlockedTutorials))
                     .add("completedTutorials", stringArray(mat.completedTutorials))
+                    .add("tutorialProgress", object()
+                            .use(builder -> {
+                                for (Map.Entry<String, Integer> entry : mat.tutorialProgress.entrySet())
+                                    builder.add(entry.getKey(), entry.getValue());
+                            })
+                            .build())
                     .add("tutorialSeen", mat.matTutorialSeen)
                     .add("unlockedStats", stringArray(mat.unlockedStats))
                     .add("locations", locations)
@@ -75,6 +81,8 @@ public class QuestingAdapter {
                 mat.unlockedTutorials.add(element.getAsString());
             for (JsonElement element : GsonHelper.getAsJsonArray(object, "completedTutorials", new JsonArray()))
                 mat.completedTutorials.add(element.getAsString());
+            for (Map.Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(object, "tutorialProgress", new JsonObject()).entrySet())
+                mat.tutorialProgress.put(entry.getKey(), entry.getValue().getAsInt());
             mat.matTutorialSeen = GsonHelper.getAsBoolean(object, "tutorialSeen", false);
             for (JsonElement element : GsonHelper.getAsJsonArray(object, "unlockedStats", new JsonArray()))
                 mat.unlockedStats.add(element.getAsString());

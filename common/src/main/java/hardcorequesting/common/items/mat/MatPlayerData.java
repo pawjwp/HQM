@@ -8,9 +8,11 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,6 +22,7 @@ import java.util.Set;
 public class MatPlayerData {
     public final Set<String> unlockedTutorials = new LinkedHashSet<>();
     public final Set<String> completedTutorials = new HashSet<>();
+    public final Map<String, Integer> tutorialProgress = new HashMap<>(); // the current step
     public boolean matTutorialSeen;
     public final List<String> unlockedStats = new ArrayList<>(); // stats, unlock order
     public final List<TrackedLocation> locations = new ArrayList<>(); // locations, insertion order
@@ -36,6 +39,9 @@ public class MatPlayerData {
         CompoundTag tag = new CompoundTag();
         tag.put("UnlockedTutorials", stringList(unlockedTutorials));
         tag.put("CompletedTutorials", stringList(completedTutorials));
+        CompoundTag progress = new CompoundTag();
+        for (Map.Entry<String, Integer> entry : tutorialProgress.entrySet()) progress.putInt(entry.getKey(), entry.getValue());
+        tag.put("TutorialProgress", progress);
         tag.putBoolean("TutorialSeen", matTutorialSeen);
         tag.put("UnlockedStats", stringList(unlockedStats));
 
@@ -53,6 +59,9 @@ public class MatPlayerData {
         readStrings(tag.getList("UnlockedTutorials", Tag.TAG_STRING), unlockedTutorials);
         completedTutorials.clear();
         readStrings(tag.getList("CompletedTutorials", Tag.TAG_STRING), completedTutorials);
+        tutorialProgress.clear();
+        CompoundTag progress = tag.getCompound("TutorialProgress");
+        for (String id : progress.getAllKeys()) tutorialProgress.put(id, progress.getInt(id));
         matTutorialSeen = tag.getBoolean("TutorialSeen");
         unlockedStats.clear();
         readStrings(tag.getList("UnlockedStats", Tag.TAG_STRING), unlockedStats);

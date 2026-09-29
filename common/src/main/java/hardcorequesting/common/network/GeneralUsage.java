@@ -146,6 +146,33 @@ public enum GeneralUsage {
             if (player instanceof ServerPlayer serverPlayer) MatMaps.sendMap(serverPlayer, nbt.getInt("Index"));
         }
     },
+    // Saves the step a tutorial is on
+    MAT_TUTORIAL_PROGRESS {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (!(player instanceof ServerPlayer serverPlayer)) return;
+            MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+            String id = nbt.getString("Tutorial");
+            if (!mat.unlockedTutorials.contains(id)) return;
+            int step = nbt.getInt("Step");
+            if (step > 0) mat.tutorialProgress.put(id, step);
+            else mat.tutorialProgress.remove(id);
+            sendMatDataSync(serverPlayer);
+        }
+    },
+    // Marks a tutorial completed and resets its saved position
+    MAT_TUTORIAL_COMPLETED {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (!(player instanceof ServerPlayer serverPlayer)) return;
+            MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+            String id = nbt.getString("Tutorial");
+            if (!mat.unlockedTutorials.contains(id)) return;
+            mat.completedTutorials.add(id);
+            mat.tutorialProgress.remove(id);
+            sendMatDataSync(serverPlayer);
+        }
+    },
     MAT_UNLOCK_TOAST {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
@@ -230,6 +257,23 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("Index", index);
         MAT_REQUEST_MAP.sendMessageToServer(nbt);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendMatTutorialProgress(String tutorial, int step) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putString("Tutorial", tutorial);
+        nbt.putInt("Step", step);
+        MAT_TUTORIAL_PROGRESS.sendMessageToServer(nbt);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendMatTutorialCompleted(String tutorial) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putString("Tutorial", tutorial);
+        MAT_TUTORIAL_COMPLETED.sendMessageToServer(nbt);
     }
     
     // client -> server

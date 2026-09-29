@@ -56,12 +56,13 @@ public class MatUnlocks {
         return locations.size();
     }
 
-    // Removes the matching tutorials along with their completion, so unlocking one again starts fresh
+    // Removes the matching tutorials along with their completion and saved progress, so unlocking one again starts fresh
     public static int removeTutorials(ServerPlayer player, Predicate<String> filter) {
         MatPlayerData mat = data(player);
         int before = mat.unlockedTutorials.size();
         mat.unlockedTutorials.removeIf(filter);
         mat.completedTutorials.removeIf(filter);
+        mat.tutorialProgress.keySet().removeIf(filter);
         return synced(player, before - mat.unlockedTutorials.size());
     }
 

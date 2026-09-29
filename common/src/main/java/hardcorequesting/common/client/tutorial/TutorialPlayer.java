@@ -6,6 +6,7 @@ import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.tutorial.Tutorial;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -53,14 +54,20 @@ public class TutorialPlayer {
         // Clicking the text box moves to the next step of the tutorial instead of clicking whatever is underneath
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
             if (tutorial == null || button != InputConstants.MOUSE_BUTTON_LEFT || !isOverTextBox(mouseX, mouseY)) return EventResult.pass();
-            if (++stepIndex >= tutorial.steps().size()) pause();
+            stepIndex++;
+            if (stepIndex < tutorial.steps().size()) {
+                GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
+            } else {
+                GeneralUsage.sendMatTutorialCompleted(tutorial.id());
+                pause();
+            }
             return EventResult.interruptFalse();
         });
         ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> pause());
     }
 
-    // Starts the tutorial at its first step, replacing any that are already running
-    public static void start(Tutorial tutorial) {
+    // Starts the tutorial at a step, replacing any that are already running, and saves that step on the server
+    public static void start(Tutorial tutorial, int startStep) {
         for (Tutorial.Step step : tutorial.steps()) {
             for (Tutorial.TextBox textBox : step.textBoxes()) {
                 if (TutorialAnchors.resolve(textBox.anchor()) == null) {
@@ -69,12 +76,14 @@ public class TutorialPlayer {
             }
         }
         TutorialPlayer.tutorial = tutorial;
-        stepIndex = 0;
+        stepIndex = startStep;
+        if (stepIndex >= tutorial.steps().size()) stepIndex = 0;
         if (tutorial.steps().isEmpty()) pause(); // a tutorial without steps has nothing to show
+        else GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
     }
 
+    // Removes the active tutorial
     public static void pause() {
-        // removes the active tutorial, will add progress saving later
         tutorial = null;
     }
 

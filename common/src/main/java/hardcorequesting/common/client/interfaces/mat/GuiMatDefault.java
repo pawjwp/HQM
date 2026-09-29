@@ -39,6 +39,7 @@ public class GuiMatDefault extends GuiBase {
     private static final int TEXT_Y = 35;                 // first line of text content on both sides
     private static final int TUTORIAL_X = 20;             // x of the tutorial heading
     private static final int TUTORIAL_WIDTH = 137;
+    private static final int TITLE_WIDTH = TUTORIAL_WIDTH - 10;  // leaves room for the completion check mark at the row's right end
     private static final int TUTORIAL_ROW_HEIGHT = 24;
     private static final int VISIBLE_TUTORIALS = 7;
     private static final int TUTORIAL_SCROLL_X = 159;
@@ -106,8 +107,11 @@ public class GuiMatDefault extends GuiBase {
                 } else if (!isSelected(id)) {
                     color = HQMConfig.TEXT_HINT;
                 }
-                drawString(graphics, trimToWidth(title, TUTORIAL_WIDTH), x, y, color);
+                drawString(graphics, trimToWidth(title, TITLE_WIDTH), x, y, color);
                 drawString(graphics, trimToWidth(description, DESCRIPTION_WIDTH), x + DESCRIPTION_X, y + DESCRIPTION_Y, DESCRIPTION_SCALE, HQMConfig.TEXT_HINT);
+                if (isCompleted(id)) {
+                    drawString(graphics, Component.literal("✔"), x + TUTORIAL_WIDTH - getStringWidth("✔"), y, HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET);
+                }
             }
 
             // Cut off text shows the full title and description of the tutorial on hover
@@ -115,10 +119,10 @@ public class GuiMatDefault extends GuiBase {
             protected FormattedText getTooltip(String id) {
                 Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
                 if (tutorial == null) {
-                    if (getStringWidth(id) > TUTORIAL_WIDTH) return Component.literal(id);
+                    if (getStringWidth(id) > TITLE_WIDTH) return Component.literal(id);
                     return null;
                 }
-                if (getStringWidth(tutorial.title()) <= TUTORIAL_WIDTH && getStringWidth(tutorial.description()) <= DESCRIPTION_WIDTH) return null;
+                if (getStringWidth(tutorial.title()) <= TITLE_WIDTH && getStringWidth(tutorial.description()) <= DESCRIPTION_WIDTH) return null;
                 return Component.literal(tutorial.title() + "\n").append(Component.literal(tutorial.description()).withStyle(ChatFormatting.GRAY));
             }
 
@@ -128,7 +132,7 @@ public class GuiMatDefault extends GuiBase {
             }
         };
 
-        // Plays the selected tutorial, replacing any running tutorials, or stops playing if this tutorial is active
+        // Plays the selected tutorial from its saved step, replacing any running tutorials, or pauses it if this tutorial is active
         this.playButton = new LargeButton(this, "hqm.mat.default.play", "hqm.mat.default.unavailable", PLAY_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
@@ -138,12 +142,13 @@ public class GuiMatDefault extends GuiBase {
             @Override
             public void onClick() {
                 if (isPlaying(selectedTutorial)) TutorialPlayer.pause();
-                else TutorialPlayer.start(TutorialManager.getInstance().tutorials.get(selectedTutorial));
+                else TutorialPlayer.start(TutorialManager.getInstance().tutorials.get(selectedTutorial), matData().tutorialProgress.getOrDefault(selectedTutorial, 0));
             }
 
             @Override
             protected FormattedText getName() {
                 if (isPlaying(selectedTutorial)) return Translator.translatable("hqm.mat.default.pause");
+                if (hasProgress(selectedTutorial)) return Translator.translatable("hqm.mat.default.resume");
                 if (isCompleted(selectedTutorial)) return Translator.translatable("hqm.mat.default.replay");
                 return Translator.translatable("hqm.mat.default.play");
             }
@@ -155,14 +160,22 @@ public class GuiMatDefault extends GuiBase {
             }
         };
 
+        // Starts the selected tutorial over from its first step, while it's running or has a saved step
         this.restartButton = new LargeButton(this, "hqm.mat.default.restart", "hqm.mat.default.unavailable", RESTART_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
-                return false;
+                return TutorialManager.getInstance().tutorials.containsKey(selectedTutorial) && (isPlaying(selectedTutorial) || hasProgress(selectedTutorial));
             }
 
             @Override
             public void onClick() {
+                TutorialPlayer.start(TutorialManager.getInstance().tutorials.get(selectedTutorial), 0);
+            }
+
+            @Override
+            protected FormattedText getDescription() {
+                if (isEnabled()) return null;
+                return super.getDescription();
             }
         };
 
@@ -277,6 +290,10 @@ public class GuiMatDefault extends GuiBase {
 
     private boolean isCompleted(String tutorial) {
         return matData().completedTutorials.contains(tutorial);
+    }
+
+    private boolean hasProgress(String tutorial) {
+        return matData().tutorialProgress.containsKey(tutorial);
     }
 
     private boolean isPlaying(String tutorial) {

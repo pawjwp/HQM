@@ -14,6 +14,8 @@ import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
@@ -202,6 +204,12 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
         ItemProperties.register(item, id, (ItemPropertyFunction) function);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public Rect2i getContainerPanel(AbstractContainerScreen<?> screen) {
+        return new Rect2i(screen.getGuiLeft(), screen.getGuiTop(), screen.getXSize(), screen.getYSize());
     }
     
     @Override

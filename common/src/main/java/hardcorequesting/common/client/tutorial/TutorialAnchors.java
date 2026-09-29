@@ -1,19 +1,23 @@
 package hardcorequesting.common.client.tutorial;
 
 import com.mojang.blaze3d.platform.Window;
+import hardcorequesting.common.HardcoreQuestingCore;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * The anchors available at which text boxes can be placed based on GUI coordinates
  * - Window anchors are locations based on the bounds of the screen
  * - HUD anchors are locations on the vanilla HUD
+ * - Container anchors are locations on an active container UI
  */
 @Environment(EnvType.CLIENT)
 public class TutorialAnchors {
@@ -30,6 +34,17 @@ public class TutorialAnchors {
         if (anchor.matches("hud/hotbar/[0-8]")) {
             int slot = anchor.charAt(anchor.length() - 1) - '0';
             return new Rect2i(horizontalCenter - 90 + 20 * slot, height - 22, 20, 22);
+        }
+
+        // Container anchors are only valid when a container screen is open
+        if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen) {
+            Rect2i panel = HardcoreQuestingCore.platform.getContainerPanel(screen);
+            if (anchor.equals("screen/panel")) return panel;
+            for (Slot slot : screen.getMenu().slots) {
+                if (anchor.equals("slot/" + slot.index) || (slot.container == player.getInventory() && anchor.equals("inventory/" + slot.getContainerSlot()))) {
+                    return new Rect2i(panel.getX() + slot.x - 1, panel.getY() + slot.y - 1, 18, 18);
+                }
+            }
         }
 
         return switch (anchor) {
@@ -56,5 +71,10 @@ public class TutorialAnchors {
 
             default -> null;
         };
+    }
+
+    // If an anchor name is valid or not
+    public static boolean isKnownAnchor(String anchor) {
+        return resolve(anchor) != null || anchor.matches("slot/\\d+|inventory/\\d+|screen/panel");
     }
 }

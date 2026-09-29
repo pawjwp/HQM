@@ -35,6 +35,8 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -146,6 +148,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
         FabricModelPredicateProviderRegistry.register(item, id, function);
+    }
+
+    // Accessible using hqm.accesswidener
+    @Override
+    public Rect2i getContainerPanel(AbstractContainerScreen<?> screen) {
+        return new Rect2i(screen.leftPos, screen.topPos, screen.imageWidth, screen.imageHeight);
     }
     
     @Override

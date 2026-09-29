@@ -8,6 +8,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -72,6 +74,10 @@ public interface AbstractPlatform {
     // Registers a model property
     @Environment(EnvType.CLIENT)
     void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function);
+
+    // The container's screen's panel size
+    @Environment(EnvType.CLIENT)
+    Rect2i getContainerPanel(AbstractContainerScreen<?> screen);
     
     void registerOnWorldTick(Consumer<Level> consumer);
 

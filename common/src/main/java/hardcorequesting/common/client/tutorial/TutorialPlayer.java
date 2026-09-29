@@ -71,8 +71,8 @@ public class TutorialPlayer {
     public static void start(Tutorial tutorial, int startStep) {
         for (Tutorial.Step step : tutorial.steps()) {
             for (Tutorial.TextBox textBox : step.textBoxes()) {
-                if (TutorialAnchors.resolve(textBox.anchor()) == null) {
-                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses the unknown anchor %s, so that text box is hidden", tutorial.id(), textBox.anchor());
+                if (!TutorialAnchors.isKnownAnchor(textBox.anchor())) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown anchor %s, so that text box is not shown", tutorial.id(), textBox.anchor());
                 }
                 for (String screen : textBox.screens()) {
                     if (!TutorialScreens.isKnownScreen(screen)) {

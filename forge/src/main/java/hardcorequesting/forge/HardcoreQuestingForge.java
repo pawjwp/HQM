@@ -47,6 +47,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
@@ -197,6 +198,7 @@ public class HardcoreQuestingForge implements AbstractPlatform {
         });
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void registerModelProperty(Item item, ResourceLocation id, ClampedItemPropertyFunction function) {
         ItemProperties.register(item, id, (ItemPropertyFunction) function);

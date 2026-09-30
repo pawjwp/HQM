@@ -9,8 +9,9 @@ public record Tutorial(String id, String title, String description, List<Step> s
     public record Step(List<TextBox> textBoxes, Trigger trigger) {
     }
 
-    // A text box placed on the screen, including text content, anchor location, anchor side, offset, width, and screens to display on
-    public record TextBox(String text, String anchor, Side side, int offsetX, int offsetY, int width, List<String> screens) {
+    // A text box placed on the screen, including text content, anchor location, anchor side, offset, width,
+    // screens to display on, if it has a connecting line, and width of connecting line
+    public record TextBox(String text, String anchor, Side side, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth) {
     }
 
     // Where a text box is placed relative to its anchor point

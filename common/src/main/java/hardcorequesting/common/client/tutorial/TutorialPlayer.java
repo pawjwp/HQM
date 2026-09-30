@@ -18,6 +18,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -40,10 +41,18 @@ public class TutorialPlayer {
     private static int stepIndex;
     private static boolean screenWasOpen; // if a screen_close step's screen was open during this step
 
-    // A text box's lines and size on-screen
-    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height) {
+    // A text box's lines and size on-screen, and the anchor it was placed against
+    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor) {
+        int right() {
+            return x + width;
+        }
+
+        int bottom() {
+            return y + height;
+        }
+
         boolean contains(double mouseX, double mouseY) {
-            return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
+            return mouseX >= x && mouseX < right() && mouseY >= y && mouseY < bottom();
         }
     }
 
@@ -140,6 +149,7 @@ public class TutorialPlayer {
             Layout layout = layout(textBox);
             if (layout == null) continue;
             drawFrame(graphics, layout, isClickStep() && layout.contains(mouseX, mouseY) ? HOVERED_FILL : FILL);
+            if (textBox.line()) drawConnectingLine(graphics, textBox, layout);
             for (int i = 0; i < layout.lines().size(); i++) {
                 graphics.drawString(font, layout.lines().get(i), layout.x() + FRAME, layout.y() + FRAME + i * font.lineHeight, TEXT_COLOR, false);
             }
@@ -182,12 +192,62 @@ public class TutorialPlayer {
             default -> anchor.getY() + (anchor.getHeight() - height) / 2;
         };
 
-        return new Layout(lines, x + textBox.offsetX(), y + textBox.offsetY(), width, height);
+        return new Layout(lines, x + textBox.offsetX(), y + textBox.offsetY(), width, height, anchor);
+    }
+
+    // Draws the line connecting a text box to its anchor between the two edges facing each other
+    private static void drawConnectingLine(GuiGraphics graphics, Tutorial.TextBox textBox, Layout layout) {
+        Rect2i anchor = layout.anchor();
+        int anchorRight = anchor.getX() + anchor.getWidth();    // right anchor edge
+        int anchorBottom = anchor.getY() + anchor.getHeight();  // bottom anchor edge
+
+        // Each gap is positive if the box is on that side of the anchor
+        int gapLeft = anchor.getX() - layout.right();
+        int gapRight = layout.x() - anchorRight;
+        int gapAbove = anchor.getY() - layout.bottom();
+        int gapBelow = layout.y() - anchorBottom;
+        boolean horizontallyClear = gapLeft > 0 || gapRight > 0;
+        boolean verticallyClear = gapAbove > 0 || gapBelow > 0;
+        if (!horizontallyClear && !verticallyClear) return; // if the anchor and text box overlap, don't draw lines at all
+
+        // if the line connects horizontally or not
+        boolean horizontal = switch (textBox.side()) {
+            case LEFT, RIGHT -> horizontallyClear;  // connect horizontally if there is a horizontal gap
+            case ABOVE, BELOW -> !verticallyClear;  // connect horizontally only if there is no vertical gap
+            case CENTER -> Math.max(gapLeft, gapRight) > Math.max(gapAbove, gapBelow); // connect horizontally if the horizontal gap is greater
+        };
+        int lineWidth = textBox.lineWidth();
+        float half = lineWidth / 2F; // half pixels round up and left when centering
+
+        // The two straight parts run from their edge to the nearest side of the turn, which includes both corners
+        if (horizontal) {
+            boolean boxOnRight = gapRight > 0;
+            int boxEdge = boxOnRight ? layout.x() + 1 : layout.right() - 1;             // the box's edge facing the anchor, past the dark outline
+            int anchorEdge = boxOnRight ? anchorRight : anchor.getX();                  // the anchor's edge facing the box
+            int boxRow = Mth.floor(layout.y() + layout.height() / 2F - half);           // top of the line leaving the box, at the box's midpoint
+            int anchorRow = Mth.floor(anchor.getY() + anchor.getHeight() / 2F - half);  // top of the line reaching the anchor, at the anchor's midpoint
+            int turn = Mth.floor((boxEdge + anchorEdge) / 2F - half);                   // left of the vertical part, halfway between the edges
+
+            graphics.fill(turn, Math.min(boxRow, anchorRow), turn + lineWidth, Math.max(boxRow, anchorRow) + lineWidth, BORDER_TOP);                // vertical part
+            graphics.fill(Math.min(boxEdge, turn + lineWidth), boxRow, Math.max(boxEdge, turn), boxRow + lineWidth, BORDER_TOP);                    // from the box to the turn
+            graphics.fill(Math.min(anchorEdge, turn + lineWidth), anchorRow, Math.max(anchorEdge, turn), anchorRow + lineWidth, BORDER_TOP);        // from the turn to the anchor
+        } else {
+            boolean boxBelow = gapBelow > 0;
+            int boxEdge = boxBelow ? layout.y() + 1 : layout.bottom() - 1;               // the box's edge facing the anchor, past the dark outline
+            int anchorEdge = boxBelow ? anchorBottom : anchor.getY();                    // the anchor's edge facing the box
+            int boxColumn = Mth.floor(layout.x() + layout.width() / 2F - half);          // left of the line leaving the box, at the box's midpoint
+            int anchorColumn = Mth.floor(anchor.getX() + anchor.getWidth() / 2F - half); // left of the line reaching the anchor, at the anchor's midpoint
+            int turn = Mth.floor((boxEdge + anchorEdge) / 2F - half);                    // top of the horizontal part, halfway between the edges
+
+            graphics.fill(Math.min(boxColumn, anchorColumn), turn, Math.max(boxColumn, anchorColumn) + lineWidth, turn + lineWidth, BORDER_TOP);    // horizontal part
+            graphics.fill(boxColumn, Math.min(boxEdge, turn + lineWidth), boxColumn + lineWidth, Math.max(boxEdge, turn), BORDER_TOP);              // from the box to the turn
+            graphics.fill(anchorColumn, Math.min(anchorEdge, turn + lineWidth), anchorColumn + lineWidth, Math.max(anchorEdge, turn), BORDER_TOP);  // from the turn to the anchor
+        }
     }
 
     // Draws the frame, shaped like vanilla's tooltips with a 1 pixel rounded outline, with a two-color 1 pixel outline inside that
     private static void drawFrame(GuiGraphics graphics, Layout layout, int fill) {
-        int left = layout.x(), top = layout.y(), right = left + layout.width(), bottom = top + layout.height();
+        int left = layout.x(), top = layout.y(), right = layout.right(), bottom = layout.bottom();
         graphics.fill(left + 1, top, right - 1, top + 1, fill);
         graphics.fill(left, top + 1, right, bottom - 1, fill);
         graphics.fill(left + 1, bottom - 1, right - 1, bottom, fill);

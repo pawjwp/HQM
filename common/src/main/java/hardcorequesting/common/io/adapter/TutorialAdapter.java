@@ -3,6 +3,7 @@ package hardcorequesting.common.io.adapter;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.tutorial.Tutorial;
 import net.minecraft.util.GsonHelper;
@@ -33,11 +34,24 @@ public class TutorialAdapter {
         for (JsonElement textBox : GsonHelper.getAsJsonArray(json, "text_boxes", new JsonArray())) {
             textBoxes.add(readTextBox(textBox.getAsJsonObject()));
         }
-        Tutorial.Trigger trigger = Tutorial.Trigger.CLICK_TEXT_BOX;
+        Tutorial.Trigger trigger = new Tutorial.Trigger.ClickTextBox();
         if (json.has("trigger")) {
-            trigger = Tutorial.Trigger.valueOf(GsonHelper.getAsString(GsonHelper.getAsJsonObject(json, "trigger"), "type").toUpperCase(Locale.ROOT));
+            trigger = readTrigger(GsonHelper.getAsJsonObject(json, "trigger"));
         }
         return new Tutorial.Step(textBoxes, trigger);
+    }
+
+    // A screen trigger without a screen list waits for any screen
+    private static Tutorial.Trigger readTrigger(JsonObject json) {
+        List<String> screens = readStrings(json, "screens");
+        if (screens.isEmpty()) screens = List.of("any");
+        String type = GsonHelper.getAsString(json, "type");
+        return switch (type) {
+            case "click_text_box" -> new Tutorial.Trigger.ClickTextBox();
+            case "screen_open" -> new Tutorial.Trigger.ScreenOpen(screens);
+            case "screen_close" -> new Tutorial.Trigger.ScreenClose(screens);
+            default -> throw new JsonSyntaxException("Unknown trigger type " + type);
+        };
     }
 
     private static Tutorial.TextBox readTextBox(JsonObject json) {
@@ -48,10 +62,6 @@ public class TutorialAdapter {
             offsetX = offset.get(0).getAsInt();
             offsetY = offset.get(1).getAsInt();
         }
-        List<String> screens = new ArrayList<>();
-        for (JsonElement screen : GsonHelper.getAsJsonArray(json, "screens", new JsonArray())) {
-            screens.add(screen.getAsString());
-        }
         return new Tutorial.TextBox(
             GsonHelper.getAsString(json, "text"),
             GsonHelper.getAsString(json, "anchor", DEFAULT_ANCHOR),
@@ -59,7 +69,16 @@ public class TutorialAdapter {
             offsetX,
             offsetY,
             GsonHelper.getAsInt(json, "width", DEFAULT_WIDTH),
-            screens
+            readStrings(json, "screens")
         );
+    }
+
+    // An array of strings, empty if the key is missing
+    private static List<String> readStrings(JsonObject json, String key) {
+        List<String> strings = new ArrayList<>();
+        for (JsonElement element : GsonHelper.getAsJsonArray(json, key, new JsonArray())) {
+            strings.add(element.getAsString());
+        }
+        return strings;
     }
 }

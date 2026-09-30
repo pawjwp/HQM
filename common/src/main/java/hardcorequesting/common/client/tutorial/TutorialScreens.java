@@ -12,6 +12,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -36,6 +37,14 @@ public class TutorialScreens {
                 yield id != null && screen instanceof AbstractContainerScreen<?> container && id.equals(menuId(container));
             }
         };
+    }
+
+    // Whether any of the screen names matches the open screen
+    public static boolean matchesAny(List<String> names, @Nullable Screen screen) {
+        for (String name : names) {
+            if (matches(name, screen)) return true;
+        }
+        return false;
     }
 
     // Whether a screen name exists

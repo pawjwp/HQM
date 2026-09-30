@@ -5,6 +5,7 @@ import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
+import dev.architectury.event.events.client.ClientTickEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.tutorial.Tutorial;
@@ -37,6 +38,7 @@ public class TutorialPlayer {
     @Nullable
     private static Tutorial tutorial;
     private static int stepIndex;
+    private static boolean screenWasOpen; // if a screen_close step's screen was open during this step
 
     // A text box's lines and size on-screen
     private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height) {
@@ -52,17 +54,24 @@ public class TutorialPlayer {
         });
         ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, partialTick) -> render(graphics, mouseX, mouseY));
 
-        // Clicking the text box moves to the next step of the tutorial instead of clicking whatever is underneath
+        // Clicking the text box of a click step moves to the next step of the tutorial instead of clicking whatever is underneath
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
-            if (tutorial == null || button != InputConstants.MOUSE_BUTTON_LEFT || !isOverTextBox(mouseX, mouseY)) return EventResult.pass();
-            stepIndex++;
-            if (stepIndex < tutorial.steps().size()) {
-                GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
-            } else {
-                GeneralUsage.sendMatTutorialCompleted(tutorial.id());
-                pause();
-            }
+            if (!isClickStep() || button != InputConstants.MOUSE_BUTTON_LEFT || !isOverTextBox(mouseX, mouseY)) return EventResult.pass();
+            advance();
             return EventResult.interruptFalse();
+        });
+
+        // Screen steps check the open screen each tick
+        ClientTickEvent.CLIENT_POST.register(minecraft -> {
+            if (tutorial == null) return;
+            Tutorial.Trigger trigger = tutorial.steps().get(stepIndex).trigger();
+            boolean open = TutorialScreens.matchesAny(trigger.screens(), minecraft.screen);
+            if (trigger instanceof Tutorial.Trigger.ScreenOpen && open) {
+                advance();
+            } else if (trigger instanceof Tutorial.Trigger.ScreenClose) {
+                if (open) screenWasOpen = true;
+                else if (screenWasOpen) advance();
+            }
         });
         ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> pause());
     }
@@ -80,8 +89,14 @@ public class TutorialPlayer {
                     }
                 }
             }
+            for (String screen : step.trigger().screens()) {
+                if (!TutorialScreens.isKnownScreen(screen)) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s in a trigger, so that step can't advance on it", tutorial.id(), screen);
+                }
+            }
         }
         TutorialPlayer.tutorial = tutorial;
+        screenWasOpen = false;
         stepIndex = startStep;
         if (stepIndex >= tutorial.steps().size()) stepIndex = 0;
         if (tutorial.steps().isEmpty()) pause(); // a tutorial without steps has nothing to show
@@ -99,6 +114,23 @@ public class TutorialPlayer {
         return tutorial.id();
     }
 
+    // Moves to the next step and saves it on the server, completes the tutorial after the last step
+    private static void advance() {
+        stepIndex++;
+        screenWasOpen = false;
+        if (stepIndex < tutorial.steps().size()) {
+            GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
+        } else {
+            GeneralUsage.sendMatTutorialCompleted(tutorial.id());
+            pause();
+        }
+    }
+
+    // Only allow clicking if the step's trigger is click
+    private static boolean isClickStep() {
+        return tutorial != null && tutorial.steps().get(stepIndex).trigger() instanceof Tutorial.Trigger.ClickTextBox;
+    }
+
     private static void render(GuiGraphics graphics, int mouseX, int mouseY) {
         if (tutorial == null) return;
         Font font = Minecraft.getInstance().font;
@@ -107,7 +139,7 @@ public class TutorialPlayer {
         for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
             Layout layout = layout(textBox);
             if (layout == null) continue;
-            drawFrame(graphics, layout, layout.contains(mouseX, mouseY) ? HOVERED_FILL : FILL);
+            drawFrame(graphics, layout, isClickStep() && layout.contains(mouseX, mouseY) ? HOVERED_FILL : FILL);
             for (int i = 0; i < layout.lines().size(); i++) {
                 graphics.drawString(font, layout.lines().get(i), layout.x() + FRAME, layout.y() + FRAME + i * font.lineHeight, TEXT_COLOR, false);
             }
@@ -129,7 +161,7 @@ public class TutorialPlayer {
         Font font = Minecraft.getInstance().font;
 
         // Null when the text box isn't shown, when its anchor can't be found, or if its screen isn't open
-        if (!textBox.screens().isEmpty() && textBox.screens().stream().noneMatch(name -> TutorialScreens.matches(name, screen))) return null;
+        if (!textBox.screens().isEmpty() && !TutorialScreens.matchesAny(textBox.screens(), screen)) return null;
         
         Rect2i anchor = TutorialAnchors.resolve(textBox.anchor());
         if (anchor == null) return null;

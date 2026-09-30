@@ -19,7 +19,22 @@ public record Tutorial(String id, String title, String description, List<Step> s
     }
 
     // The trigger that advances to the next step of the tutorial
-    public enum Trigger {
-        CLICK_TEXT_BOX // Left clicking on a text box (default)
+    public sealed interface Trigger {
+        // The screens a screen trigger can wait for
+        default List<String> screens() {
+            return List.of();
+        }
+
+        // Left clicking a text box (default)
+        record ClickTextBox() implements Trigger {
+        }
+
+        // A screens opens, or is open
+        record ScreenOpen(List<String> screens) implements Trigger {
+        }
+
+        // A screen closes
+        record ScreenClose(List<String> screens) implements Trigger {
+        }
     }
 }

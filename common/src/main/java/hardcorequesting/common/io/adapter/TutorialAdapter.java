@@ -56,6 +56,11 @@ public class TutorialAdapter {
                 if (keys.isEmpty()) throw new JsonSyntaxException("A key trigger needs valid keys");
                 yield new Tutorial.Trigger.Key(keys, screens);
             }
+            case "click_anchor" -> {
+                List<String> anchors = readStrings(json, "anchors");
+                if (anchors.isEmpty()) throw new JsonSyntaxException("A click_anchor trigger needs valid anchors");
+                yield new Tutorial.Trigger.ClickAnchor(anchors, screens);
+            }
             default -> throw new JsonSyntaxException("Unknown trigger type " + type);
         };
     }

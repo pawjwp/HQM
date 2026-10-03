@@ -67,11 +67,20 @@ public class TutorialPlayer {
         });
         ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, partialTick) -> render(graphics, mouseX, mouseY));
 
-        // Clicking the text box of a click step moves to the next step of the tutorial instead of clicking whatever is underneath
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
-            if (!isClickStep() || button != InputConstants.MOUSE_BUTTON_LEFT || !isOverTextBox(mouseX, mouseY)) return EventResult.pass();
-            advance();
-            return EventResult.interruptFalse();
+            if (tutorial == null || button != InputConstants.MOUSE_BUTTON_LEFT) return EventResult.pass();
+            Tutorial.Trigger trigger = tutorial.steps().get(stepIndex).trigger();
+            // Clicking the text box of a click step moves to the next step of the tutorial instead of clicking whatever is underneath
+            if (trigger instanceof Tutorial.Trigger.ClickTextBox && isOverTextBox(mouseX, mouseY)) {
+                advance();
+                return EventResult.interruptFalse();
+            }
+            // Clicking an anchor moves to the next step and also clicks what's underneath
+            if (trigger instanceof Tutorial.Trigger.ClickAnchor click && TutorialScreens.matchesAny(click.screens(), screen)
+                    && isOverAnchor(click.anchors(), mouseX, mouseY)) {
+                advance();
+            }
+            return EventResult.pass();
         });
 
         // Check key and mouse presses without stopping them from running
@@ -127,6 +136,13 @@ public class TutorialPlayer {
                 for (String name : key.keys()) {
                     if (!TutorialKeys.isKnownKey(name)) {
                         HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown key %s, so that step is unable to advance", tutorial.id(), name);
+                    }
+                }
+            }
+            if (step.trigger() instanceof Tutorial.Trigger.ClickAnchor click) {
+                for (String anchor : click.anchors()) {
+                    if (!TutorialAnchors.isContainerAnchor(anchor)) {
+                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses %s in a click_anchor trigger, which is likely not actually clickable", tutorial.id(), anchor);
                     }
                 }
             }
@@ -191,6 +207,15 @@ public class TutorialPlayer {
             }
         }
         graphics.pose().popPose();
+    }
+
+    // If the mouse is inside any of the anchors
+    private static boolean isOverAnchor(List<String> anchors, double mouseX, double mouseY) {
+        for (String name : anchors) {
+            Rect2i anchor = TutorialAnchors.resolve(name);
+            if (anchor != null && anchor.contains((int) mouseX, (int) mouseY)) return true;
+        }
+        return false;
     }
 
     private static boolean isOverTextBox(double mouseX, double mouseY) {

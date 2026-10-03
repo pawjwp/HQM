@@ -75,6 +75,11 @@ public class TutorialAnchors {
 
     // If an anchor name is valid or not
     public static boolean isKnownAnchor(String anchor) {
-        return resolve(anchor) != null || anchor.matches("slot/\\d+|inventory/\\d+|screen/panel");
+        return resolve(anchor) != null || isContainerAnchor(anchor);
+    }
+
+    // Container anchors are the only clickable ones
+    public static boolean isContainerAnchor(String anchor) {
+        return anchor.matches("slot/\\d+|inventory/\\d+|screen/panel");
     }
 }

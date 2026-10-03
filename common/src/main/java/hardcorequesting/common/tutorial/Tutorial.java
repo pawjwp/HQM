@@ -41,5 +41,9 @@ public record Tutorial(String id, String title, String description, List<Step> s
         // A key is pressed while one of the screens is open, by keybind name or exact key name
         record Key(List<String> keys, List<String> screens) implements Trigger {
         }
+
+        // A click in one of the anchors while a screen is open
+        record ClickAnchor(List<String> anchors, List<String> screens) implements Trigger {
+        }
     }
 }

@@ -49,5 +49,9 @@ public record Tutorial(String id, String title, String description, List<Step> s
         // One of the clicks in one of the anchors while a screen is open
         record ClickAnchor(List<String> anchors, List<String> screens, List<Click> clicks) implements Trigger {
         }
+
+        // A number of ticks pass
+        record Timer(int ticks) implements Trigger {
+        }
     }
 }

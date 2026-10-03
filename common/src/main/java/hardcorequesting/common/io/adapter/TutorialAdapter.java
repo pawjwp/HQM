@@ -64,6 +64,11 @@ public class TutorialAdapter {
                 if (anchors.isEmpty()) throw new JsonSyntaxException("A click_anchor trigger needs valid anchors");
                 yield new Tutorial.Trigger.ClickAnchor(anchors, screens, readClicks(json));
             }
+            case "timer" -> {
+                int ticks = Math.round(GsonHelper.getAsFloat(json, "seconds", 0) * 20); // Multiply by 20 to convert to tickss
+                if (ticks <= 0) throw new JsonSyntaxException("A timer trigger needs a valid second count");
+                yield new Tutorial.Trigger.Timer(ticks);
+            }
             default -> throw new JsonSyntaxException("Unknown trigger type " + type);
         };
     }

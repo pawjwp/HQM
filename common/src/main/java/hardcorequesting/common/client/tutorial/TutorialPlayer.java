@@ -37,11 +37,13 @@ public class TutorialPlayer {
     private static final int BORDER_TOP = 0xBFFFFFFF;
     private static final int BORDER_BOTTOM = 0xBFDFDFDF;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
+    private static final int TIMER_COLOR = 0xFF00AA00;    // green timer color vanilla toasts use for progress
 
     @Nullable
     private static Tutorial tutorial;
     private static int stepIndex;
     private static boolean screenWasOpen; // if a screen_close step's screen was open during this step
+    private static int timerTicks; // ticks counted so far (for timer triggers)
     @Nullable
     private static Screen tickScreen; // the screen open last tick
 
@@ -63,9 +65,9 @@ public class TutorialPlayer {
     public static void register() {
         // Render text boxes on screen during gameplay
         ClientGuiEvent.RENDER_HUD.register((graphics, partialTick) -> {
-            if (Minecraft.getInstance().screen == null) render(graphics, Integer.MIN_VALUE, Integer.MIN_VALUE);
+            if (Minecraft.getInstance().screen == null) render(graphics, Integer.MIN_VALUE, Integer.MIN_VALUE, partialTick);
         });
-        ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, partialTick) -> render(graphics, mouseX, mouseY));
+        ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, partialTick) -> render(graphics, mouseX, mouseY, partialTick));
 
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
             if (tutorial == null) return EventResult.pass();
@@ -109,6 +111,8 @@ public class TutorialPlayer {
             } else if (trigger instanceof Tutorial.Trigger.ScreenClose) {
                 if (open) screenWasOpen = true;
                 else if (screenWasOpen) advance();
+            } else if (trigger instanceof Tutorial.Trigger.Timer timer && !minecraft.isPaused() && ++timerTicks >= timer.ticks()) {
+                advance();
             }
         });
         ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> pause());
@@ -149,6 +153,7 @@ public class TutorialPlayer {
         }
         TutorialPlayer.tutorial = tutorial;
         screenWasOpen = false;
+        timerTicks = 0;
         stepIndex = startStep;
         if (stepIndex >= tutorial.steps().size()) stepIndex = 0;
         if (tutorial.steps().isEmpty()) pause(); // a tutorial without steps has nothing to show
@@ -170,6 +175,7 @@ public class TutorialPlayer {
     private static void advance() {
         stepIndex++;
         screenWasOpen = false;
+        timerTicks = 0;
         if (stepIndex < tutorial.steps().size()) {
             GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
         } else {
@@ -192,15 +198,21 @@ public class TutorialPlayer {
         return tutorial != null && tutorial.steps().get(stepIndex).trigger() instanceof Tutorial.Trigger.ClickTextBox;
     }
 
-    private static void render(GuiGraphics graphics, int mouseX, int mouseY) {
+    private static void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (tutorial == null) return;
         Font font = Minecraft.getInstance().font;
+        Tutorial.Step step = tutorial.steps().get(stepIndex);
         graphics.pose().pushPose();
         graphics.pose().translate(0, 0, Z);
-        for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
+        for (Tutorial.TextBox textBox : step.textBoxes()) {
             Layout layout = layout(textBox);
             if (layout == null) continue;
             drawFrame(graphics, layout, isClickStep() && layout.contains(mouseX, mouseY) ? HOVERED_FILL : FILL);
+            // Timer triggers have a green bar on the bottom like vanilla's tutorial toasts
+            if (step.trigger() instanceof Tutorial.Trigger.Timer timer) {
+                float progress = Math.min((timerTicks + partialTick) / timer.ticks(), 1);
+                graphics.fill(layout.x() + 1, layout.bottom() - 2, layout.x() + 1 + (int) ((layout.width() - 2) * progress), layout.bottom() - 1, TIMER_COLOR);
+            }
             if (textBox.line()) drawConnectingLine(graphics, textBox, layout);
             for (int i = 0; i < layout.lines().size(); i++) {
                 graphics.drawString(font, layout.lines().get(i), layout.x() + FRAME, layout.y() + FRAME + i * font.lineHeight, TEXT_COLOR, false);

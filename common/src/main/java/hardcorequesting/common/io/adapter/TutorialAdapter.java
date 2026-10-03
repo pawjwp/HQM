@@ -42,14 +42,20 @@ public class TutorialAdapter {
     }
 
     // A screen trigger without a screen list waits for any screen
+    // A key trigger without a screen only triggers during gameplay
     private static Tutorial.Trigger readTrigger(JsonObject json) {
-        List<String> screens = readStrings(json, "screens");
-        if (screens.isEmpty()) screens = List.of("any");
         String type = GsonHelper.getAsString(json, "type");
+        List<String> screens = readStrings(json, "screens");
+        if (screens.isEmpty()) screens = List.of(type.equals("key") ? "gameplay" : "any");
         return switch (type) {
             case "click_text_box" -> new Tutorial.Trigger.ClickTextBox();
             case "screen_open" -> new Tutorial.Trigger.ScreenOpen(screens);
             case "screen_close" -> new Tutorial.Trigger.ScreenClose(screens);
+            case "key" -> {
+                List<String> keys = readStrings(json, "keys");
+                if (keys.isEmpty()) throw new JsonSyntaxException("A key trigger needs valid keys");
+                yield new Tutorial.Trigger.Key(keys, screens);
+            }
             default -> throw new JsonSyntaxException("Unknown trigger type " + type);
         };
     }

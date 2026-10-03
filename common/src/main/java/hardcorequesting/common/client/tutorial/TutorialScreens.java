@@ -56,6 +56,7 @@ public class TutorialScreens {
     // A containers menu id, null for menus without defined names
     @Nullable
     private static ResourceLocation menuId(AbstractContainerScreen<?> screen) {
+        if (screen instanceof InventoryScreen || screen instanceof CreativeModeInventoryScreen) return null;
         try {
             return BuiltInRegistries.MENU.getKey(screen.getMenu().getType());
         } catch (UnsupportedOperationException e) {

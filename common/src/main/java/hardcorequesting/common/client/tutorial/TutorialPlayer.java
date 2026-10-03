@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
+import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
@@ -20,6 +21,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -40,6 +42,8 @@ public class TutorialPlayer {
     private static Tutorial tutorial;
     private static int stepIndex;
     private static boolean screenWasOpen; // if a screen_close step's screen was open during this step
+    @Nullable
+    private static Screen tickScreen; // the screen open last tick
 
     // A text box's lines and size on-screen, and the anchor it was placed against
     private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor) {
@@ -70,8 +74,24 @@ public class TutorialPlayer {
             return EventResult.interruptFalse();
         });
 
+        // Check key and mouse presses without stopping them from running
+        ClientScreenInputEvent.KEY_PRESSED_PRE.register((minecraft, screen, keyCode, scanCode, modifiers) -> {
+            keyPressed(InputConstants.getKey(keyCode, scanCode), screen);
+            return EventResult.pass();
+        });
+        ClientRawInputEvent.KEY_PRESSED.register((minecraft, keyCode, scanCode, action, modifiers) -> {
+            if (action == GLFW.GLFW_PRESS && tickScreen == null) keyPressed(InputConstants.getKey(keyCode, scanCode), null);
+            return EventResult.pass();
+        });
+        // Mouse presses are checked before anything uses them, with or without a screen open
+        ClientRawInputEvent.MOUSE_CLICKED_PRE.register((minecraft, button, action, mods) -> {
+            if (action == GLFW.GLFW_PRESS) keyPressed(InputConstants.Type.MOUSE.getOrCreate(button), minecraft.screen);
+            return EventResult.pass();
+        });
+
         // Screen steps check the open screen each tick
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
+            tickScreen = minecraft.screen;
             if (tutorial == null) return;
             Tutorial.Trigger trigger = tutorial.steps().get(stepIndex).trigger();
             boolean open = TutorialScreens.matchesAny(trigger.screens(), minecraft.screen);
@@ -103,6 +123,13 @@ public class TutorialPlayer {
                     HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s in a trigger, so that step can't advance on it", tutorial.id(), screen);
                 }
             }
+            if (step.trigger() instanceof Tutorial.Trigger.Key key) {
+                for (String name : key.keys()) {
+                    if (!TutorialKeys.isKnownKey(name)) {
+                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown key %s, so that step is unable to advance", tutorial.id(), name);
+                    }
+                }
+            }
         }
         TutorialPlayer.tutorial = tutorial;
         screenWasOpen = false;
@@ -132,6 +159,15 @@ public class TutorialPlayer {
         } else {
             GeneralUsage.sendMatTutorialCompleted(tutorial.id());
             pause();
+        }
+    }
+
+    // Advances a key-triggered step when one of its keys is pressed while on the correct screen
+    private static void keyPressed(InputConstants.Key pressed, @Nullable Screen screen) {
+        if (tutorial == null) return;
+        if (tutorial.steps().get(stepIndex).trigger() instanceof Tutorial.Trigger.Key key
+                && TutorialScreens.matchesAny(key.screens(), screen) && TutorialKeys.matchesAny(key.keys(), pressed)) {
+            advance();
         }
     }
 

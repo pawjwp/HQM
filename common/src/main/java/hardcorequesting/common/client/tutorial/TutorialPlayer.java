@@ -68,16 +68,16 @@ public class TutorialPlayer {
         ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, partialTick) -> render(graphics, mouseX, mouseY));
 
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
-            if (tutorial == null || button != InputConstants.MOUSE_BUTTON_LEFT) return EventResult.pass();
+            if (tutorial == null) return EventResult.pass();
             Tutorial.Trigger trigger = tutorial.steps().get(stepIndex).trigger();
             // Clicking the text box of a click step moves to the next step of the tutorial instead of clicking whatever is underneath
-            if (trigger instanceof Tutorial.Trigger.ClickTextBox && isOverTextBox(mouseX, mouseY)) {
+            if (trigger instanceof Tutorial.Trigger.ClickTextBox click && matchesAnyClick(click.clicks(), button) && isOverTextBox(mouseX, mouseY)) {
                 advance();
                 return EventResult.interruptFalse();
             }
             // Clicking an anchor moves to the next step and also clicks what's underneath
-            if (trigger instanceof Tutorial.Trigger.ClickAnchor click && TutorialScreens.matchesAny(click.screens(), screen)
-                    && isOverAnchor(click.anchors(), mouseX, mouseY)) {
+            if (trigger instanceof Tutorial.Trigger.ClickAnchor click && matchesAnyClick(click.clicks(), button)
+                    && TutorialScreens.matchesAny(click.screens(), screen) && isOverAnchor(click.anchors(), mouseX, mouseY)) {
                 advance();
             }
             return EventResult.pass();
@@ -207,6 +207,15 @@ public class TutorialPlayer {
             }
         }
         graphics.pose().popPose();
+    }
+
+    // If the button matches any click types
+    private static boolean matchesAnyClick(List<Tutorial.Click> clicks, int button) {
+        for (Tutorial.Click click : clicks) {
+            if (click.button() == button && (!click.shift() || Screen.hasShiftDown())
+                    && (!click.ctrl() || Screen.hasControlDown()) && (!click.alt() || Screen.hasAltDown())) return true;
+        }
+        return false;
     }
 
     // If the mouse is inside any of the anchors

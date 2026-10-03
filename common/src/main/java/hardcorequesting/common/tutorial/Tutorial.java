@@ -19,6 +19,10 @@ public record Tutorial(String id, String title, String description, List<Step> s
         ABOVE, BELOW, LEFT, RIGHT, CENTER
     }
 
+    // A mouse button (0 left, 1 right, 2 middle) and the modifier keys that must be held with it
+    public record Click(int button, boolean shift, boolean ctrl, boolean alt) {
+    }
+
     // The trigger that advances to the next step of the tutorial
     public sealed interface Trigger {
         // The screens a screen trigger can wait for
@@ -26,8 +30,8 @@ public record Tutorial(String id, String title, String description, List<Step> s
             return List.of();
         }
 
-        // Left clicking a text box (default)
-        record ClickTextBox() implements Trigger {
+        // Clicking a text box with one of the clicks (default left click)
+        record ClickTextBox(List<Click> clicks) implements Trigger {
         }
 
         // A screens opens, or is open
@@ -42,8 +46,8 @@ public record Tutorial(String id, String title, String description, List<Step> s
         record Key(List<String> keys, List<String> screens) implements Trigger {
         }
 
-        // A click in one of the anchors while a screen is open
-        record ClickAnchor(List<String> anchors, List<String> screens) implements Trigger {
+        // One of the clicks in one of the anchors while a screen is open
+        record ClickAnchor(List<String> anchors, List<String> screens, List<Click> clicks) implements Trigger {
         }
     }
 }

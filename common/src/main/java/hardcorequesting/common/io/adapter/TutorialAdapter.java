@@ -11,6 +11,7 @@ import net.minecraft.util.GsonHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Reads tutorial files and throws errors when invalid
@@ -18,6 +19,8 @@ import java.util.Locale;
 public class TutorialAdapter {
     private static final String DEFAULT_ANCHOR = "window/center";
     private static final int DEFAULT_WIDTH = 180;
+    private static final Tutorial.Click LEFT_CLICK = new Tutorial.Click(0, false, false, false);
+    private static final Set<String> MODIFIERS = Set.of("shift", "ctrl", "alt");
 
     public static Tutorial read(String id, String text) {
         JsonObject json = SaveHandler.JSON_PARSER.parse(text).getAsJsonObject();
@@ -34,7 +37,7 @@ public class TutorialAdapter {
         for (JsonElement textBox : GsonHelper.getAsJsonArray(json, "text_boxes", new JsonArray())) {
             textBoxes.add(readTextBox(textBox.getAsJsonObject()));
         }
-        Tutorial.Trigger trigger = new Tutorial.Trigger.ClickTextBox();
+        Tutorial.Trigger trigger = new Tutorial.Trigger.ClickTextBox(List.of(LEFT_CLICK));
         if (json.has("trigger")) {
             trigger = readTrigger(GsonHelper.getAsJsonObject(json, "trigger"));
         }
@@ -48,7 +51,7 @@ public class TutorialAdapter {
         List<String> screens = readStrings(json, "screens");
         if (screens.isEmpty()) screens = List.of(type.equals("key") ? "gameplay" : "any");
         return switch (type) {
-            case "click_text_box" -> new Tutorial.Trigger.ClickTextBox();
+            case "click_text_box" -> new Tutorial.Trigger.ClickTextBox(readClicks(json));
             case "screen_open" -> new Tutorial.Trigger.ScreenOpen(screens);
             case "screen_close" -> new Tutorial.Trigger.ScreenClose(screens);
             case "key" -> {
@@ -59,10 +62,36 @@ public class TutorialAdapter {
             case "click_anchor" -> {
                 List<String> anchors = readStrings(json, "anchors");
                 if (anchors.isEmpty()) throw new JsonSyntaxException("A click_anchor trigger needs valid anchors");
-                yield new Tutorial.Trigger.ClickAnchor(anchors, screens);
+                yield new Tutorial.Trigger.ClickAnchor(anchors, screens, readClicks(json));
             }
             default -> throw new JsonSyntaxException("Unknown trigger type " + type);
         };
+    }
+
+    // A click trigger with no click types uses left click by default
+    private static List<Tutorial.Click> readClicks(JsonObject json) {
+        List<Tutorial.Click> clicks = new ArrayList<>();
+        for (String click : readStrings(json, "clicks")) {
+            clicks.add(readClick(click));
+        }
+        if (clicks.isEmpty()) clicks.add(LEFT_CLICK);
+        return clicks;
+    }
+
+    // Interpret click types, including applying modifiers
+    private static Tutorial.Click readClick(String text) {
+        List<String> parts = List.of(text.split("\\+"));
+        int button = switch (parts.get(parts.size() - 1)) {
+            case "left" -> 0;
+            case "right" -> 1;
+            case "middle" -> 2;
+            default -> throw new JsonSyntaxException("Unknown mouse button in click " + text);
+        };
+        List<String> modifiers = parts.subList(0, parts.size() - 1);
+        for (String modifier : modifiers) {
+            if (!MODIFIERS.contains(modifier)) throw new JsonSyntaxException("Unknown modifier in click " + text);
+        }
+        return new Tutorial.Click(button, modifiers.contains("shift"), modifiers.contains("ctrl"), modifiers.contains("alt"));
     }
 
     private static Tutorial.TextBox readTextBox(JsonObject json) {

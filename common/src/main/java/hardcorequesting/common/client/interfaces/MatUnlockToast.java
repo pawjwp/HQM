@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces;
 
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -10,7 +11,6 @@ import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -21,18 +21,18 @@ public class MatUnlockToast implements Toast {
     private static final ResourceLocation TEXTURE = new ResourceLocation(HardcoreQuestingCore.ID, "textures/gui/mat_toast.png");
     private static final long DURATION = 5000L;
 
-    private final ItemStack icon;
+    private final MatIcons.Icon icon;
     private final Component title;
     @Nullable
     private final Component message;
 
-    private MatUnlockToast(ItemStack icon, Component title, @Nullable Component message) {
+    private MatUnlockToast(MatIcons.Icon icon, Component title, @Nullable Component message) {
         this.icon = icon;
         this.title = title;
         this.message = message;
     }
 
-    public static void show(ItemStack icon, Component title, @Nullable Component message) {
+    public static void show(MatIcons.Icon icon, Component title, @Nullable Component message) {
         Minecraft.getInstance().getToasts().addToast(new MatUnlockToast(icon, title, message));
     }
 
@@ -48,7 +48,7 @@ public class MatUnlockToast implements Toast {
             graphics.drawString(font, message, 30, 18, 0xFFFFFFFF, false);
         }
 
-        graphics.renderFakeItem(icon, 8, 8);
+        icon.draw(graphics, 7, 7);
         return timeSinceLastVisible >= DURATION ? Visibility.HIDE : Visibility.SHOW;
     }
 }

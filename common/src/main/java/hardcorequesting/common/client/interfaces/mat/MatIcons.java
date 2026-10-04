@@ -13,6 +13,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
@@ -138,6 +139,12 @@ public class MatIcons {
             return icon;
         }
         return item(ModItems.statisticDataChip.get());
+    }
+
+    // If the icon is a statistic icon or a normal item
+    public static Icon fromTag(CompoundTag tag) {
+        if (tag.contains("Stat")) return get(tag.getString("Stat"));
+        return item(ItemStack.of(tag.getCompound("Item")).getItem());
     }
 
     // The icon, derived from items or effects, based on the stat's associated item, block, or mob, or the CUSTOM map above

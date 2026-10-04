@@ -6,6 +6,7 @@ import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.tutorial.TutorialManager;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +32,7 @@ public class MatUnlocks {
         }
         mat.unlockedTutorials.add(id);
         GeneralUsage.sendMatDataSync(player);
-        if (showToast) toast(player, ModItems.tutorialDataChip.get().getDefaultInstance(),
+        if (showToast) toast(player, itemIcon(ModItems.tutorialDataChip.get().getDefaultInstance()),
                 Component.translatable("hqm.mat.toast.tutorial"), Component.literal(id));
         return Result.UNLOCKED;
     }
@@ -43,7 +44,7 @@ public class MatUnlocks {
         if (mat.unlockedStats.contains(statKey)) return Result.ALREADY;
         mat.unlockedStats.add(statKey);
         GeneralUsage.sendMatDataSync(player);
-        if (showToast) toast(player, ModItems.statisticDataChip.get().getDefaultInstance(),
+        if (showToast) toast(player, statIcon(statKey),
                 Component.translatable("hqm.mat.toast.statistic"), StatKey.displayName(statKey));
         return Result.UNLOCKED;
     }
@@ -57,7 +58,7 @@ public class MatUnlocks {
             Component message = locations.size() == 1
                     ? Component.literal(locations.get(0).name())
                     : Component.translatable("hqm.mat.toast.location.multiple", locations.size());
-            toast(player, ModItems.locationDataChip.get().getDefaultInstance(),
+            toast(player, itemIcon(ModItems.locationDataChip.get().getDefaultInstance()),
                     Component.translatable("hqm.mat.toast.location"), message);
         }
         // returns count of added locations
@@ -98,8 +99,22 @@ public class MatUnlocks {
         return removed;
     }
 
-    private static void toast(ServerPlayer player, ItemStack icon, Component title, Component message) {
+    private static void toast(ServerPlayer player, CompoundTag icon, Component title, Component message) {
         GeneralUsage.sendMatUnlockToast(player, icon, title, message);
+    }
+
+    // A toast icon showing an item
+    private static CompoundTag itemIcon(ItemStack stack) {
+        CompoundTag icon = new CompoundTag();
+        icon.put("Item", stack.save(new CompoundTag()));
+        return icon;
+    }
+
+    // A toast icon showing a statistic's icon
+    private static CompoundTag statIcon(String key) {
+        CompoundTag icon = new CompoundTag();
+        icon.putString("Stat", key);
+        return icon;
     }
 
     private static MatPlayerData data(ServerPlayer player) {

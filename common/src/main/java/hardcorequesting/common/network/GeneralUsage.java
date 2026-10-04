@@ -3,6 +3,7 @@ package hardcorequesting.common.network;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.GuiReward;
 import hardcorequesting.common.client.interfaces.MatUnlockToast;
+import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.client.interfaces.mat.MatScreens;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
@@ -26,7 +27,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.UUID;
 
@@ -176,7 +176,7 @@ public enum GeneralUsage {
     MAT_UNLOCK_TOAST {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            ItemStack icon = ItemStack.of(nbt.getCompound("Icon"));
+            MatIcons.Icon icon = MatIcons.fromTag(nbt.getCompound("Icon"));
             Component title = Component.Serializer.fromJson(nbt.getString("Title"));
             Component message = nbt.contains("Message") ? Component.Serializer.fromJson(nbt.getString("Message")) : null;
             MatUnlockToast.show(icon, title, message);
@@ -211,9 +211,9 @@ public enum GeneralUsage {
     }
 
     // server -> client
-    public static void sendMatUnlockToast(ServerPlayer player, ItemStack icon, Component title, Component message) {
+    public static void sendMatUnlockToast(ServerPlayer player, CompoundTag icon, Component title, Component message) {
         CompoundTag nbt = new CompoundTag();
-        nbt.put("Icon", icon.save(new CompoundTag()));
+        nbt.put("Icon", icon);
         nbt.putString("Title", Component.Serializer.toJson(title));
         if (message != null) nbt.putString("Message", Component.Serializer.toJson(message));
         MAT_UNLOCK_TOAST.sendMessageToPlayer(nbt, player);

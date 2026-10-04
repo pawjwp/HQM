@@ -8,12 +8,15 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import hardcorequesting.common.commands.CommandHandler;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.LocationResolver;
 import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.StatKey;
 import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.tutorial.TutorialManager;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -99,6 +102,14 @@ public class MatSubCommand implements CommandHandler.SubCommand {
                 .then(withOptions(Commands.argument("id", StringArgumentType.string()),
                         (context, targets, silent) -> {
                             String id = StringArgumentType.getString(context, "id");
+                            // Send an error if the tutorial is invalid. If REQUIRE_TUTORIAL_FILES is false, allow the unlock with a warning.
+                            if (!TutorialManager.getInstance().tutorials.containsKey(id)) {
+                                if (HQMConfig.getInstance().MAT.REQUIRE_TUTORIAL_FILES) {
+                                    context.getSource().sendFailure(Component.translatable("hqm.mat.command.unknownTutorial", id));
+                                    return 0;
+                                }
+                                context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.unknownTutorialUnlocked", id).withStyle(ChatFormatting.YELLOW), false);
+                            }
                             int count = 0;
                             for (ServerPlayer target : targets) {
                                 if (MatUnlocks.unlockTutorial(target, id, !silent) == MatUnlocks.Result.UNLOCKED) count++;

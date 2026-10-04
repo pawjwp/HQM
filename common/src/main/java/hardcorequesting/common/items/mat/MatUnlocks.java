@@ -1,8 +1,11 @@
 package hardcorequesting.common.items.mat;
 
+import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.tutorial.TutorialManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +24,11 @@ public class MatUnlocks {
     public static Result unlockTutorial(ServerPlayer player, String id, boolean showToast) {
         MatPlayerData mat = data(player);
         if (mat.unlockedTutorials.contains(id)) return Result.ALREADY;
+        // Send an warning if tutorial is invalid but REQUIRE_TUTORIAL_FILES is false
+        if (!TutorialManager.getInstance().tutorials.containsKey(id)) {
+            if (HQMConfig.getInstance().MAT.REQUIRE_TUTORIAL_FILES) return Result.INVALID;
+            HardcoreQuestingCore.LOGGER.warn("Unlocked the tutorial %s for %s, but it has no tutorial file", id, player.getScoreboardName());
+        }
         mat.unlockedTutorials.add(id);
         GeneralUsage.sendMatDataSync(player);
         if (showToast) toast(player, ModItems.tutorialDataChip.get().getDefaultInstance(),

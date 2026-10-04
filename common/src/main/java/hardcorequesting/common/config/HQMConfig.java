@@ -385,6 +385,8 @@ public class HQMConfig {
         public int LIFE_SIGNS_RADIUS = 64;
         @Comment("Auto-play the MAT introductory tutorial")
         public boolean AUTO_PLAY_MAT_TUTORIAL = true;
+        @Comment("Only allow unlocking tutorials with a valid tutorial file. When false, any tutorial ID can be unlocked with a warning.")
+        public boolean REQUIRE_TUTORIAL_FILES = false;
         @Comment("Show exact coordinates/distances in the Tracking tab. When disabled, coordinates are disabled and distances are rounded.")
         public boolean SHOW_TRACKING_COORDINATES = false;
     }

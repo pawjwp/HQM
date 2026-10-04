@@ -9,10 +9,10 @@ import hardcorequesting.common.quests.task.TaskType;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.Collections;
 import java.util.UUID;
 
 public class DetectItemTask extends ItemRequirementTask {
@@ -76,10 +76,13 @@ public class DetectItemTask extends ItemRequirementTask {
     
     private void countItems(Player player, ItemStack stack) {
         if (!player.getCommandSenderWorld().isClientSide) {
-            NonNullList<ItemStack> items = NonNullList.withSize(player.getInventory().items.size() + 1, ItemStack.EMPTY);
-            Collections.copy(items, player.getInventory().items);
+            Inventory inventory = player.getInventory();
+            NonNullList<ItemStack> items = NonNullList.create();
+            items.addAll(inventory.items);
+            items.addAll(inventory.armor);
+            items.addAll(inventory.offhand);
             if (!stack.isEmpty()) {
-                items.set(items.size() - 1, stack);
+                items.add(stack);
             }
             countItems(items, getData(player), player.getUUID());
         }

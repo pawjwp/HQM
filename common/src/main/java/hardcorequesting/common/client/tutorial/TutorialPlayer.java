@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.tutorial;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.platform.Window;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.client.ClientGuiEvent;
 import dev.architectury.event.events.client.ClientPlayerEvent;
@@ -350,8 +351,17 @@ public class TutorialPlayer {
             case BELOW -> anchor.getY() + anchor.getHeight();
             default -> anchor.getY() + (anchor.getHeight() - height) / 2;
         };
+        x += textBox.offsetX();
+        y += textBox.offsetY();
 
-        return new Layout(lines, x + textBox.offsetX(), y + textBox.offsetY(), width, height, anchor);
+        // Clamps the text box inside the window
+        if (textBox.clamp()) {
+            Window window = Minecraft.getInstance().getWindow();
+            x = Mth.clamp(x, 0, Math.max(window.getGuiScaledWidth() - width, 0));
+            y = Mth.clamp(y, 0, Math.max(window.getGuiScaledHeight() - height, 0));
+        }
+
+        return new Layout(lines, x, y, width, height, anchor);
     }
 
     // Draws the line connecting a text box to its anchor between the two edges facing each other

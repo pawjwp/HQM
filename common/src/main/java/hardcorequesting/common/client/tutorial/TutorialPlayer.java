@@ -128,6 +128,8 @@ public class TutorialPlayer {
                     state.done = true;
                 } else if (trigger instanceof Tutorial.Trigger.HasItem hasItem && !state.done && TutorialItems.count(minecraft.player, hasItem.items()) >= hasItem.count()) {
                     state.done = true;
+                } else if (trigger instanceof Tutorial.Trigger.Location location && !state.done && TutorialLocations.matches(location, minecraft.player)) {
+                    state.done = true;
                 }
             }
             advanceIfDone();
@@ -175,6 +177,18 @@ public class TutorialPlayer {
                     for (String item : hasItem.items()) {
                         if (!TutorialItems.isKnownItem(item)) {
                             HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown item %s, it is likely unable to advance", tutorial.id(), item);
+                        }
+                    }
+                }
+                if (trigger instanceof Tutorial.Trigger.Location location) {
+                    for (String dimension : location.dimensions()) {
+                        if (!TutorialLocations.isKnownDimension(dimension)) {
+                            HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown dimension %s, so it never matches", tutorial.id(), dimension);
+                        }
+                    }
+                    for (String biome : location.biomes()) {
+                        if (!TutorialLocations.isKnownBiome(biome)) {
+                            HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown biome %s, so it never matches", tutorial.id(), biome);
                         }
                     }
                 }

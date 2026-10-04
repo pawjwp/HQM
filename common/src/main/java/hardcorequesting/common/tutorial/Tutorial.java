@@ -1,6 +1,8 @@
 package hardcorequesting.common.tutorial;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -63,6 +65,10 @@ public record Tutorial(String id, Component title, Component description, List<S
 
         // The player has a number of specified items, by id or #tag
         record HasItem(List<String> items, int count) implements Trigger {
+        }
+
+        // The player is located at the listed position, in the listed dimensions, or in the listed biomes
+        record Location(List<String> dimensions, @Nullable BlockPos position, int radius, List<String> biomes) implements Trigger {
         }
 
         // One of the triggers happens

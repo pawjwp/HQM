@@ -87,12 +87,11 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         boolean any = false;
         if (!part.dimension.isEmpty()) {
             any = true;
-            if (!level.dimension().location().toString().equals(part.dimension)) return false;
+            if (!matchesDimension(level, part.dimension)) return false;
         }
         if (part.radius >= 0) {
             any = true;
-            double max = (double) part.radius * part.radius;
-            if (player.distanceToSqr(part.pos.getX() + 0.5D, part.pos.getY() + 0.5D, part.pos.getZ() + 0.5D) > max) return false;
+            if (!isWithinRadius(player, part.pos, part.radius)) return false;
         }
         BlockPos at = player.blockPosition();
         if (!part.biome.isEmpty()) {
@@ -106,7 +105,18 @@ public class VisitLocationTask extends IconLayoutTask<VisitLocationTask.Part, Lo
         return any;
     }
 
-    private boolean matchesBiome(ServerLevel level, BlockPos pos, String id) {
+    // Whether the current level is the target dimension
+    public static boolean matchesDimension(Level level, String id) {
+        return level.dimension().location().equals(ResourceLocation.tryParse(id));
+    }
+
+    // Whether the player is within the radius of the target position
+    public static boolean isWithinRadius(Player player, BlockPos pos, int radius) {
+        return player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) <= (double) radius * radius;
+    }
+
+    // Whether the current position is in the target biome
+    public static boolean matchesBiome(Level level, BlockPos pos, String id) {
         Holder<Biome> biome = level.getBiome(pos);
         if (id.startsWith("#")) {
             ResourceLocation rl = ResourceLocation.tryParse(id.substring(1));

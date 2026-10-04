@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.tutorial.Tutorial;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
 
@@ -84,6 +85,17 @@ public class TutorialAdapter {
                 int count = GsonHelper.getAsInt(json, "count", 1);
                 if (count < 1) throw new JsonSyntaxException("A has_item trigger needs a count of at least 1");
                 yield new Tutorial.Trigger.HasItem(items, count);
+            }
+            case "location" -> {
+                BlockPos position = null;
+                if (json.has("position")) {
+                    JsonArray xyz = GsonHelper.getAsJsonArray(json, "position");
+                    position = new BlockPos(xyz.get(0).getAsInt(), xyz.get(1).getAsInt(), xyz.get(2).getAsInt());
+                }
+                List<String> dimensions = readStrings(json, "dimensions");
+                List<String> biomes = readStrings(json, "biomes");
+                if (dimensions.isEmpty() && position == null && biomes.isEmpty()) throw new JsonSyntaxException("A location trigger needs a position, dimensions, or biomes");
+                yield new Tutorial.Trigger.Location(dimensions, position, GsonHelper.getAsInt(json, "radius", 3), biomes);
             }
             case "any" -> new Tutorial.Trigger.Any(readTriggers(json));
             case "all" -> new Tutorial.Trigger.All(readTriggers(json));

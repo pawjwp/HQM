@@ -226,7 +226,7 @@ public class GuiMatDefault extends GuiBase {
         for (int i = 0; i < rows.size(); i++) {
             MatClientData.StatRow row = rows.get(i);
             int rowY = STAT_Y + i * STAT_ROW_HEIGHT;
-            row.icon().draw(this, graphics, STAT_ICON_X, rowY);
+            row.icon().draw(graphics, left + STAT_ICON_X, top + rowY);
             drawString(graphics, trimToWidth(row.title(), getNameWidth(row)), STAT_X + STAT_TEXT_X, rowY + STAT_TEXT_Y, HQMConfig.TEXT_NORMAL);
             drawString(graphics, row.value(), STAT_X + STAT_WIDTH - getStringWidth(row.value()), rowY + STAT_TEXT_Y, HQMConfig.TEXT_HINT);
         }

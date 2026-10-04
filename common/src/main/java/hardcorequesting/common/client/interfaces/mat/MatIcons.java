@@ -1,8 +1,12 @@
 package hardcorequesting.common.client.interfaces.mat;
 
+import java.util.Map;
+
+import org.jetbrains.annotations.Nullable;
+
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import hardcorequesting.common.HardcoreQuestingCore;
-import hardcorequesting.common.client.interfaces.GuiBase;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.items.mat.StatKey;
 import net.fabricmc.api.EnvType;
@@ -20,20 +24,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.ItemLike;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 /**
- * Chooses the icon associated with each statistic, used in the MAT's statistic screen.
+ * Chooses the icon associated with MAT statistics and fetches icons for tutorials and toasts
  */
 @Environment(EnvType.CLIENT)
-public class MatStatIcons {
+public class MatIcons {
     private static final int SIZE = 18;
 
-    // Draws a statistic icon in the provided screen
+    // Draws an icon
     public interface Icon {
-        void draw(GuiBase gui, GuiGraphics graphics, int x, int y);
+        void draw(GuiGraphics graphics, int x, int y);
     }
     
     // Icons for custom statistics that can't be derived automatically
@@ -168,22 +169,22 @@ public class MatStatIcons {
     // Items used as icons are 16x16, centered
     private static Icon item(Item item) {
         ItemStack stack = new ItemStack(item);
-        return (gui, graphics, x, y) -> gui.drawItemStack(graphics, stack, x + 1, y + 1, false);
+        return (graphics, x, y) -> graphics.renderItem(stack, x + 1, y + 1);
     }
 
     // Status effects used as icons are 18x18
     private static Icon effect(MobEffect effect) {
-        return (gui, graphics, x, y) -> {
+        return (graphics, x, y) -> {
             RenderSystem.enableBlend();
-            graphics.blit(gui.getLeft() + x, gui.getTop() + y, 0, SIZE, SIZE, Minecraft.getInstance().getMobEffectTextures().get(effect));
+            graphics.blit(x, y, 0, SIZE, SIZE, Minecraft.getInstance().getMobEffectTextures().get(effect));
         };
     }
 
     // Custom textures used as icons are taken from textures/gui/stat_icons/<statistic key>
     private static Icon texture(ResourceLocation texture) {
-        return (gui, graphics, x, y) -> {
+        return (graphics, x, y) -> {
             RenderSystem.enableBlend();
-            graphics.blit(texture, gui.getLeft() + x, gui.getTop() + y, 0, 0, SIZE, SIZE, SIZE, SIZE);
+            graphics.blit(texture, x, y, 0, 0, SIZE, SIZE, SIZE, SIZE);
         };
     }
 }

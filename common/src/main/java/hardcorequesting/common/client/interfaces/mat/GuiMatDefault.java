@@ -102,8 +102,8 @@ public class GuiMatDefault extends GuiBase {
 
                 // Set title and description
                 if (tutorial != null) {
-                    title = Component.literal(tutorial.title());
-                    description = Component.literal(tutorial.description());
+                    title = tutorial.title();
+                    description = tutorial.description();
                 } else if (!isSelected(id)) {
                     color = HQMConfig.TEXT_HINT;
                 }
@@ -123,7 +123,7 @@ public class GuiMatDefault extends GuiBase {
                     return null;
                 }
                 if (getStringWidth(tutorial.title()) <= TITLE_WIDTH && getStringWidth(tutorial.description()) <= DESCRIPTION_WIDTH) return null;
-                return Component.literal(tutorial.title() + "\n").append(Component.literal(tutorial.description()).withStyle(ChatFormatting.GRAY));
+                return Component.empty().append(tutorial.title()).append("\n").append(tutorial.description().copy().withStyle(ChatFormatting.GRAY));
             }
 
             @Override

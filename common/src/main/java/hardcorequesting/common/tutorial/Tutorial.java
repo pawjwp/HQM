@@ -1,9 +1,11 @@
 package hardcorequesting.common.tutorial;
 
+import net.minecraft.network.chat.Component;
+
 import java.util.List;
 
 // The tutorial itself
-public record Tutorial(String id, String title, String description, List<Step> steps) {
+public record Tutorial(String id, Component title, Component description, List<Step> steps) {
 
     // A step of a tutorial, including the text boxes it shows and the trigger that advances it to the next step
     public record Step(List<TextBox> textBoxes, Trigger trigger) {
@@ -11,7 +13,7 @@ public record Tutorial(String id, String title, String description, List<Step> s
 
     // A text box placed on the screen, including text content, anchor location, anchor side, offset, width,
     // screens to display on, if it has a connecting line, and width of connecting line
-    public record TextBox(String text, String anchor, Side side, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth) {
+    public record TextBox(Component text, String anchor, Side side, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth) {
     }
 
     // Where a text box is placed relative to its anchor point

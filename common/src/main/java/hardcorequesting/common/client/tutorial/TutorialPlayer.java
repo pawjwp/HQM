@@ -17,7 +17,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
@@ -259,7 +258,7 @@ public class TutorialPlayer {
         if (anchor == null) return null;
         
         // Each text box is as wide and tall as it needs to be to fit all lines (and line width is limited by configured size)
-        List<FormattedCharSequence> lines = font.split(FormattedText.of(textBox.text()), textBox.width());
+        List<FormattedCharSequence> lines = font.split(textBox.text(), textBox.width());
         int width = lines.stream().mapToInt(font::width).max().orElse(0) + 2 * FRAME;
         int height = lines.size() * font.lineHeight + 2 * FRAME;
 

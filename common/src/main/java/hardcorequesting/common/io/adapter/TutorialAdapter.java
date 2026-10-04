@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import hardcorequesting.common.io.SaveHandler;
 import hardcorequesting.common.tutorial.Tutorial;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
 
 import java.util.ArrayList;
@@ -28,7 +29,15 @@ public class TutorialAdapter {
         for (JsonElement step : GsonHelper.getAsJsonArray(json, "steps", new JsonArray())) {
             steps.add(readStep(step.getAsJsonObject()));
         }
-        return new Tutorial(id, GsonHelper.getAsString(json, "title", id), GsonHelper.getAsString(json, "description", ""), steps);
+        Component title = json.has("title") ? readText(json.get("title")) : Component.literal(id);
+        Component description = json.has("description") ? readText(json.get("description")) : Component.empty();
+        return new Tutorial(id, title, description, steps);
+    }
+
+    // Interpret plain strings as text, everything else as a JSON text component
+    private static Component readText(JsonElement json) {
+        if (json.isJsonPrimitive()) return Component.literal(json.getAsString());
+        return Component.Serializer.fromJson(json);
     }
 
     // Tutorials are broken into steps, each one advances based on a provided trigger (or a click, if no trigger is defined)
@@ -107,8 +116,9 @@ public class TutorialAdapter {
             offsetX = offset.get(0).getAsInt();
             offsetY = offset.get(1).getAsInt();
         }
+        if (!json.has("text")) throw new JsonSyntaxException("A text box needs text");
         return new Tutorial.TextBox(
-            GsonHelper.getAsString(json, "text"),
+            readText(json.get("text")),
             GsonHelper.getAsString(json, "anchor", DEFAULT_ANCHOR),
             Tutorial.Side.valueOf(GsonHelper.getAsString(json, "side", "center").toUpperCase(Locale.ROOT)),
             offsetX,

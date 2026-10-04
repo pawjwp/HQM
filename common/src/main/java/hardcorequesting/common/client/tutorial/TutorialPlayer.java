@@ -22,7 +22,10 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Plays a tutorial by drawing its text boxes over the screen
@@ -41,10 +44,16 @@ public class TutorialPlayer {
     @Nullable
     private static Tutorial tutorial;
     private static int stepIndex;
-    private static boolean screenWasOpen; // if a screen_close step's screen was open during this step
-    private static int timerTicks; // ticks counted so far (for timer triggers)
+    private static final Map<Tutorial.Trigger, TriggerState> states = new IdentityHashMap<>(); // by identity, since identical triggers can appear twice
     @Nullable
     private static Screen tickScreen; // the screen open last tick
+
+    // Progress of one trigger during the current step
+    private static class TriggerState {
+        boolean done;
+        boolean screenWasOpen; // if a screen_close trigger's screen was open during this step
+        int timerTicks;        // ticks counted so far for a timer trigger
+    }
 
     // A text box's lines and size on-screen, and the anchor it was placed against
     private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor) {
@@ -70,17 +79,21 @@ public class TutorialPlayer {
 
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
             if (tutorial == null) return EventResult.pass();
-            Tutorial.Trigger trigger = tutorial.steps().get(stepIndex).trigger();
-            // Clicking the text box of a click step moves to the next step of the tutorial instead of clicking whatever is underneath
-            if (trigger instanceof Tutorial.Trigger.ClickTextBox click && matchesAnyClick(click.clicks(), button) && isOverTextBox(mouseX, mouseY)) {
-                advance();
-                return EventResult.interruptFalse();
+            boolean clickedTextBox = false;
+            for (Tutorial.Trigger trigger : currentTriggers()) {
+                // Clicking a text box completes a click_text_box trigger instead of clicking whatever is underneath
+                if (trigger instanceof Tutorial.Trigger.ClickTextBox click && !state(trigger).done && matchesAnyClick(click.clicks(), button) && isOverTextBox(mouseX, mouseY)) {
+                    state(trigger).done = true;
+                    clickedTextBox = true;
+                }
+                // Clicking an anchor completes a click_anchor trigger and also clicks what's underneath
+                if (trigger instanceof Tutorial.Trigger.ClickAnchor click && matchesAnyClick(click.clicks(), button)
+                        && TutorialScreens.matchesAny(click.screens(), screen) && isOverAnchor(click.anchors(), mouseX, mouseY)) {
+                    state(trigger).done = true;
+                }
             }
-            // Clicking an anchor moves to the next step and also clicks what's underneath
-            if (trigger instanceof Tutorial.Trigger.ClickAnchor click && matchesAnyClick(click.clicks(), button)
-                    && TutorialScreens.matchesAny(click.screens(), screen) && isOverAnchor(click.anchors(), mouseX, mouseY)) {
-                advance();
-            }
+            advanceIfDone();
+            if (clickedTextBox) return EventResult.interruptFalse();
             return EventResult.pass();
         });
 
@@ -99,26 +112,30 @@ public class TutorialPlayer {
             return EventResult.pass();
         });
 
-        // Screen steps check the open screen each tick
+        // Screen and timer triggers are checked each tick
         ClientTickEvent.CLIENT_POST.register(minecraft -> {
             tickScreen = minecraft.screen;
             if (tutorial == null) return;
-            Tutorial.Trigger trigger = tutorial.steps().get(stepIndex).trigger();
-            boolean open = TutorialScreens.matchesAny(trigger.screens(), minecraft.screen);
-            if (trigger instanceof Tutorial.Trigger.ScreenOpen && open) {
-                advance();
-            } else if (trigger instanceof Tutorial.Trigger.ScreenClose) {
-                if (open) screenWasOpen = true;
-                else if (screenWasOpen) advance();
-            } else if (trigger instanceof Tutorial.Trigger.Timer timer && !minecraft.isPaused() && ++timerTicks >= timer.ticks()) {
-                advance();
+            for (Tutorial.Trigger trigger : currentTriggers()) {
+                TriggerState state = state(trigger);
+                boolean open = TutorialScreens.matchesAny(trigger.screens(), minecraft.screen);
+                if (trigger instanceof Tutorial.Trigger.ScreenOpen && open) {
+                    state.done = true;
+                } else if (trigger instanceof Tutorial.Trigger.ScreenClose) {
+                    if (open) state.screenWasOpen = true;
+                    else if (state.screenWasOpen) state.done = true;
+                } else if (trigger instanceof Tutorial.Trigger.Timer timer && !state.done && !minecraft.isPaused() && ++state.timerTicks >= timer.ticks()) {
+                    state.done = true;
+                }
             }
+            advanceIfDone();
         });
         ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> pause());
     }
 
     // Starts the tutorial at a step, replacing any that are already running, and saves that step on the server
     public static void start(Tutorial tutorial, int startStep) {
+        states.clear();
         for (Tutorial.Step step : tutorial.steps()) {
             for (Tutorial.TextBox textBox : step.textBoxes()) {
                 if (!TutorialAnchors.isKnownAnchor(textBox.anchor())) {
@@ -130,33 +147,39 @@ public class TutorialPlayer {
                     }
                 }
             }
-            for (String screen : step.trigger().screens()) {
-                if (!TutorialScreens.isKnownScreen(screen)) {
-                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s in a trigger, so that step can't advance on it", tutorial.id(), screen);
-                }
-            }
-            if (step.trigger() instanceof Tutorial.Trigger.Key key) {
-                for (String name : key.keys()) {
-                    if (!TutorialKeys.isKnownKey(name)) {
-                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown key %s, so that step is unable to advance", tutorial.id(), name);
+            List<Tutorial.Trigger> stepTriggers = new ArrayList<>();
+            collectTriggers(step.trigger(), stepTriggers, false);
+            for (Tutorial.Trigger trigger : stepTriggers) {
+                for (String screen : trigger.screens()) {
+                    if (!TutorialScreens.isKnownScreen(screen)) {
+                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s in a trigger, so that step can't advance on it", tutorial.id(), screen);
                     }
                 }
-            }
-            if (step.trigger() instanceof Tutorial.Trigger.ClickAnchor click) {
-                for (String anchor : click.anchors()) {
-                    if (!TutorialAnchors.isContainerAnchor(anchor)) {
-                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses %s in a click_anchor trigger, which is likely not actually clickable", tutorial.id(), anchor);
+                if (trigger instanceof Tutorial.Trigger.Key key) {
+                    for (String name : key.keys()) {
+                        if (!TutorialKeys.isKnownKey(name)) {
+                            HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown key %s, so that step is unable to advance", tutorial.id(), name);
+                        }
+                    }
+                }
+                if (trigger instanceof Tutorial.Trigger.ClickAnchor click) {
+                    for (String anchor : click.anchors()) {
+                        if (!TutorialAnchors.isContainerAnchor(anchor)) {
+                            HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses %s in a click_anchor trigger, which is likely not actually clickable", tutorial.id(), anchor);
+                        }
                     }
                 }
             }
         }
         TutorialPlayer.tutorial = tutorial;
-        screenWasOpen = false;
-        timerTicks = 0;
         stepIndex = startStep;
         if (stepIndex >= tutorial.steps().size()) stepIndex = 0;
-        if (tutorial.steps().isEmpty()) pause(); // a tutorial without steps has nothing to show
-        else GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
+        if (tutorial.steps().isEmpty()) {
+            pause(); // a tutorial without steps has nothing to show
+        } else {
+            states.clear();
+            GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
+        }
     }
 
     // Removes the active tutorial
@@ -170,11 +193,41 @@ public class TutorialPlayer {
         return tutorial.id();
     }
 
-    // Moves to the next step and saves it on the server, completes the tutorial after the last step
-    private static void advance() {
+    // The current step's triggers, leaving out unfinished parts of completed "any" and "all" groups
+    private static List<Tutorial.Trigger> currentTriggers() {
+        List<Tutorial.Trigger> list = new ArrayList<>();
+        collectTriggers(tutorial.steps().get(stepIndex).trigger(), list, false);
+        return list;
+    }
+
+    // Adds a trigger to the list, or adds any/all the triggers inside it
+    private static void collectTriggers(Tutorial.Trigger trigger, List<Tutorial.Trigger> list, boolean insideDoneGroup) {
+        if (trigger.triggers().isEmpty()) {
+            if (!insideDoneGroup || state(trigger).done) list.add(trigger);
+        } else {
+            boolean done = insideDoneGroup || isDone(trigger);
+            for (Tutorial.Trigger part : trigger.triggers()) collectTriggers(part, list, done);
+        }
+    }
+
+    private static TriggerState state(Tutorial.Trigger trigger) {
+        return states.computeIfAbsent(trigger, t -> new TriggerState());
+    }
+
+    // The "any" triggers are done when any condition is met
+    // The "all" triggers are done when all conditions are met, in any order
+    // Other triggers are done once they have happened
+    private static boolean isDone(Tutorial.Trigger trigger) {
+        if (trigger instanceof Tutorial.Trigger.Any any) return any.triggers().stream().anyMatch(TutorialPlayer::isDone);
+        if (trigger instanceof Tutorial.Trigger.All all) return all.triggers().stream().allMatch(TutorialPlayer::isDone);
+        return state(trigger).done;
+    }
+
+    // Moves to the next step when the current step's trigger is done and saves it on the server, completes the tutorial after the last step
+    private static void advanceIfDone() {
+        if (tutorial == null || !isDone(tutorial.steps().get(stepIndex).trigger())) return;
+        states.clear();
         stepIndex++;
-        screenWasOpen = false;
-        timerTicks = 0;
         if (stepIndex < tutorial.steps().size()) {
             GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
         } else {
@@ -183,33 +236,35 @@ public class TutorialPlayer {
         }
     }
 
-    // Advances a key-triggered step when one of its keys is pressed while on the correct screen
+    // Completes key triggers when one of their keys is pressed while on the correct screen
     private static void keyPressed(InputConstants.Key pressed, @Nullable Screen screen) {
         if (tutorial == null) return;
-        if (tutorial.steps().get(stepIndex).trigger() instanceof Tutorial.Trigger.Key key
-                && TutorialScreens.matchesAny(key.screens(), screen) && TutorialKeys.matchesAny(key.keys(), pressed)) {
-            advance();
+        for (Tutorial.Trigger trigger : currentTriggers()) {
+            if (trigger instanceof Tutorial.Trigger.Key key && TutorialScreens.matchesAny(key.screens(), screen) && TutorialKeys.matchesAny(key.keys(), pressed)) {
+                state(trigger).done = true;
+            }
         }
-    }
-
-    // Only allow clicking if the step's trigger is click
-    private static boolean isClickStep() {
-        return tutorial != null && tutorial.steps().get(stepIndex).trigger() instanceof Tutorial.Trigger.ClickTextBox;
+        advanceIfDone();
     }
 
     private static void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (tutorial == null) return;
         Font font = Minecraft.getInstance().font;
-        Tutorial.Step step = tutorial.steps().get(stepIndex);
+        boolean clickable = false;
+        Tutorial.Trigger.Timer timer = null;
+        for (Tutorial.Trigger trigger : currentTriggers()) {
+            if (trigger instanceof Tutorial.Trigger.ClickTextBox && !state(trigger).done) clickable = true;
+            if (trigger instanceof Tutorial.Trigger.Timer next && (timer == null || state(timer).done)) timer = next;
+        }
         graphics.pose().pushPose();
         graphics.pose().translate(0, 0, Z);
-        for (Tutorial.TextBox textBox : step.textBoxes()) {
+        for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
             Layout layout = layout(textBox);
             if (layout == null) continue;
-            drawFrame(graphics, layout, isClickStep() && layout.contains(mouseX, mouseY) ? HOVERED_FILL : FILL);
+            drawFrame(graphics, layout, clickable && layout.contains(mouseX, mouseY) ? HOVERED_FILL : FILL);
             // Timer triggers have a green bar on the bottom like vanilla's tutorial toasts
-            if (step.trigger() instanceof Tutorial.Trigger.Timer timer) {
-                float progress = Math.min((timerTicks + partialTick) / timer.ticks(), 1);
+            if (timer != null) {
+                float progress = Math.min((state(timer).timerTicks + partialTick) / timer.ticks(), 1);
                 graphics.fill(layout.x() + 1, layout.bottom() - 2, layout.x() + 1 + (int) ((layout.width() - 2) * progress), layout.bottom() - 1, TIMER_COLOR);
             }
             if (textBox.line()) drawConnectingLine(graphics, textBox, layout);

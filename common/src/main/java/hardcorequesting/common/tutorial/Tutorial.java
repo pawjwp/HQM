@@ -32,6 +32,11 @@ public record Tutorial(String id, Component title, Component description, List<S
             return List.of();
         }
 
+        // The triggers inside an "any" or "all" trigger
+        default List<Trigger> triggers() {
+            return List.of();
+        }
+
         // Clicking a text box with one of the clicks (default left click)
         record ClickTextBox(List<Click> clicks) implements Trigger {
         }
@@ -54,6 +59,14 @@ public record Tutorial(String id, Component title, Component description, List<S
 
         // A number of ticks pass
         record Timer(int ticks) implements Trigger {
+        }
+
+        // One of the triggers happens
+        record Any(List<Trigger> triggers) implements Trigger {
+        }
+
+        // Every one of the triggers happens, in any order
+        record All(List<Trigger> triggers) implements Trigger {
         }
     }
 }

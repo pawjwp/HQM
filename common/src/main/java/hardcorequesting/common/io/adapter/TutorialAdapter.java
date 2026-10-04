@@ -78,8 +78,20 @@ public class TutorialAdapter {
                 if (ticks <= 0) throw new JsonSyntaxException("A timer trigger needs a valid second count");
                 yield new Tutorial.Trigger.Timer(ticks);
             }
+            case "any" -> new Tutorial.Trigger.Any(readTriggers(json));
+            case "all" -> new Tutorial.Trigger.All(readTriggers(json));
             default -> throw new JsonSyntaxException("Unknown trigger type " + type);
         };
+    }
+
+    // The triggers inside an "any" or "all" trigger
+    private static List<Tutorial.Trigger> readTriggers(JsonObject json) {
+        List<Tutorial.Trigger> triggers = new ArrayList<>();
+        for (JsonElement trigger : GsonHelper.getAsJsonArray(json, "triggers", new JsonArray())) {
+            triggers.add(readTrigger(trigger.getAsJsonObject()));
+        }
+        if (triggers.isEmpty()) throw new JsonSyntaxException("An any or all trigger needs a valid list of triggers");
+        return triggers;
     }
 
     // A click trigger with no click types uses left click by default

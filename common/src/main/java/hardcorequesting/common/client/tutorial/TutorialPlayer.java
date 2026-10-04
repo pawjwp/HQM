@@ -56,8 +56,8 @@ public class TutorialPlayer {
         int timerTicks;        // ticks counted so far for a timer trigger
     }
 
-    // A text box's lines and size on-screen, and the anchor it was placed against
-    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor) {
+    // A text box's lines and size on-screen, the anchor it was placed against, and the side it was placed on
+    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor, Tutorial.Side side) {
         int right() {
             return x + width;
         }
@@ -341,18 +341,11 @@ public class TutorialPlayer {
         int width = lines.stream().mapToInt(font::width).max().orElse(0) + 2 * FRAME;
         int height = lines.size() * font.lineHeight + 2 * FRAME;
 
-        int x = switch (textBox.side()) {
-            case LEFT -> anchor.getX() - width;
-            case RIGHT -> anchor.getX() + anchor.getWidth();
-            default -> anchor.getX() + (anchor.getWidth() - width) / 2;
-        };
-        int y = switch (textBox.side()) {
-            case ABOVE -> anchor.getY() - height;
-            case BELOW -> anchor.getY() + anchor.getHeight();
-            default -> anchor.getY() + (anchor.getHeight() - height) / 2;
-        };
-        x += textBox.offsetX();
-        y += textBox.offsetY();
+        Tutorial.Side side = textBox.side();
+        if (side == Tutorial.Side.AUTO) side = autoSide(anchor, width, height, textBox.gap());
+        Rect2i box = place(side, anchor, width, height, textBox.gap());
+        int x = box.getX() + textBox.offsetX();
+        int y = box.getY() + textBox.offsetY();
 
         // Clamps the text box inside the window
         if (textBox.clamp()) {
@@ -361,7 +354,44 @@ public class TutorialPlayer {
             y = Mth.clamp(y, 0, Math.max(window.getGuiScaledHeight() - height, 0));
         }
 
-        return new Layout(lines, x, y, width, height, anchor);
+        return new Layout(lines, x, y, width, height, anchor, side);
+    }
+
+    // The box's rectangle placed on the side of an anchor
+    private static Rect2i place(Tutorial.Side side, Rect2i anchor, int width, int height, int gap) {
+        int x = switch (side) {
+            case LEFT -> anchor.getX() - width - gap;
+            case RIGHT -> anchor.getX() + anchor.getWidth() + gap;
+            default -> anchor.getX() + (anchor.getWidth() - width) / 2;
+        };
+        int y = switch (side) {
+            case ABOVE -> anchor.getY() - height - gap;
+            case BELOW -> anchor.getY() + anchor.getHeight() + gap;
+            default -> anchor.getY() + (anchor.getHeight() - height) / 2;
+        };
+        return new Rect2i(x, y, width, height);
+    }
+
+    // The automatically chosen side, usually facing the middle of the window, falling back if that doesn't fit
+    private static Tutorial.Side autoSide(Rect2i anchor, int width, int height, int gap) {
+        Window window = Minecraft.getInstance().getWindow();
+        int windowWidth = window.getGuiScaledWidth();
+        int windowHeight = window.getGuiScaledHeight();
+
+        // Distance from the center of the anchor to the center of the window
+        float towardX = (windowWidth / 2F - (anchor.getX() + anchor.getWidth() / 2F)) / windowWidth;
+        float towardY = (windowHeight / 2F - (anchor.getY() + anchor.getHeight() / 2F)) / windowHeight;
+        Tutorial.Side horizontal = towardX > 0 ? Tutorial.Side.RIGHT : Tutorial.Side.LEFT;
+        Tutorial.Side vertical = towardY > 0 ? Tutorial.Side.BELOW : Tutorial.Side.ABOVE; // when exactly at the middle, place above
+        List<Tutorial.Side> order = Math.abs(towardX) > Math.abs(towardY)
+                ? List.of(horizontal, horizontal.opposite(), vertical, vertical.opposite())
+                : List.of(vertical, vertical.opposite(), horizontal, horizontal.opposite());
+
+        for (Tutorial.Side side : order) {
+            Rect2i box = place(side, anchor, width, height, gap);
+            if (box.getX() >= 0 && box.getY() >= 0 && box.getX() + width <= windowWidth && box.getY() + height <= windowHeight) return side;
+        }
+        return order.get(0);
     }
 
     // Draws the line connecting a text box to its anchor between the two edges facing each other
@@ -380,10 +410,10 @@ public class TutorialPlayer {
         if (!horizontallyClear && !verticallyClear) return; // if the anchor and text box overlap, don't draw lines at all
 
         // if the line connects horizontally or not
-        boolean horizontal = switch (textBox.side()) {
+        boolean horizontal = switch (layout.side()) {
             case LEFT, RIGHT -> horizontallyClear;  // connect horizontally if there is a horizontal gap
             case ABOVE, BELOW -> !verticallyClear;  // connect horizontally only if there is no vertical gap
-            case CENTER -> Math.max(gapLeft, gapRight) > Math.max(gapAbove, gapBelow); // connect horizontally if the horizontal gap is greater
+            default -> Math.max(gapLeft, gapRight) > Math.max(gapAbove, gapBelow); // centered: connect horizontally if the horizontal gap is greater
         };
         int lineWidth = textBox.lineWidth();
         float half = lineWidth / 2F; // half pixels round up and left when centering

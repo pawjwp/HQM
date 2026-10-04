@@ -13,14 +13,24 @@ public record Tutorial(String id, Component title, Component description, List<S
     public record Step(List<TextBox> textBoxes, Trigger trigger) {
     }
 
-    // A text box placed on the screen, including text content, anchor location, anchor side, offset, width,
+    // A text box placed on the screen, including text content, anchor location, anchor side, gap from the anchor, offset, width,
     // screens to display on, if it has a connecting line, width of connecting line, and if it's clamped in the window
-    public record TextBox(Component text, String anchor, Side side, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth, boolean clamp) {
+    public record TextBox(Component text, String anchor, Side side, int gap, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth, boolean clamp) {
     }
 
-    // Where a text box is placed relative to its anchor point
+    // Where a text box is placed relative to its anchor point, with AUTO picking placing automatically towards the center
     public enum Side {
-        ABOVE, BELOW, LEFT, RIGHT, CENTER
+        ABOVE, BELOW, LEFT, RIGHT, CENTER, AUTO;
+
+        public Side opposite() {
+            return switch (this) {
+                case ABOVE -> BELOW;
+                case BELOW -> ABOVE;
+                case LEFT -> RIGHT;
+                case RIGHT -> LEFT;
+                default -> this;
+            };
+        }
     }
 
     // A mouse button (0 left, 1 right, 2 middle) and the modifier keys that must be held with it

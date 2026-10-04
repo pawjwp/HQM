@@ -148,10 +148,13 @@ public class TutorialAdapter {
             offsetY = offset.get(1).getAsInt();
         }
         if (!json.has("text")) throw new JsonSyntaxException("A text box needs text");
+        String anchor = GsonHelper.getAsString(json, "anchor", DEFAULT_ANCHOR);
+        String side = GsonHelper.getAsString(json, "side", anchor.equals("window/center") ? "center" : "auto");
         return new Tutorial.TextBox(
             readText(json.get("text")),
-            GsonHelper.getAsString(json, "anchor", DEFAULT_ANCHOR),
-            Tutorial.Side.valueOf(GsonHelper.getAsString(json, "side", "center").toUpperCase(Locale.ROOT)),
+            anchor,
+            Tutorial.Side.valueOf(side.toUpperCase(Locale.ROOT)),
+            GsonHelper.getAsInt(json, "gap", 0),
             offsetX,
             offsetY,
             GsonHelper.getAsInt(json, "width", DEFAULT_WIDTH),

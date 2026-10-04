@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.interfaces.mat;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +14,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
@@ -141,10 +143,30 @@ public class MatIcons {
         return item(ModItems.statisticDataChip.get());
     }
 
-    // If the icon is a statistic icon or a normal item
+    // If the icon is a statistic icon, a named icon, or a normal item
     public static Icon fromTag(CompoundTag tag) {
         if (tag.contains("Stat")) return get(tag.getString("Stat"));
+        if (tag.contains("Name")) {
+            Icon named = parse(tag.getString("Name"));
+            if (named != null) return named;
+        }
         return item(ItemStack.of(tag.getCompound("Item")).getItem());
+    }
+
+    // An icon with a texture path, item id, or status effect id (checked in that order)
+    @Nullable
+    public static Icon parse(String name) {
+        ResourceLocation id = ResourceLocation.tryParse(name);
+        if (id == null) return null;
+        if (name.endsWith(".png")) {
+            if (Minecraft.getInstance().getResourceManager().getResource(id).isPresent()) return texture(id);
+            return null;
+        }
+        Optional<Item> item = BuiltInRegistries.ITEM.getOptional(id);
+        if (item.isPresent() && item.get() != Items.AIR) return item(item.get());
+        Optional<MobEffect> effect = BuiltInRegistries.MOB_EFFECT.getOptional(id);
+        if (effect.isPresent()) return effect(effect.get());
+        return null;
     }
 
     // The icon, derived from items or effects, based on the stat's associated item, block, or mob, or the CUSTOM map above

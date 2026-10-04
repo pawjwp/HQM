@@ -5,6 +5,7 @@ import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.ModItems;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.tutorial.Tutorial;
 import hardcorequesting.common.tutorial.TutorialManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -32,8 +33,17 @@ public class MatUnlocks {
         }
         mat.unlockedTutorials.add(id);
         GeneralUsage.sendMatDataSync(player);
-        if (showToast) toast(player, itemIcon(ModItems.tutorialDataChip.get().getDefaultInstance()),
-                Component.translatable("hqm.mat.toast.tutorial"), Component.literal(id));
+        if (showToast) {
+            // Tutorial chip as the default icon if another one isn't available
+            CompoundTag icon = itemIcon(ModItems.tutorialDataChip.get().getDefaultInstance());
+            Component message = Component.literal(id);
+            Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
+            if (tutorial != null) {
+                message = tutorial.title();
+                if (tutorial.icon() != null) icon.putString("Name", tutorial.icon());
+            }
+            toast(player, icon, Component.translatable("hqm.mat.toast.tutorial"), message);
+        }
         return Result.UNLOCKED;
     }
 

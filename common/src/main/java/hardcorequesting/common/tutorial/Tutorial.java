@@ -61,6 +61,10 @@ public record Tutorial(String id, Component title, Component description, List<S
         record Timer(int ticks) implements Trigger {
         }
 
+        // The player has a number of specified items, by id or #tag
+        record HasItem(List<String> items, int count) implements Trigger {
+        }
+
         // One of the triggers happens
         record Any(List<Trigger> triggers) implements Trigger {
         }

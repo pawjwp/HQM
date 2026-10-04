@@ -126,6 +126,8 @@ public class TutorialPlayer {
                     else if (state.screenWasOpen) state.done = true;
                 } else if (trigger instanceof Tutorial.Trigger.Timer timer && !state.done && !minecraft.isPaused() && ++state.timerTicks >= timer.ticks()) {
                     state.done = true;
+                } else if (trigger instanceof Tutorial.Trigger.HasItem hasItem && !state.done && TutorialItems.count(minecraft.player, hasItem.items()) >= hasItem.count()) {
+                    state.done = true;
                 }
             }
             advanceIfDone();
@@ -166,6 +168,13 @@ public class TutorialPlayer {
                     for (String anchor : click.anchors()) {
                         if (!TutorialAnchors.isContainerAnchor(anchor)) {
                             HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses %s in a click_anchor trigger, which is likely not actually clickable", tutorial.id(), anchor);
+                        }
+                    }
+                }
+                if (trigger instanceof Tutorial.Trigger.HasItem hasItem) {
+                    for (String item : hasItem.items()) {
+                        if (!TutorialItems.isKnownItem(item)) {
+                            HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown item %s, it is likely unable to advance", tutorial.id(), item);
                         }
                     }
                 }

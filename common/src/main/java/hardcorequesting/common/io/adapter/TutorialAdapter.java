@@ -47,11 +47,20 @@ public class TutorialAdapter {
         for (JsonElement textBox : GsonHelper.getAsJsonArray(json, "text_boxes", new JsonArray())) {
             textBoxes.add(readTextBox(textBox.getAsJsonObject()));
         }
+        List<Tutorial.Highlight> highlights = new ArrayList<>();
+        for (JsonElement highlight : GsonHelper.getAsJsonArray(json, "highlights", new JsonArray())) {
+            highlights.add(readHighlight(highlight.getAsJsonObject()));
+        }
         Tutorial.Trigger trigger = new Tutorial.Trigger.ClickTextBox(List.of(LEFT_CLICK));
         if (json.has("trigger")) {
             trigger = readTrigger(GsonHelper.getAsJsonObject(json, "trigger"));
         }
-        return new Tutorial.Step(textBoxes, trigger);
+        return new Tutorial.Step(textBoxes, highlights, trigger);
+    }
+
+    private static Tutorial.Highlight readHighlight(JsonObject json) {
+        if (!json.has("anchor")) throw new JsonSyntaxException("A highlight needs a target anchor");
+        return new Tutorial.Highlight(GsonHelper.getAsString(json, "anchor"), readStrings(json, "screens"), GsonHelper.getAsInt(json, "line_width", 1));
     }
 
     // A screen trigger without a screen list waits for any screen

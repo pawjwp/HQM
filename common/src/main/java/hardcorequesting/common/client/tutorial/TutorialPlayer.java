@@ -152,6 +152,18 @@ public class TutorialPlayer {
                     }
                 }
             }
+            for (Tutorial.Highlight highlight : step.highlights()) {
+                if (!TutorialAnchors.isKnownAnchor(highlight.anchor())) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown anchor %s, so that highlight is not shown", tutorial.id(), highlight.anchor());
+                } else if (highlight.anchor().startsWith("window/")) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s highlights %s, which is a point with nothing to outline", tutorial.id(), highlight.anchor());
+                }
+                for (String screen : highlight.screens()) {
+                    if (!TutorialScreens.isKnownScreen(screen)) {
+                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s, so that highlight is not shown", tutorial.id(), screen);
+                    }
+                }
+            }
             List<Tutorial.Trigger> stepTriggers = new ArrayList<>();
             collectTriggers(step.trigger(), stepTriggers, false);
             for (Tutorial.Trigger trigger : stepTriggers) {
@@ -282,6 +294,9 @@ public class TutorialPlayer {
         }
         graphics.pose().pushPose();
         graphics.pose().translate(0, 0, Z);
+        for (Tutorial.Highlight highlight : tutorial.steps().get(stepIndex).highlights()) {
+            drawHighlight(graphics, highlight);
+        }
         for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
             Layout layout = layout(textBox);
             if (layout == null) continue;
@@ -442,6 +457,26 @@ public class TutorialPlayer {
             graphics.fill(boxColumn, Math.min(boxEdge, turn + lineWidth), boxColumn + lineWidth, Math.max(boxEdge, turn), BORDER_TOP);              // from the box to the turn
             graphics.fill(anchorColumn, Math.min(anchorEdge, turn + lineWidth), anchorColumn + lineWidth, Math.max(anchorEdge, turn), BORDER_TOP);  // from the turn to the anchor
         }
+    }
+
+    // Draws the highlight, an outline just outside the anchor box
+    private static void drawHighlight(GuiGraphics graphics, Tutorial.Highlight highlight) {
+        if (!highlight.screens().isEmpty() && !TutorialScreens.matchesAny(highlight.screens(), Minecraft.getInstance().screen)) return;
+        Rect2i anchor = TutorialAnchors.resolve(highlight.anchor());
+        if (anchor == null || anchor.getWidth() == 0) return; // single-point anchors have nothing to outline
+        int lineWidth = highlight.lineWidth();
+        int anchorRight = anchor.getX() + anchor.getWidth();    // right anchor edge
+        int anchorBottom = anchor.getY() + anchor.getHeight();  // bottom anchor edge
+        int left = anchor.getX() - lineWidth;
+        int top = anchor.getY() - lineWidth;
+        int right = anchorRight + lineWidth;
+        int bottom = anchorBottom + lineWidth;
+
+        // drawn as 4 non-overlapping rectangles
+        graphics.fill(left, top, right, anchor.getY(), BORDER_TOP);                  // top (and top corners)
+        graphics.fill(left, anchorBottom, right, bottom, BORDER_TOP);                // bottom (and bottom corners)
+        graphics.fill(left, anchor.getY(), anchor.getX(), anchorBottom, BORDER_TOP); // left
+        graphics.fill(anchorRight, anchor.getY(), right, anchorBottom, BORDER_TOP);  // right
     }
 
     // Draws the frame, shaped like vanilla's tooltips with a 1 pixel rounded outline, with a two-color 1 pixel outline inside that

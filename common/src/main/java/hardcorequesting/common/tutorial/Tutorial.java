@@ -9,8 +9,12 @@ import java.util.List;
 // The tutorial itself
 public record Tutorial(String id, Component title, Component description, List<Step> steps) {
 
-    // A step of a tutorial, including the text boxes it shows and the trigger that advances it to the next step
-    public record Step(List<TextBox> textBoxes, Trigger trigger) {
+    // A step of a tutorial, including the text boxes and highlights it shows and the trigger that advances it to the next step
+    public record Step(List<TextBox> textBoxes, List<Highlight> highlights, Trigger trigger) {
+    }
+
+    // An outline around an anchor, the screens to display on, and its width
+    public record Highlight(String anchor, List<String> screens, int lineWidth) {
     }
 
     // A text box placed on the screen, including text content, anchor location, anchor side, gap from the anchor, offset, width,

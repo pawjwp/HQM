@@ -69,6 +69,10 @@ public class MatSubCommand implements CommandHandler.SubCommand {
                 .orElseGet(() -> builder.buildFuture());
     };
 
+    // Suggests ids of all loaded tutorials
+    private static final SuggestionProvider<CommandSourceStack> TUTORIALS = (context, builder) ->
+            SharedSuggestionProvider.suggest(TutorialManager.getInstance().tutorials.keySet().stream().map(StringArgumentType::escapeIfRequired), builder);
+
     // Unlocks the requested option
     private interface UnlockAction {
         int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, boolean silent) throws CommandSyntaxException;
@@ -99,7 +103,7 @@ public class MatSubCommand implements CommandHandler.SubCommand {
 
     private ArgumentBuilder<CommandSourceStack, ?> tutorialBranch() {
         return Commands.literal("tutorial")
-                .then(withOptions(Commands.argument("id", StringArgumentType.string()),
+                .then(withOptions(Commands.argument("id", StringArgumentType.string()).suggests(TUTORIALS),
                         (context, targets, silent) -> {
                             String id = StringArgumentType.getString(context, "id");
                             // Send an error if the tutorial is invalid. If REQUIRE_TUTORIAL_FILES is false, allow the unlock with a warning.

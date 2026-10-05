@@ -32,7 +32,13 @@ public class TutorialAdapter {
         }
         Component title = json.has("title") ? readText(json.get("title")) : Component.literal(id);
         Component description = json.has("description") ? readText(json.get("description")) : Component.empty();
-        return new Tutorial(id, title, description, GsonHelper.getAsString(json, "icon", null), GsonHelper.getAsBoolean(json, "default_unlocked", false), steps);
+        return new Tutorial(
+            id, title, description,
+            GsonHelper.getAsString(json, "icon", null),
+            GsonHelper.getAsBoolean(json, "default_unlocked", false),
+            GsonHelper.getAsBoolean(json, "auto_play", false),
+            steps
+        );
     }
 
     // Interpret plain strings as text, everything else as a JSON text component

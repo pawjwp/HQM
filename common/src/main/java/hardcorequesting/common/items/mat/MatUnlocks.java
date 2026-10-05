@@ -44,6 +44,7 @@ public class MatUnlocks {
             }
             toast(player, icon, Component.translatable("hqm.mat.toast.tutorial"), message);
         }
+        GeneralUsage.sendMatTutorialAutoPlay(player);
         return Result.UNLOCKED;
     }
 
@@ -54,7 +55,10 @@ public class MatUnlocks {
         for (Tutorial tutorial : TutorialManager.getInstance().tutorials.values()) {
             if (tutorial.defaultUnlocked() && mat.unlockedTutorials.add(tutorial.id())) added = true;
         }
-        if (added) GeneralUsage.sendMatDataSync(player);
+        if (added) {
+            GeneralUsage.sendMatDataSync(player);
+            GeneralUsage.sendMatTutorialAutoPlay(player);
+        }
     }
 
     // Unlocks a statistic

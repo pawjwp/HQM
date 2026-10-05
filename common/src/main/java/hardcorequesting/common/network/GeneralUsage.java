@@ -175,6 +175,7 @@ public enum GeneralUsage {
             mat.completedTutorials.add(id);
             mat.tutorialProgress.remove(id);
             sendMatDataSync(serverPlayer);
+            sendMatTutorialAutoPlay(serverPlayer);
         }
     },
     MAT_UNLOCK_TOAST {
@@ -199,6 +200,13 @@ public enum GeneralUsage {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (!nbt.contains("Tutorial") || nbt.getString("Tutorial").equals(TutorialPlayer.getPlayingId())) TutorialPlayer.pause();
+        }
+    },
+    // Starts an auto-play tutorial if nothing is playing
+    MAT_TUTORIAL_AUTO_PLAY {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            TutorialPlayer.autoPlay();
         }
     };
     
@@ -308,6 +316,11 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         if (tutorial != null) nbt.putString("Tutorial", tutorial);
         MAT_TUTORIAL_PAUSE.sendMessageToPlayer(nbt, player);
+    }
+
+    // server -> client
+    public static void sendMatTutorialAutoPlay(ServerPlayer player) {
+        MAT_TUTORIAL_AUTO_PLAY.sendMessageToPlayer(new CompoundTag(), player);
     }
     
     // client -> server

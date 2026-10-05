@@ -45,8 +45,11 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
         ctx.getTaskQueue().accept(() -> {
             if (message.data != null && message.usage >= 0) {
                 GeneralUsage usage = GeneralUsage.values()[message.usage];
-                if (message.player != null) {
-                    usage.receiveData(message.player, message.data);
+                // Get player if they don't exist before receiving data
+                Player player = message.player;
+                if (player == null) player = ctx.getPlayer();
+                if (player != null) {
+                    usage.receiveData(player, message.data);
                 }
             }
         });

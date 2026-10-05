@@ -9,7 +9,9 @@ import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.network.GeneralUsage;
+import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.tutorial.Tutorial;
 import hardcorequesting.common.tutorial.TutorialManager;
 import net.fabricmc.api.EnvType;
@@ -25,9 +27,11 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Plays a tutorial by drawing its text boxes over the screen
@@ -49,6 +53,7 @@ public class TutorialPlayer {
     private static final Map<Tutorial.Trigger, TriggerState> states = new IdentityHashMap<>(); // by identity, since identical triggers can appear twice
     @Nullable
     private static Screen tickScreen; // the screen open last tick
+    private static final Set<String> pausedAutoPlays = new HashSet<>(); // list of auto-play tutorials paused this session not played until a rejoin
 
     // Progress of one trigger during the current step
     private static class TriggerState {
@@ -136,7 +141,25 @@ public class TutorialPlayer {
             }
             advanceIfDone();
         });
-        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> pause());
+        ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> {
+            pause();
+            pausedAutoPlays.clear();
+        });
+    }
+
+    // Starts the first unlocked and unfinished auto-play tutorial, skipping any paused this session
+    // Called after logging in, upon unlocking a tutorial, or completing one
+    public static void autoPlay() {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (tutorial != null || minecraft.player == null) return;
+        MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(minecraft.player).matData;
+        for (Tutorial candidate : TutorialManager.getInstance().tutorials.values()) {
+            if (candidate.autoPlay() && mat.unlockedTutorials.contains(candidate.id())
+                    && !mat.completedTutorials.contains(candidate.id()) && !pausedAutoPlays.contains(candidate.id())) {
+                start(candidate, mat.tutorialProgress.getOrDefault(candidate.id(), 0));
+                return;
+            }
+        }
     }
 
     // Starts the tutorial at a step, replacing any that are already running, and saves that step on the server
@@ -208,6 +231,9 @@ public class TutorialPlayer {
                 }
             }
         }
+        if (TutorialPlayer.tutorial != null && TutorialPlayer.tutorial.autoPlay() && !TutorialPlayer.tutorial.id().equals(tutorial.id())) {
+            pausedAutoPlays.add(TutorialPlayer.tutorial.id());
+        }
         TutorialPlayer.tutorial = tutorial;
         stepIndex = startStep;
         if (stepIndex >= tutorial.steps().size()) stepIndex = 0;
@@ -228,7 +254,9 @@ public class TutorialPlayer {
     }
 
     // Removes the active tutorial
+    // Auto-play tutorials won't play again until a restart
     public static void pause() {
+        if (tutorial != null && tutorial.autoPlay()) pausedAutoPlays.add(tutorial.id());
         tutorial = null;
     }
 
@@ -277,7 +305,7 @@ public class TutorialPlayer {
             GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
         } else {
             GeneralUsage.sendMatTutorialCompleted(tutorial.id());
-            pause();
+            tutorial = null;
         }
     }
 

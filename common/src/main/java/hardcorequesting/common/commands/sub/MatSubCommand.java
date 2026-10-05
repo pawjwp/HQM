@@ -140,10 +140,10 @@ public class MatSubCommand implements CommandHandler.SubCommand {
             return 0;
         }
         for (ServerPlayer target : targets) {
-            if (unlock) MatUnlocks.unlockTutorial(target, id, true);
             int step = 0;
             if (!restart) step = QuestingDataManager.getInstance().getQuestingData(target).matData.tutorialProgress.getOrDefault(id, 0);
             GeneralUsage.sendMatTutorialPlay(target, id, step);
+            if (unlock) MatUnlocks.unlockTutorial(target, id, true);
         }
         context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.played", id, targets.size()), true);
         return targets.size();

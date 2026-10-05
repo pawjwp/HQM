@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 // The tutorial itself
-public record Tutorial(String id, Component title, Component description, @Nullable String icon, boolean defaultUnlocked, List<Step> steps) {
+public record Tutorial(String id, Component title, Component description, @Nullable String icon, boolean defaultUnlocked, boolean autoPlay, List<Step> steps) {
 
     // A step of a tutorial, including the text boxes and highlights it shows and the trigger that advances it to the next step
     public record Step(List<TextBox> textBoxes, List<Highlight> highlights, Trigger trigger) {

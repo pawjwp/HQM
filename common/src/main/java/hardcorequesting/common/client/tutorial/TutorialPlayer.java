@@ -182,7 +182,7 @@ public class TutorialPlayer {
                 }
                 if (trigger instanceof Tutorial.Trigger.ClickAnchor click) {
                     for (String anchor : click.anchors()) {
-                        if (!TutorialAnchors.isContainerAnchor(anchor)) {
+                        if (!TutorialAnchors.isClickableAnchor(anchor)) {
                             HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses %s in a click_anchor trigger, which is likely not actually clickable", tutorial.id(), anchor);
                         }
                     }

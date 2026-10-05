@@ -2,6 +2,8 @@ package hardcorequesting.common.client.tutorial;
 
 import com.mojang.blaze3d.platform.Window;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.interfaces.mat.MatScreen;
+import hardcorequesting.common.items.mat.MatMode;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * - Window anchors are locations based on the bounds of the screen
  * - HUD anchors are locations on the vanilla HUD
  * - Container anchors are locations on an active container UI
+ * - MAT anchors are the MAT's main panel, tabs, and tab bar
  */
 @Environment(EnvType.CLIENT)
 public class TutorialAnchors {
@@ -44,6 +47,16 @@ public class TutorialAnchors {
                 if (anchor.equals("slot/" + slot.index) || (slot.container == player.getInventory() && anchor.equals("inventory/" + slot.getContainerSlot()))) {
                     return new Rect2i(panel.getX() + slot.x - 1, panel.getY() + slot.y - 1, 18, 18);
                 }
+            }
+        }
+
+        // MAT anchors are only valid when a MAT screen is open
+        if (Minecraft.getInstance().screen instanceof MatScreen mat) {
+            Rect2i panel = mat.getPanel();
+            if (anchor.equals("mat/panel")) return panel;
+            if (anchor.equals("mat/tab_bar")) return mat.getTabBar().barBounds(panel.getX(), panel.getY());
+            for (MatMode mode : MatMode.values()) {
+                if (anchor.equals("mat/tab/" + TutorialScreens.modeName(mode))) return mat.getTabBar().tabBounds(mode, panel.getX(), panel.getY());
             }
         }
 
@@ -75,11 +88,15 @@ public class TutorialAnchors {
 
     // If an anchor name is valid or not
     public static boolean isKnownAnchor(String anchor) {
-        return resolve(anchor) != null || isContainerAnchor(anchor);
+        return resolve(anchor) != null || isClickableAnchor(anchor);
     }
 
-    // Container anchors are the only clickable ones
-    public static boolean isContainerAnchor(String anchor) {
-        return anchor.matches("slot/\\d+|inventory/\\d+|screen/panel");
+    // Container and MAT anchors are the only clickable ones, and only exist while their screen is open
+    public static boolean isClickableAnchor(String anchor) {
+        if (anchor.matches("slot/\\d+|inventory/\\d+|screen/panel|mat/panel|mat/tab_bar")) return true;
+        for (MatMode mode : MatMode.values()) {
+            if (anchor.equals("mat/tab/" + TutorialScreens.modeName(mode))) return true;
+        }
+        return false;
     }
 }

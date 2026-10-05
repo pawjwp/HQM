@@ -15,6 +15,7 @@ import java.util.Map;
 public class TutorialManager implements Serializable {
     public final Map<String, Tutorial> tutorials = new LinkedHashMap<>();
     public final Map<String, String> files = new LinkedHashMap<>();
+    public int skippedFiles; // files not read in the last load
 
     public static TutorialManager getInstance() {
         return QuestLine.getActiveQuestLine().tutorialManager;
@@ -34,6 +35,7 @@ public class TutorialManager implements Serializable {
     public void load(DataReader reader) {
         tutorials.clear();
         files.clear();
+        skippedFiles = 0;
         for (Map.Entry<String, String> file : reader.readFolder("tutorials").entrySet()) {
             String fileName = file.getKey();
             String id = fileName.substring(0, fileName.length() - ".json".length());
@@ -46,6 +48,7 @@ public class TutorialManager implements Serializable {
                 }
             } catch (RuntimeException e) {
                 HardcoreQuestingCore.LOGGER.warn("Skipped tutorial %s: %s", fileName, e.getMessage());
+                skippedFiles++;
             }
         }
         HardcoreQuestingCore.LOGGER.info("Loaded %d tutorials.", tutorials.size());

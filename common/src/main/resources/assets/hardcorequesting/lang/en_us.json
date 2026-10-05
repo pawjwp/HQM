@@ -165,6 +165,8 @@
   "hqm.mat.command.unlocked": "Unlocked MAT data for %s player(s).",
   "hqm.mat.command.none": "No new MAT data was unlocked.",
   "hqm.mat.command.unknownTutorial": "Invalid tutorial name %s.",
+  "hqm.mat.command.reloaded": "Reloaded %s tutorials.",
+  "hqm.mat.command.reloadSkipped": "%s tutorial files couldn't be read, see the log for details.",
   "hqm.mat.command.unknownTutorialUnlocked": "Unlocked invalid tutorial %s. It will remain unplayable until a valid tutorial file is created.",
   "hqm.mat.command.removed": "Removed MAT data from %s player(s).",
   "hqm.mat.command.noneRemoved": "No matching MAT data was found to remove.",

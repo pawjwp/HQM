@@ -7,6 +7,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.LocationResolver;
@@ -14,6 +15,8 @@ import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.StatKey;
 import hardcorequesting.common.items.mat.TrackedLocation;
+import hardcorequesting.common.network.NetworkManager;
+import hardcorequesting.common.network.message.TutorialSyncMessage;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.tutorial.TutorialManager;
 import net.minecraft.ChatFormatting;
@@ -98,7 +101,20 @@ public class MatSubCommand implements CommandHandler.SubCommand {
                 .then(Commands.literal("remove")
                         .then(removeTutorialBranch())
                         .then(removeStatisticBranch())
-                        .then(removeLocationBranch()));
+                        .then(removeLocationBranch()))
+                .then(Commands.literal("reload").executes(this::reload));
+    }
+
+    // Reloads tutorial files and sends them to each player
+    private int reload(CommandContext<CommandSourceStack> context) {
+        TutorialManager manager = TutorialManager.getInstance();
+        manager.load(HardcoreQuestingCore.packManager);
+        NetworkManager.sendToAllPlayers(new TutorialSyncMessage(manager.files));
+        context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.reloaded", manager.tutorials.size()), true);
+        if (manager.skippedFiles > 0) {
+            context.getSource().sendFailure(Component.translatable("hqm.mat.command.reloadSkipped", manager.skippedFiles));
+        }
+        return manager.tutorials.size();
     }
 
     private ArgumentBuilder<CommandSourceStack, ?> tutorialBranch() {

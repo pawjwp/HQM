@@ -11,6 +11,7 @@ import dev.architectury.event.events.client.ClientTickEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.tutorial.Tutorial;
+import hardcorequesting.common.tutorial.TutorialManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -216,6 +217,14 @@ public class TutorialPlayer {
             states.clear();
             GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
         }
+    }
+
+    // Reloads the playing tutorial, setting it to a new version if applicable or pausing if not
+    public static void reload() {
+        if (tutorial == null) return;
+        Tutorial reloaded = TutorialManager.getInstance().tutorials.get(tutorial.id());
+        if (reloaded == null) pause();
+        else start(reloaded, stepIndex);
     }
 
     // Removes the active tutorial

@@ -31,6 +31,7 @@ public class NetworkManager {
         registerMessage(OpenGuiMessage.Handler.class, OpenGuiMessage.class, id++, EnvType.CLIENT);
         
         registerMessage(PlayerDataSyncMessage.Handler.class, PlayerDataSyncMessage.class, id++, EnvType.CLIENT);
+        registerMessage(TutorialSyncMessage.Handler.class, TutorialSyncMessage.class, id++, EnvType.CLIENT);
         
         registerMessage(TeamStatsMessage.Handler.class, TeamStatsMessage.class, id++, EnvType.CLIENT);
         registerMessage(TeamErrorMessage.Handler.class, TeamErrorMessage.class, id++, EnvType.CLIENT);

@@ -8,7 +8,6 @@ import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.util.Translator;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -67,17 +66,10 @@ public class MatHandler {
         }
     }
 
-    // Opens the Default mode, loading the statistics and preparing tutorial auto-play on first launch
+    // Opens the Default mode, loading the statistics
     private static void openDefault(Player player) {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
-        CompoundTag payload = MatStats.buildStatsPayload(serverPlayer);
-        MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
-        if (HQMConfig.getInstance().MAT.AUTO_PLAY_MAT_TUTORIAL && !mat.matTutorialSeen && mat.unlockedTutorials.contains("mat")) {
-            payload.putBoolean("AutoPlay", true);
-            mat.matTutorialSeen = true;
-            GeneralUsage.sendMatDataSync(serverPlayer);
-        }
-        GeneralUsage.sendOpenMat(player, MatMode.DEFAULT, payload);
+        GeneralUsage.sendOpenMat(player, MatMode.DEFAULT, MatStats.buildStatsPayload(serverPlayer));
     }
 
     private static void openQuest(Player player) {

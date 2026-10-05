@@ -26,7 +26,6 @@ public class MatClientData {
     public record StatRow(Component title, Component value, MatIcons.Icon icon) {}
 
     private static List<StatRow> stats = new ArrayList<>();
-    private static boolean autoPlay;
 
     public static void update(CompoundTag payload) {
         List<StatRow> rows = new ArrayList<>();
@@ -37,18 +36,10 @@ public class MatClientData {
             rows.add(new StatRow(StatKey.displayName(key), formatValue(key, entry.getLong("Value")), MatIcons.get(key)));
         }
         stats = rows;
-        autoPlay = payload.getBoolean("AutoPlay");
     }
 
     public static List<StatRow> stats() {
         return stats;
-    }
-
-    // Returns whether this open requested the intro tutorial to auto-play, clearing the flag so it plays only once.
-    public static boolean consumeAutoPlay() {
-        boolean value = autoPlay;
-        autoPlay = false;
-        return value;
     }
 
     private static Component formatValue(String key, long value) {

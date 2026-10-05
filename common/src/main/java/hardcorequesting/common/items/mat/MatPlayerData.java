@@ -23,7 +23,6 @@ public class MatPlayerData {
     public final Set<String> unlockedTutorials = new LinkedHashSet<>();
     public final Set<String> completedTutorials = new HashSet<>();
     public final Map<String, Integer> tutorialProgress = new HashMap<>(); // the current step
-    public boolean matTutorialSeen;
     public final List<String> unlockedStats = new ArrayList<>(); // stats, unlock order
     public final List<TrackedLocation> locations = new ArrayList<>(); // locations, insertion order
     public int selectedLocation = -1; // start with no selected location
@@ -42,7 +41,6 @@ public class MatPlayerData {
         CompoundTag progress = new CompoundTag();
         for (Map.Entry<String, Integer> entry : tutorialProgress.entrySet()) progress.putInt(entry.getKey(), entry.getValue());
         tag.put("TutorialProgress", progress);
-        tag.putBoolean("TutorialSeen", matTutorialSeen);
         tag.put("UnlockedStats", stringList(unlockedStats));
 
         ListTag locationList = new ListTag();
@@ -62,7 +60,6 @@ public class MatPlayerData {
         tutorialProgress.clear();
         CompoundTag progress = tag.getCompound("TutorialProgress");
         for (String id : progress.getAllKeys()) tutorialProgress.put(id, progress.getInt(id));
-        matTutorialSeen = tag.getBoolean("TutorialSeen");
         unlockedStats.clear();
         readStrings(tag.getList("UnlockedStats", Tag.TAG_STRING), unlockedStats);
 

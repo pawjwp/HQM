@@ -37,6 +37,7 @@ public class TutorialAdapter {
             GsonHelper.getAsString(json, "icon", null),
             GsonHelper.getAsBoolean(json, "default_unlocked", false),
             GsonHelper.getAsBoolean(json, "auto_play", false),
+            GsonHelper.getAsBoolean(json, "navigation", true),
             steps
         );
     }

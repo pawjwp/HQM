@@ -46,10 +46,18 @@ public class TutorialPlayer {
     private static final int BORDER_BOTTOM = 0xBFDFDFDF;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final int TIMER_COLOR = 0xFF00AA00;    // green timer color vanilla toasts use for progress
+    private static final int NAV_HEIGHT = 9;              // height of the navigation controls
+    private static final int NAV_GAP = 4;                 // gap between the text and navigation controls
+    private static final int NAV_SPACE = 3;               // gap between the navigation arrows and text
+    private static final int NAV_DROP = 3;                // distance the navigation controls are offset below their line
+    private static final int ARROW_WIDTH = 3;
+    private static final int ARROW_HOVERED = 0xFFFFFFFF;
+    private static final int ARROW_DISABLED = 0x40FFFFFF;
 
     @Nullable
     private static Tutorial tutorial;
     private static int stepIndex;
+    private static int furthestStep; // the furthest step reached, which navigating forward can move up to
     private static final Map<Tutorial.Trigger, TriggerState> states = new IdentityHashMap<>(); // by identity, since identical triggers can appear twice
     @Nullable
     private static Screen tickScreen; // the screen open last tick
@@ -62,8 +70,9 @@ public class TutorialPlayer {
         int timerTicks;        // ticks counted so far for a timer trigger
     }
 
-    // A text box's lines and size on-screen, the anchor it was placed against, and the side it was placed on
-    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor, Tutorial.Side side) {
+    // A text box's lines and size on-screen, the anchor it was placed against, the side it was placed on,
+    // if it shows navigation controls, and where the navigation controls are placed
+    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor, Tutorial.Side side, boolean navigation, int navX, int navY) {
         int right() {
             return x + width;
         }
@@ -74,6 +83,14 @@ public class TutorialPlayer {
 
         boolean contains(double mouseX, double mouseY) {
             return mouseX >= x && mouseX < right() && mouseY >= y && mouseY < bottom();
+        }
+
+        // The clickable areas of each arrow, slightly larger than the arrow itself
+        Rect2i previousArea() {
+            return new Rect2i(navX - 2, navY - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
+        }
+        Rect2i nextArea() {
+            return new Rect2i(right() - FRAME - ARROW_WIDTH - 2, navY - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
         }
     }
 
@@ -86,6 +103,21 @@ public class TutorialPlayer {
 
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
             if (tutorial == null) return EventResult.pass();
+            // Navigation arrows intercept clicks before the text box, even if grayed out
+            if (button == InputConstants.MOUSE_BUTTON_LEFT) {
+                for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
+                    Layout layout = layout(textBox);
+                    if (layout == null || !layout.navigation()) continue;
+                    if (layout.previousArea().contains((int) mouseX, (int) mouseY)) {
+                        if (stepIndex > 0) goToStep(stepIndex - 1);
+                        return EventResult.interruptFalse();
+                    }
+                    if (layout.nextArea().contains((int) mouseX, (int) mouseY)) {
+                        if (stepIndex < furthestStep) goToStep(stepIndex + 1);
+                        return EventResult.interruptFalse();
+                    }
+                }
+            }
             boolean clickedTextBox = false;
             for (Tutorial.Trigger trigger : currentTriggers()) {
                 // Clicking a text box completes a click_text_box trigger instead of clicking whatever is underneath
@@ -237,6 +269,12 @@ public class TutorialPlayer {
         TutorialPlayer.tutorial = tutorial;
         stepIndex = startStep;
         if (stepIndex >= tutorial.steps().size()) stepIndex = 0;
+        
+        MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(Minecraft.getInstance().player).matData;
+        furthestStep = Math.max(stepIndex, mat.tutorialFurthest.getOrDefault(tutorial.id(), 0));
+        // if the tutorial has previously been completed, the furthest step is the last one
+        if (mat.completedTutorials.contains(tutorial.id())) furthestStep = tutorial.steps().size() - 1;
+        furthestStep = Math.min(furthestStep, tutorial.steps().size() - 1);
         if (tutorial.steps().isEmpty()) {
             pause(); // a tutorial without steps has nothing to show
         } else {
@@ -302,11 +340,19 @@ public class TutorialPlayer {
         states.clear();
         stepIndex++;
         if (stepIndex < tutorial.steps().size()) {
+            furthestStep = Math.max(furthestStep, stepIndex);
             GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
         } else {
             GeneralUsage.sendMatTutorialCompleted(tutorial.id());
             tutorial = null;
         }
+    }
+
+    // Goes to a specific step and saves progress there
+    private static void goToStep(int step) {
+        states.clear();
+        stepIndex = step;
+        GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
     }
 
     // Completes key triggers when one of their keys is pressed while on the correct screen
@@ -347,6 +393,7 @@ public class TutorialPlayer {
             for (int i = 0; i < layout.lines().size(); i++) {
                 graphics.drawString(font, layout.lines().get(i), layout.x() + FRAME, layout.y() + FRAME + i * font.lineHeight, TEXT_COLOR, false);
             }
+            if (layout.navigation()) drawNavigation(graphics, font, layout, mouseX, mouseY);
         }
         graphics.pose().popPose();
     }
@@ -390,8 +437,27 @@ public class TutorialPlayer {
         
         // Each text box is as wide and tall as it needs to be to fit all lines (and line width is limited by configured size)
         List<FormattedCharSequence> lines = font.split(textBox.text(), textBox.width());
-        int width = lines.stream().mapToInt(font::width).max().orElse(0) + 2 * FRAME;
-        int height = lines.size() * font.lineHeight + 2 * FRAME;
+        int textWidth = lines.stream().mapToInt(font::width).max().orElse(0);
+        int textHeight = lines.size() * font.lineHeight;
+
+        // Navigation controls show only when a screen is open at the end of the last line
+        boolean navigation = screen != null && tutorial.navigation();
+        int navWidth = 2 * ARROW_WIDTH + 2 * NAV_SPACE + font.width(stepCounter()) - 1;
+        // Place navigation bar on the last line, offset NAV_DROP pixels down as long as the box is multiple lines tall
+        int navOffsetY = textHeight - font.lineHeight + (lines.size() > 1 ? NAV_DROP : 0);
+        if (navigation) {
+            int lastLine = lines.isEmpty() ? 0 : font.width(lines.get(lines.size() - 1));
+            // increase size of text box as needed to accommodate the nav bar
+            if (lines.isEmpty() || lastLine + NAV_GAP + navWidth > textBox.width()) {
+                navOffsetY = textHeight;
+                textHeight += NAV_HEIGHT - (lines.isEmpty() ? 0 : NAV_DROP);
+                textWidth = Math.max(textWidth, navWidth);
+            } else {
+                textWidth = Math.max(textWidth, lastLine + NAV_GAP + navWidth);
+            }
+        }
+        int width = textWidth + 2 * FRAME;
+        int height = textHeight + 2 * FRAME;
 
         Tutorial.Side side = textBox.side();
         if (side == Tutorial.Side.AUTO) side = autoSide(anchor, width, height, textBox.gap());
@@ -406,7 +472,35 @@ public class TutorialPlayer {
             y = Mth.clamp(y, 0, Math.max(window.getGuiScaledHeight() - height, 0));
         }
 
-        return new Layout(lines, x, y, width, height, anchor, side);
+        return new Layout(lines, x, y, width, height, anchor, side, navigation, x + width - FRAME - navWidth, y + FRAME + navOffsetY);
+    }
+
+    // The current step out of the total steps
+    private static String stepCounter() {
+        return (stepIndex + 1) + "/" + tutorial.steps().size();
+    }
+
+    // Draws the navigation bar
+    private static void drawNavigation(GuiGraphics graphics, Font font, Layout layout, int mouseX, int mouseY) {
+        int arrowY = layout.navY() + 1;
+        // dim arrows if not currently usable
+        drawArrow(graphics, layout.navX(), arrowY, false, arrowColor(stepIndex > 0, layout.previousArea().contains(mouseX, mouseY)));
+        drawArrow(graphics, layout.right() - FRAME - ARROW_WIDTH, arrowY, true, arrowColor(stepIndex < furthestStep, layout.nextArea().contains(mouseX, mouseY)));
+        graphics.drawString(font, stepCounter(), layout.navX() + ARROW_WIDTH + NAV_SPACE, layout.navY(), TEXT_COLOR, false);
+    }
+
+    private static int arrowColor(boolean enabled, boolean hovered) {
+        if (!enabled) return ARROW_DISABLED;
+        if (hovered) return ARROW_HOVERED;
+        return BORDER_TOP;
+    }
+
+    // Draws an arrow, which is a triangle drawn as 3 columns of 1, 3, and 5 pixels
+    private static void drawArrow(GuiGraphics graphics, int x, int y, boolean right, int color) {
+        for (int column = 0; column < ARROW_WIDTH; column++) {
+            int columnX = right ? x + ARROW_WIDTH - 1 - column : x + column;
+            graphics.fill(columnX, y + 2 - column, columnX + 1, y + 3 + column, color);
+        }
     }
 
     // The box's rectangle placed on the side of an anchor

@@ -161,6 +161,7 @@ public enum GeneralUsage {
             int step = nbt.getInt("Step");
             if (step > 0) mat.tutorialProgress.put(id, step);
             else mat.tutorialProgress.remove(id);
+            if (step > mat.tutorialFurthest.getOrDefault(id, 0)) mat.tutorialFurthest.put(id, step);
             sendMatDataSync(serverPlayer);
         }
     },
@@ -174,6 +175,7 @@ public enum GeneralUsage {
             if (!mat.unlockedTutorials.contains(id)) return;
             mat.completedTutorials.add(id);
             mat.tutorialProgress.remove(id);
+            mat.tutorialFurthest.remove(id);
             sendMatDataSync(serverPlayer);
             sendMatTutorialAutoPlay(serverPlayer);
         }

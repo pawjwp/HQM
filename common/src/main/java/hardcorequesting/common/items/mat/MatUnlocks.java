@@ -96,6 +96,7 @@ public class MatUnlocks {
         mat.unlockedTutorials.removeIf(filter);
         mat.completedTutorials.removeIf(filter);
         mat.tutorialProgress.keySet().removeIf(filter);
+        mat.tutorialFurthest.keySet().removeIf(filter);
         return synced(player, before - mat.unlockedTutorials.size());
     }
 

@@ -47,6 +47,16 @@ public class MatUnlocks {
         return Result.UNLOCKED;
     }
 
+    // Unlocks tutorial marked as default_unlocked
+    public static void unlockDefaultTutorials(ServerPlayer player) {
+        MatPlayerData mat = data(player);
+        boolean added = false;
+        for (Tutorial tutorial : TutorialManager.getInstance().tutorials.values()) {
+            if (tutorial.defaultUnlocked() && mat.unlockedTutorials.add(tutorial.id())) added = true;
+        }
+        if (added) GeneralUsage.sendMatDataSync(player);
+    }
+
     // Unlocks a statistic
     public static Result unlockStat(ServerPlayer player, String statKey, boolean showToast) {
         if (!StatKey.isValid(statKey)) return Result.INVALID;

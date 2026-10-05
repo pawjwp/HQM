@@ -3,6 +3,7 @@ package hardcorequesting.common.event;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.death.DeathStatsManager;
+import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.quests.Quest;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -55,6 +56,7 @@ public class PlayerTracker {
         }
         
         questingData.spawnBook(player);
+        MatUnlocks.unlockDefaultTutorials(player);
     }
     
     

@@ -167,6 +167,9 @@ public class MatSubCommand implements CommandHandler.SubCommand {
         TutorialManager manager = TutorialManager.getInstance();
         manager.load(HardcoreQuestingCore.packManager);
         NetworkManager.sendToAllPlayers(new TutorialSyncMessage(manager.files));
+        for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
+            MatUnlocks.unlockDefaultTutorials(player);
+        }
         context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.reloaded", manager.tutorials.size()), true);
         if (manager.skippedFiles > 0) {
             context.getSource().sendFailure(Component.translatable("hqm.mat.command.reloadSkipped", manager.skippedFiles));

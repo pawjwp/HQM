@@ -15,6 +15,7 @@ import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.StatKey;
 import hardcorequesting.common.items.mat.TrackedLocation;
+import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.NetworkManager;
 import hardcorequesting.common.network.message.TutorialSyncMessage;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -39,6 +40,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.structure.Structure;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
@@ -91,6 +94,11 @@ public class MatSubCommand implements CommandHandler.SubCommand {
         int run(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets) throws CommandSyntaxException;
     }
 
+    // Gets the players a command applies to
+    private interface TargetGetter {
+        Collection<ServerPlayer> get(CommandContext<CommandSourceStack> context) throws CommandSyntaxException;
+    }
+
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
         return builder.requires(source -> source.hasPermission(Commands.LEVEL_OWNERS))
@@ -102,7 +110,56 @@ public class MatSubCommand implements CommandHandler.SubCommand {
                         .then(removeTutorialBranch())
                         .then(removeStatisticBranch())
                         .then(removeLocationBranch()))
-                .then(Commands.literal("reload").executes(this::reload));
+                .then(Commands.literal("reload").executes(this::reload))
+                .then(Commands.literal("tutorial")
+                        .then(Commands.literal("play")
+                                .then(playOptions(Commands.argument("id", StringArgumentType.string()).suggests(TUTORIALS), MatSubCommand::sender)
+                                        .then(playOptions(Commands.argument("targets", EntityArgument.players()), context -> EntityArgument.getPlayers(context, "targets")))))
+                        .then(Commands.literal("pause")
+                                .executes(context -> pause(context, sender(context), null))
+                                .then(Commands.literal("all")
+                                        .executes(context -> pause(context, sender(context), null))
+                                        .then(Commands.argument("targets", EntityArgument.players())
+                                                .executes(context -> pause(context, EntityArgument.getPlayers(context, "targets"), null))))
+                                .then(Commands.argument("id", StringArgumentType.string()).suggests(TUTORIALS)
+                                        .executes(context -> pause(context, sender(context), StringArgumentType.getString(context, "id")))
+                                        .then(Commands.argument("targets", EntityArgument.players())
+                                                .executes(context -> pause(context, EntityArgument.getPlayers(context, "targets"), StringArgumentType.getString(context, "id")))))));
+    }
+
+    // Adds the optional "restart" and "unlock" options
+    private <T extends ArgumentBuilder<CommandSourceStack, T>> T playOptions(T node, TargetGetter targets) {
+        return node.executes(context -> play(context, targets.get(context), false, false))
+                .then(Commands.literal("restart").executes(context -> play(context, targets.get(context), true, false))
+                        .then(Commands.literal("unlock").executes(context -> play(context, targets.get(context), true, true))))
+                .then(Commands.literal("unlock").executes(context -> play(context, targets.get(context), false, true)));
+    }
+
+    // Starts a tutorial for each target, optionally restarting or unlocking it if relevant
+    private int play(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, boolean restart, boolean unlock) {
+        String id = StringArgumentType.getString(context, "id");
+        if (!TutorialManager.getInstance().tutorials.containsKey(id)) {
+            context.getSource().sendFailure(Component.translatable("hqm.mat.command.unknownTutorial", id));
+            return 0;
+        }
+        for (ServerPlayer target : targets) {
+            if (unlock) MatUnlocks.unlockTutorial(target, id, true);
+            int step = 0;
+            if (!restart) step = QuestingDataManager.getInstance().getQuestingData(target).matData.tutorialProgress.getOrDefault(id, 0);
+            GeneralUsage.sendMatTutorialPlay(target, id, step);
+        }
+        context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.played", id, targets.size()), true);
+        return targets.size();
+    }
+
+    // Pauses a tutorial for each target
+    private int pause(CommandContext<CommandSourceStack> context, Collection<ServerPlayer> targets, @Nullable String id) {
+        for (ServerPlayer target : targets) {
+            GeneralUsage.sendMatTutorialPause(target, id);
+        }
+        if (id == null) context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.pausedAll", targets.size()), true);
+        else context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.paused", id, targets.size()), true);
+        return targets.size();
     }
 
     // Reloads tutorial files and sends them to each player

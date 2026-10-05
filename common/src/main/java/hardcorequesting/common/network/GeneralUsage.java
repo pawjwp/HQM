@@ -5,6 +5,7 @@ import hardcorequesting.common.client.interfaces.GuiReward;
 import hardcorequesting.common.client.interfaces.MatUnlockToast;
 import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.client.interfaces.mat.MatScreens;
+import hardcorequesting.common.client.tutorial.TutorialPlayer;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.items.ModItems;
@@ -19,6 +20,8 @@ import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.team.PlayerEntry;
+import hardcorequesting.common.tutorial.Tutorial;
+import hardcorequesting.common.tutorial.TutorialManager;
 import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -27,6 +30,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -181,6 +185,21 @@ public enum GeneralUsage {
             Component message = nbt.contains("Message") ? Component.Serializer.fromJson(nbt.getString("Message")) : null;
             MatUnlockToast.show(icon, title, message);
         }
+    },
+    // Starts a tutorial at a step
+    MAT_TUTORIAL_PLAY {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            Tutorial tutorial = TutorialManager.getInstance().tutorials.get(nbt.getString("Tutorial"));
+            if (tutorial != null) TutorialPlayer.start(tutorial, nbt.getInt("Step"));
+        }
+    },
+    // Pauses a tutorial
+    MAT_TUTORIAL_PAUSE {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (!nbt.contains("Tutorial") || nbt.getString("Tutorial").equals(TutorialPlayer.getPlayingId())) TutorialPlayer.pause();
+        }
     };
     
     // server -> client
@@ -274,6 +293,21 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putString("Tutorial", tutorial);
         MAT_TUTORIAL_COMPLETED.sendMessageToServer(nbt);
+    }
+
+    // server -> client
+    public static void sendMatTutorialPlay(ServerPlayer player, String tutorial, int step) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putString("Tutorial", tutorial);
+        nbt.putInt("Step", step);
+        MAT_TUTORIAL_PLAY.sendMessageToPlayer(nbt, player);
+    }
+
+    // server -> client
+    public static void sendMatTutorialPause(ServerPlayer player, @Nullable String tutorial) {
+        CompoundTag nbt = new CompoundTag();
+        if (tutorial != null) nbt.putString("Tutorial", tutorial);
+        MAT_TUTORIAL_PAUSE.sendMessageToPlayer(nbt, player);
     }
     
     // client -> server

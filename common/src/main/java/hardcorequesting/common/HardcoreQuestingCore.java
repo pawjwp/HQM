@@ -1,6 +1,7 @@
 package hardcorequesting.common;
 
 import dev.architectury.event.events.common.PlayerEvent;
+import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.registries.RegistrarManager;
 import hardcorequesting.common.client.sounds.Sounds;
 import hardcorequesting.common.commands.CommandHandler;
@@ -16,10 +17,13 @@ import hardcorequesting.common.proxies.ClientProxy;
 import hardcorequesting.common.proxies.CommonProxy;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.task.TaskType;
+import hardcorequesting.common.tutorial.TutorialManager;
 import hardcorequesting.common.util.Executor;
 import hardcorequesting.common.util.RegisterHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -84,6 +88,10 @@ public class HardcoreQuestingCore {
         });
         PlayerEvent.PLAYER_CLONE.register((oldPlayer, newPlayer, wonGame) -> {
             PlayerDeathEventListener.instance.onPlayerClone(oldPlayer, newPlayer, wonGame);
+        });
+        // Reload tutorial files on /reload
+        ReloadListenerRegistry.register(PackType.SERVER_DATA, (ResourceManagerReloadListener) manager -> {
+            if (getServer() != null) TutorialManager.reload(getServer());
         });
 
         RegistrarManager registries = RegistrarManager.get(HardcoreQuestingCore.ID);

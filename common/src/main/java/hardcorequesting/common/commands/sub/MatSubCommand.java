@@ -7,7 +7,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.commands.CommandHandler;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.LocationResolver;
@@ -16,8 +15,6 @@ import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.StatKey;
 import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.network.GeneralUsage;
-import hardcorequesting.common.network.NetworkManager;
-import hardcorequesting.common.network.message.TutorialSyncMessage;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.tutorial.TutorialManager;
 import net.minecraft.ChatFormatting;
@@ -164,12 +161,8 @@ public class MatSubCommand implements CommandHandler.SubCommand {
 
     // Reloads tutorial files and sends them to each player
     private int reload(CommandContext<CommandSourceStack> context) {
+        TutorialManager.reload(context.getSource().getServer());
         TutorialManager manager = TutorialManager.getInstance();
-        manager.load(HardcoreQuestingCore.packManager);
-        NetworkManager.sendToAllPlayers(new TutorialSyncMessage(manager.files));
-        for (ServerPlayer player : context.getSource().getServer().getPlayerList().getPlayers()) {
-            MatUnlocks.unlockDefaultTutorials(player);
-        }
         context.getSource().sendSuccess(() -> Component.translatable("hqm.mat.command.reloaded", manager.tutorials.size()), true);
         if (manager.skippedFiles > 0) {
             context.getSource().sendFailure(Component.translatable("hqm.mat.command.reloadSkipped", manager.skippedFiles));

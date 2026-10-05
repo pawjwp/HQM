@@ -4,10 +4,15 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.io.DataReader;
 import hardcorequesting.common.io.DataWriter;
 import hardcorequesting.common.io.adapter.TutorialAdapter;
+import hardcorequesting.common.items.mat.MatUnlocks;
+import hardcorequesting.common.network.NetworkManager;
+import hardcorequesting.common.network.message.TutorialSyncMessage;
 import hardcorequesting.common.quests.QuestLine;
 import hardcorequesting.common.quests.Serializable;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -19,6 +24,16 @@ public class TutorialManager implements Serializable {
 
     public static TutorialManager getInstance() {
         return QuestLine.getActiveQuestLine().tutorialManager;
+    }
+
+    // Reloads tutorial files
+    public static void reload(MinecraftServer server) {
+        TutorialManager manager = getInstance();
+        manager.load(HardcoreQuestingCore.packManager);
+        NetworkManager.sendToAllPlayers(new TutorialSyncMessage(manager.files));
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            MatUnlocks.unlockDefaultTutorials(player);
+        }
     }
 
     @Override

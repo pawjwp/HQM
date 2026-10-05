@@ -24,6 +24,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -34,7 +35,7 @@ import net.minecraft.world.entity.player.Player;
  * The MAT's Default mode shows the unlocked tutorials on the left and statistics on the right
  */
 @Environment(EnvType.CLIENT)
-public class GuiMatDefault extends GuiBase {
+public class GuiMatDefault extends GuiBase implements MatScreen {
     private static final int HEADER_Y = 20;               // heading y on both sides
     private static final int TEXT_Y = 35;                 // first line of text content on both sides
     private static final int TUTORIAL_X = 20;             // x of the tutorial heading
@@ -307,5 +308,20 @@ public class GuiMatDefault extends GuiBase {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public MatMode getMode() {
+        return MatMode.DEFAULT;
+    }
+
+    @Override
+    public Rect2i getPanel() {
+        return new Rect2i(left, top, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT);
+    }
+
+    @Override
+    public MatTabBar getTabBar() {
+        return tabBar;
     }
 }

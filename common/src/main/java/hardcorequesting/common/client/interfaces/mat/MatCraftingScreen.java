@@ -11,6 +11,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -18,7 +19,7 @@ import net.minecraft.world.inventory.CraftingMenu;
 
 // The MAT's crafting mode, an extension of CraftingScreen with the texture replaced and the tab bar added on top
 @Environment(EnvType.CLIENT)
-public class MatCraftingScreen extends CraftingScreen {
+public class MatCraftingScreen extends CraftingScreen implements MatScreen {
     private static final ResourceLocation BG_TEXTURE = ResourceHelper.getResource(MatMode.CRAFTING.getBackgroundName());
     private static final int PANEL_W = 176, PANEL_H = 200;
     // Distance from the panel top to the start of the vanilla screen
@@ -85,5 +86,20 @@ public class MatCraftingScreen extends CraftingScreen {
     public void resize(Minecraft minecraft, int width, int height) {
         UIScale.apply();
         super.resize(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
+    }
+
+    @Override
+    public MatMode getMode() {
+        return MatMode.CRAFTING;
+    }
+
+    @Override
+    public Rect2i getPanel() {
+        return new Rect2i(panelLeft(), panelTop(), PANEL_W, PANEL_H);
+    }
+
+    @Override
+    public MatTabBar getTabBar() {
+        return tabBar;
     }
 }

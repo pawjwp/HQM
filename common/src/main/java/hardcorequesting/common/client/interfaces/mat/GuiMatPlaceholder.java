@@ -12,13 +12,14 @@ import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 
 // A placeholder screen for the incomplete MAT modes with label
 @Environment(EnvType.CLIENT)
-public class GuiMatPlaceholder extends GuiBase {
+public class GuiMatPlaceholder extends GuiBase implements MatScreen {
     private final MatMode mode;
     private final MatTabBar tabBar;
     private final ResourceLocation background;
@@ -66,5 +67,20 @@ public class GuiMatPlaceholder extends GuiBase {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public MatMode getMode() {
+        return mode;
+    }
+
+    @Override
+    public Rect2i getPanel() {
+        return new Rect2i(left, top, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT);
+    }
+
+    @Override
+    public MatTabBar getTabBar() {
+        return tabBar;
     }
 }

@@ -14,8 +14,10 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
 import java.util.List;
@@ -169,6 +171,21 @@ public class MatTabBar {
             if (mouseX >= boundaryAt(tabIndex, heightFraction, guiLeft) && mouseX < boundaryAt(tabIndex + 1, heightFraction, guiLeft)) return tabIndex;
         }
         return -1;
+    }
+
+    // The tab bar's rectangle
+    public Rect2i barBounds(int guiLeft, int guiTop) {
+        return new Rect2i(guiLeft + tabBarLeft, guiTop, BAR_WIDTH, TAB_HEIGHT);
+    }
+
+    // A tab's inner area between the slanted edges
+    @Nullable
+    public Rect2i tabBounds(MatMode mode, int guiLeft, int guiTop) {
+        int index = modes.indexOf(mode);
+        if (index < 0) return null;
+        int left = Math.round(boundaryAt(index, 0.5F, guiLeft));
+        int right = Math.round(boundaryAt(index + 1, 0.5F, guiLeft));
+        return new Rect2i(left, guiTop + FILL_INSET, right - left, TAB_HEIGHT - 2 * FILL_INSET);
     }
 
     private float boundaryAt(int boundaryIndex, float heightFraction, int guiLeft) {

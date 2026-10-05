@@ -20,6 +20,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -47,7 +48,7 @@ import java.util.Set;
  * The location details on the right include the map, distance, coordinates, dimension, and biome of the location.
  */
 @Environment(EnvType.CLIENT)
-public class GuiMatTracking extends GuiBase {
+public class GuiMatTracking extends GuiBase implements MatScreen {
     private static final int HEADER_Y = 20;               // heading y on both sides
     private static final int TEXT_Y = 35;                 // first line of text content on both sides
     private static final int LIST_X = 20;                 // x of the location heading
@@ -437,5 +438,20 @@ public class GuiMatTracking extends GuiBase {
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    @Override
+    public MatMode getMode() {
+        return MatMode.TRACKING;
+    }
+
+    @Override
+    public Rect2i getPanel() {
+        return new Rect2i(left, top, GuiQuestBook.TEXTURE_WIDTH, GuiQuestBook.TEXTURE_HEIGHT);
+    }
+
+    @Override
+    public MatTabBar getTabBar() {
+        return tabBar;
     }
 }

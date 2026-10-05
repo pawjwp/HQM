@@ -8,12 +8,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.entity.player.Player;
 
 
 // The MAT's questing mode, an extension of GuiQuestBook with the MAT theme and the tab bar added on top
 @Environment(EnvType.CLIENT)
-public class GuiMatQuestBook extends GuiQuestBook {
+public class GuiMatQuestBook extends GuiQuestBook implements MatScreen {
     private final MatTabBar tabBar = new MatTabBar(MatMode.QUEST, TEXTURE_WIDTH);
 
     private GuiMatQuestBook(Player player) {
@@ -46,5 +47,20 @@ public class GuiMatQuestBook extends GuiQuestBook {
             return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public MatMode getMode() {
+        return MatMode.QUEST;
+    }
+
+    @Override
+    public Rect2i getPanel() {
+        return new Rect2i(left, top, TEXTURE_WIDTH, TEXTURE_HEIGHT);
+    }
+
+    @Override
+    public MatTabBar getTabBar() {
+        return tabBar;
     }
 }

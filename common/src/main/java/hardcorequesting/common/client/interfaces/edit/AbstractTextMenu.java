@@ -19,7 +19,9 @@ public abstract class AbstractTextMenu extends GuiEditMenu {
     
     @Override
     public boolean keyPressed(int keyCode) {
-        return textLogic.onKeyStroke(keyCode) || super.keyPressed(keyCode);
+        if (!textLogic.onKeyStroke(keyCode)) super.keyPressed(keyCode);
+        // always report text boxes as being typed in
+        return true;
     }
     
     @Override

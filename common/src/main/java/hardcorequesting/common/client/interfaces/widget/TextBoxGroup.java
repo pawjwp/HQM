@@ -48,7 +48,9 @@ public class TextBoxGroup implements Drawable, Clickable {
     
     public boolean onKeyStroke(int k) {
         if (selectedTextBox != null && selectedTextBox.isVisible()) {
-            return selectedTextBox.onKeyStroke(k);
+            selectedTextBox.onKeyStroke(k);
+            // always report text boxes as being typed in
+            return true;
         }
         return false;
     }

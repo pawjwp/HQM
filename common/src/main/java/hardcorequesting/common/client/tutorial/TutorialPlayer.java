@@ -84,14 +84,6 @@ public class TutorialPlayer {
         boolean contains(double mouseX, double mouseY) {
             return mouseX >= x && mouseX < right() && mouseY >= y && mouseY < bottom();
         }
-
-        // The clickable areas of each arrow, slightly larger than the arrow itself
-        Rect2i previousArea() {
-            return new Rect2i(navX - 2, navY - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
-        }
-        Rect2i nextArea() {
-            return new Rect2i(right() - FRAME - ARROW_WIDTH - 2, navY - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
-        }
     }
 
     public static void register() {
@@ -108,12 +100,12 @@ public class TutorialPlayer {
                 for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
                     Layout layout = layout(textBox);
                     if (layout == null || !layout.navigation()) continue;
-                    if (layout.previousArea().contains((int) mouseX, (int) mouseY)) {
-                        if (stepIndex > 0) goToStep(stepIndex - 1);
+                    if (previousArea(layout.navX(), layout.navY()).contains((int) mouseX, (int) mouseY)) {
+                        previousStep();
                         return EventResult.interruptFalse();
                     }
-                    if (layout.nextArea().contains((int) mouseX, (int) mouseY)) {
-                        if (stepIndex < furthestStep) goToStep(stepIndex + 1);
+                    if (nextArea(minecraft.font, layout.navX(), layout.navY()).contains((int) mouseX, (int) mouseY)) {
+                        nextStep();
                         return EventResult.interruptFalse();
                     }
                 }
@@ -355,6 +347,16 @@ public class TutorialPlayer {
         GeneralUsage.sendMatTutorialProgress(tutorial.id(), stepIndex);
     }
 
+    // Goes back one step
+    public static void previousStep() {
+        if (tutorial != null && stepIndex > 0) goToStep(stepIndex - 1);
+    }
+
+    // Goes forward one step, up to the furthest step reached
+    public static void nextStep() {
+        if (tutorial != null && stepIndex < furthestStep) goToStep(stepIndex + 1);
+    }
+
     // Completes key triggers when one of their keys is pressed while on the correct screen
     private static void keyPressed(InputConstants.Key pressed, @Nullable Screen screen) {
         if (tutorial == null) return;
@@ -393,7 +395,7 @@ public class TutorialPlayer {
             for (int i = 0; i < layout.lines().size(); i++) {
                 graphics.drawString(font, layout.lines().get(i), layout.x() + FRAME, layout.y() + FRAME + i * font.lineHeight, TEXT_COLOR, false);
             }
-            if (layout.navigation()) drawNavigation(graphics, font, layout, mouseX, mouseY);
+            if (layout.navigation()) drawNavigation(graphics, font, layout.navX(), layout.navY(), mouseX, mouseY, BORDER_TOP, ARROW_HOVERED, ARROW_DISABLED, TEXT_COLOR);
         }
         graphics.pose().popPose();
     }
@@ -442,7 +444,7 @@ public class TutorialPlayer {
 
         // Navigation controls show only when a screen is open at the end of the last line
         boolean navigation = screen != null && tutorial.navigation();
-        int navWidth = 2 * ARROW_WIDTH + 2 * NAV_SPACE + font.width(stepCounter()) - 1;
+        int navWidth = navigationWidth(font);
         // Place navigation bar on the last line, offset NAV_DROP pixels down as long as the box is multiple lines tall
         int navOffsetY = textHeight - font.lineHeight + (lines.size() > 1 ? NAV_DROP : 0);
         if (navigation) {
@@ -480,19 +482,31 @@ public class TutorialPlayer {
         return (stepIndex + 1) + "/" + tutorial.steps().size();
     }
 
-    // Draws the navigation bar
-    private static void drawNavigation(GuiGraphics graphics, Font font, Layout layout, int mouseX, int mouseY) {
-        int arrowY = layout.navY() + 1;
-        // dim arrows if not currently usable
-        drawArrow(graphics, layout.navX(), arrowY, false, arrowColor(stepIndex > 0, layout.previousArea().contains(mouseX, mouseY)));
-        drawArrow(graphics, layout.right() - FRAME - ARROW_WIDTH, arrowY, true, arrowColor(stepIndex < furthestStep, layout.nextArea().contains(mouseX, mouseY)));
-        graphics.drawString(font, stepCounter(), layout.navX() + ARROW_WIDTH + NAV_SPACE, layout.navY(), TEXT_COLOR, false);
+    // Width of the navigation bar including both arrows, the step counter, and the gaps between them
+    public static int navigationWidth(Font font) {
+        return 2 * ARROW_WIDTH + 2 * NAV_SPACE + font.width(stepCounter()) - 1; // -1 since the font has a trailing pixel
     }
 
-    private static int arrowColor(boolean enabled, boolean hovered) {
-        if (!enabled) return ARROW_DISABLED;
-        if (hovered) return ARROW_HOVERED;
-        return BORDER_TOP;
+    // The clickable areas of each arrow, slightly larger than the arrow itself
+    public static Rect2i previousArea(int x, int y) {
+        return new Rect2i(x - 2, y - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
+    }
+    public static Rect2i nextArea(Font font, int x, int y) {
+        return new Rect2i(x + navigationWidth(font) - ARROW_WIDTH - 2, y - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
+    }
+
+    // Draws the navigation bar at x, y in the given colors, used by text boxes and in the MAT
+    public static void drawNavigation(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY, int color, int hoveredColor, int disabledColor, int textColor) {
+        // dim arrows if not currently usable
+        drawArrow(graphics, x, y + 1, false, arrowColor(stepIndex > 0, previousArea(x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
+        drawArrow(graphics, x + navigationWidth(font) - ARROW_WIDTH, y + 1, true, arrowColor(stepIndex < furthestStep, nextArea(font, x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
+        graphics.drawString(font, stepCounter(), x + ARROW_WIDTH + NAV_SPACE, y, textColor, false);
+    }
+
+    private static int arrowColor(boolean enabled, boolean hovered, int color, int hoveredColor, int disabledColor) {
+        if (!enabled) return disabledColor;
+        if (hovered) return hoveredColor;
+        return color;
     }
 
     // Draws an arrow, which is a triangle drawn as 3 columns of 1, 3, and 5 pixels

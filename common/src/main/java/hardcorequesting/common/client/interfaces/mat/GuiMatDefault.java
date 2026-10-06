@@ -201,6 +201,15 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
         renderStatistics(graphics);
         statScroll.render(graphics, x, y);
 
+        if (isPlaying(selectedTutorial)) {
+            TutorialPlayer.drawNavigation(graphics, font, navigationX(), top + HEADER_Y, mouseX, mouseY,
+                    0xFF000000 | HQMConfig.TEXT_HINT,    // color
+                    0xFF000000 | HQMConfig.TEXT_NORMAL,  // hovered
+                    0xFF000000 | HQMConfig.DISABLED_SET, // disabled
+                    HQMConfig.TEXT_NORMAL     // text color
+            );
+        }
+
         tabBar.render(graphics, left, top, mouseX, mouseY);
         tutorialList.renderTooltip(graphics, x, y);
         playButton.renderTooltip(graphics, x, y);
@@ -249,10 +258,26 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
         return STAT_WIDTH - STAT_TEXT_X - getStringWidth(row.value()) - STAT_VALUE_GAP;
     }
 
+    // Horizontal starting coord of the navigation bar
+    private int navigationX() {
+        return left + TUTORIAL_X + TUTORIAL_WIDTH - TutorialPlayer.navigationWidth(font);
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (tabBar.mouseClicked(left, top, mouseX, mouseY)) {
             return true;
+        }
+        // Navigation arrows intercept clicks before the text box, even if grayed out
+        if (isPlaying(selectedTutorial)) {
+            if (TutorialPlayer.previousArea(navigationX(), top + HEADER_Y).contains((int) mouseX, (int) mouseY)) {
+                TutorialPlayer.previousStep();
+                return true;
+            }
+            if (TutorialPlayer.nextArea(font, navigationX(), top + HEADER_Y).contains((int) mouseX, (int) mouseY)) {
+                TutorialPlayer.nextStep();
+                return true;
+            }
         }
         int x = (int) (mouseX - left);
         int y = (int) (mouseY - top);

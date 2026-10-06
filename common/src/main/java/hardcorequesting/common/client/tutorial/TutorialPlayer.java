@@ -353,8 +353,30 @@ public class TutorialPlayer {
     }
 
     // Goes forward one step, up to the furthest step reached
+    // On the furthest step, it does what clicking a text box does instead
     public static void nextStep() {
-        if (tutorial != null && stepIndex < furthestStep) goToStep(stepIndex + 1);
+        if (tutorial == null) return;
+        if (stepIndex < furthestStep) {
+            goToStep(stepIndex + 1);
+        } else if (isClickable()) {
+            for (Tutorial.Trigger trigger : currentTriggers()) {
+                if (trigger instanceof Tutorial.Trigger.ClickTextBox) state(trigger).done = true;
+            }
+            advanceIfDone();
+        }
+    }
+
+    // If the next arrow can be used
+    private static boolean canGoNext() {
+        return stepIndex < furthestStep || isClickable();
+    }
+
+    // If the step has an unfinished click_text_box trigger, which makes its text boxes clickable
+    private static boolean isClickable() {
+        for (Tutorial.Trigger trigger : currentTriggers()) {
+            if (trigger instanceof Tutorial.Trigger.ClickTextBox && !state(trigger).done) return true;
+        }
+        return false;
     }
 
     // Completes key triggers when one of their keys is pressed while on the correct screen
@@ -371,10 +393,9 @@ public class TutorialPlayer {
     private static void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         if (tutorial == null) return;
         Font font = Minecraft.getInstance().font;
-        boolean clickable = false;
+        boolean clickable = isClickable();
         Tutorial.Trigger.Timer timer = null;
         for (Tutorial.Trigger trigger : currentTriggers()) {
-            if (trigger instanceof Tutorial.Trigger.ClickTextBox && !state(trigger).done) clickable = true;
             if (trigger instanceof Tutorial.Trigger.Timer next && (timer == null || state(timer).done)) timer = next;
         }
         graphics.pose().pushPose();
@@ -499,7 +520,7 @@ public class TutorialPlayer {
     public static void drawNavigation(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY, int color, int hoveredColor, int disabledColor, int textColor) {
         // dim arrows if not currently usable
         drawArrow(graphics, x, y + 1, false, arrowColor(stepIndex > 0, previousArea(x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
-        drawArrow(graphics, x + navigationWidth(font) - ARROW_WIDTH, y + 1, true, arrowColor(stepIndex < furthestStep, nextArea(font, x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
+        drawArrow(graphics, x + navigationWidth(font) - ARROW_WIDTH, y + 1, true, arrowColor(canGoNext(), nextArea(font, x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
         graphics.drawString(font, stepCounter(), x + ARROW_WIDTH + NAV_SPACE, y, textColor, false);
     }
 

@@ -108,6 +108,10 @@ public abstract class BookPage {
         public Graphic createGraphic(GuiQuestBook gui) {
             return new QuestSetMapGraphic(gui, set, this);
         }
+
+        public QuestSet getSet() {
+            return set;
+        }
     
         public BookPage forQuest(Quest quest) {
             return new QuestPage(this, quest);
@@ -125,6 +129,10 @@ public abstract class BookPage {
         @Override
         public Graphic createGraphic(GuiQuestBook gui) {
             return new QuestGraphic(gui.getPlayer().getUUID(), quest, gui);
+        }
+
+        public Quest getQuest() {
+            return quest;
         }
     }
     

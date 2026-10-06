@@ -399,4 +399,8 @@ public class GuiQuestBook extends GuiBase {
         GuiQuestBook.page = Objects.requireNonNull(page);
         pageGraphic = page.createGraphic(this);
     }
+
+    public BookPage getPage() {
+        return page;
+    }
 }

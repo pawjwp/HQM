@@ -1,6 +1,8 @@
 package hardcorequesting.common.client.interfaces.mat;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -30,6 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The MAT's Default mode shows the unlocked tutorials on the left and statistics on the right
@@ -44,10 +47,11 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
     private static final int TUTORIAL_ROW_HEIGHT = 24;
     private static final int VISIBLE_TUTORIALS = 7;
     private static final int TUTORIAL_SCROLL_X = 159;
-    private static final int DESCRIPTION_X = 10;          // a description's offset from its row
+    private static final int TUTORIAL_ICON_X = TUTORIAL_X - 3;  // tutorial icons are a few pixels to the left of the tutorial heading
+    private static final int TUTORIAL_ICON_Y = -1;
+    private static final int TUTORIAL_TEXT_X = 18;        // the text's offset from the heading in rows with an icon
     private static final int DESCRIPTION_Y = 10;
     private static final float DESCRIPTION_SCALE = 0.7F;
-    private static final int DESCRIPTION_WIDTH = (int) ((TUTORIAL_WIDTH - DESCRIPTION_X) / DESCRIPTION_SCALE); // the row's width past the offset, in unscaled font pixels
     private static final int PLAY_X = 36;                 // x of the play button
     private static final int RESTART_X = 95;              // x of the restart button
     private static final int BUTTON_Y = 200;              // y of both buttons
@@ -71,6 +75,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
     private final LargeButton playButton;
     private final LargeButton restartButton;
     private final ExtendedScrollBar<MatClientData.StatRow> statScroll;
+    private final Map<String, MatIcons.Icon> icons = new HashMap<>(); // tutorials' icons
     private String selectedTutorial;
 
     public GuiMatDefault(Player player) {
@@ -81,7 +86,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
         this.background = ResourceHelper.getResource(MatMode.DEFAULT.getBackgroundName());
         this.widgetSprites = WidgetSprites.fromMatMode(background);
 
-        this.tutorialList = new SelectableList<>(this, TUTORIAL_X, TEXT_Y, TUTORIAL_WIDTH, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
+        this.tutorialList = new SelectableList<>(this, TUTORIAL_ICON_X, TEXT_Y, TUTORIAL_X + TUTORIAL_WIDTH - TUTORIAL_ICON_X, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
             @Override
             protected List<String> getEntries() {
                 return matData().unlockedTutorials.stream().toList();
@@ -108,10 +113,12 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
                 } else if (!isSelected(id)) {
                     color = HQMConfig.TEXT_HINT;
                 }
-                drawString(graphics, trimToWidth(title, TITLE_WIDTH), x, y, color);
-                drawString(graphics, trimToWidth(description, DESCRIPTION_WIDTH), x + DESCRIPTION_X, y + DESCRIPTION_Y, DESCRIPTION_SCALE, HQMConfig.TEXT_HINT);
+                MatIcons.Icon icon = icon(id);
+                if (icon != null) icon.draw(graphics, left + TUTORIAL_ICON_X, top + y + TUTORIAL_ICON_Y);
+                drawString(graphics, trimToWidth(title, titleWidth(id)), textX(id), y, color);
+                drawString(graphics, trimToWidth(description, descriptionWidth(id)), textX(id), y + DESCRIPTION_Y, DESCRIPTION_SCALE, HQMConfig.TEXT_HINT);
                 if (isCompleted(id)) {
-                    drawString(graphics, Component.literal("✔"), x + TUTORIAL_WIDTH - getStringWidth("✔"), y, HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET);
+                    drawString(graphics, Component.literal("✔"), TUTORIAL_X + TUTORIAL_WIDTH - getStringWidth("✔"), y, HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET);
                 }
             }
 
@@ -120,10 +127,10 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
             protected FormattedText getTooltip(String id) {
                 Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
                 if (tutorial == null) {
-                    if (getStringWidth(id) > TITLE_WIDTH) return Component.literal(id);
+                    if (getStringWidth(id) > titleWidth(id)) return Component.literal(id);
                     return null;
                 }
-                if (getStringWidth(tutorial.title()) <= TITLE_WIDTH && getStringWidth(tutorial.description()) <= DESCRIPTION_WIDTH) return null;
+                if (getStringWidth(tutorial.title()) <= titleWidth(id) && getStringWidth(tutorial.description()) <= descriptionWidth(id)) return null;
                 return Component.empty().append(tutorial.title()).append("\n").append(tutorial.description().copy().withStyle(ChatFormatting.GRAY));
             }
 
@@ -312,6 +319,31 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
         tutorialList.onScroll(mouseX - left, mouseY - top, scroll);
         statScroll.onScroll(mouseX - left, mouseY - top, scroll);
         return true;
+    }
+
+    // The tutorial's icon, null when invalid
+    @Nullable
+    private MatIcons.Icon icon(String id) {
+        if (!icons.containsKey(id)) {
+            Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
+            icons.put(id, tutorial == null || tutorial.icon() == null ? null : MatIcons.parse(tutorial.icon()));
+        }
+        return icons.get(id);
+    }
+
+    // If the row has an icon, text starts after it, otherwise it's aligned with the heading
+    private int textX(String id) {
+        return TUTORIAL_X + (icon(id) == null ? 0 : TUTORIAL_TEXT_X);
+    }
+
+    // The max width a row's title can take up, minus the completion mark space
+    private int titleWidth(String id) {
+        return TUTORIAL_X + TITLE_WIDTH - textX(id);
+    }
+
+    // The max width a row's description can take up, adjusted for scale
+    private int descriptionWidth(String id) {
+        return (int) ((TUTORIAL_X + TUTORIAL_WIDTH - textX(id)) / DESCRIPTION_SCALE);
     }
 
     private boolean isCompleted(String tutorial) {

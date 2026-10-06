@@ -17,8 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class LargeButton implements Drawable, Clickable {
     
-    private static final int BUTTON_WIDTH = 57;
-    private static final int BUTTON_HEIGHT = 18;
+    public static final int BUTTON_WIDTH = 57;
+    public static final int BUTTON_HEIGHT = 18;
     
     private String name;
     private String description;

@@ -38,15 +38,17 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class QuestSetsGraphic extends EditableGraphic {
     
-    private static final int TEXT_SPACING = 20;
-    private static final int LIST_X = 25;
-    private static final int LIST_Y = 20;
-    private static final int DESCRIPTION_X = 180;
-    private static final int DESCRIPTION_Y = 20;
-    private static final int VISIBLE_DESCRIPTION_LINES = 7;
+    public static final int TEXT_SPACING = 20;
+    public static final int LIST_X = 25;
+    public static final int LIST_Y = 20;
+    public static final int DESCRIPTION_X = 180;
+    public static final int DESCRIPTION_Y = 20;
+    public static final int VISIBLE_DESCRIPTION_LINES = 7;
+    public static final int OPEN_X = 245;
+    public static final int OPEN_Y = 190;
     private static final int VISIBLE_SETS = 7;
     private static final int LINE_2_X = 10;
-    private static final int LINE_2_Y = 12;
+    public static final int LINE_2_Y = 12;
     private static final int INFO_Y = 100;
     
     private static int lastClicked = -1;
@@ -58,7 +60,7 @@ public class QuestSetsGraphic extends EditableGraphic {
     private final ScrollBar descriptionScroll;
     
     {
-        addClickable(new LargeButton(gui, "hqm.questBook.open", 245, 190) {
+        addClickable(new LargeButton(gui, "hqm.questBook.open", OPEN_X, OPEN_Y) {
             @Override
             public boolean isVisible() {
                 return selectedSet != null;

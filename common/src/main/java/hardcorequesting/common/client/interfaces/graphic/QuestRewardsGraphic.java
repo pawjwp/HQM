@@ -55,6 +55,8 @@ public class QuestRewardsGraphic extends Graphic {
     private static final int REPUTATION_SIZE = 16;
     private static final int REPUTATION_SRC_X = 30;
     private static final int REPUTATION_SRC_Y = 82;
+    public static final int CLAIM_X = 100;
+    public static final int CLAIM_Y = 190;
     
     private int selectedReward = -1;
     private long lastClicked;
@@ -70,7 +72,7 @@ public class QuestRewardsGraphic extends Graphic {
         this.playerId = playerId;
         this.gui = gui;
     
-        addClickable(new LargeButton(gui, "hqm.quest.claim", 100, 190) {
+        addClickable(new LargeButton(gui, "hqm.quest.claim", CLAIM_X, CLAIM_Y) {
             @Override
             public boolean isEnabled() {
                 return rewards.hasReward(playerId) && !(rewards.hasChoiceReward() && selectedReward == -1) && quest.isEnabled(playerId);

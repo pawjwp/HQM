@@ -41,14 +41,14 @@ import java.util.UUID;
 @Environment(EnvType.CLIENT)
 public final class QuestGraphic extends EditableGraphic {
     
-    private static final int VISIBLE_DESCRIPTION_LINES = 7;
+    public static final int VISIBLE_DESCRIPTION_LINES = 7;
     private static final int VISIBLE_TASKS = 3;
     //region pixelinfo
     public static final int START_X = 20;
     private static final int TASK_LABEL_START_Y = 100;
     private static final int TASK_MARGIN = 2;
     private static final int TITLE_START_Y = 15;
-    private static final int DESCRIPTION_START_Y = 30;
+    public static final int DESCRIPTION_START_Y = 30;
     private static final int TASK_SELECTION_ROWS = 8;
     private static final int TASK_SELECTION_COLUMNS = 2;
     

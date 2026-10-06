@@ -37,12 +37,12 @@ public class GuiQuestBook extends GuiBase {
     //region pixel info for all the things
     public static final int TEXTURE_WIDTH = 170 * 2;
     public static final int TEXTURE_HEIGHT = 234;
-    private static final int BACK_ARROW_X = 9;
-    private static final int BACK_ARROW_Y = 219;
+    public static final int BACK_ARROW_X = 9;
+    public static final int BACK_ARROW_Y = 219;
     private static final int BACK_ARROW_SRC_X = 0;
     private static final int BACK_ARROW_SRC_Y = 113;
-    private static final int BACK_ARROW_WIDTH = 15;
-    private static final int BACK_ARROW_HEIGHT = 10;
+    public static final int BACK_ARROW_WIDTH = 15;
+    public static final int BACK_ARROW_HEIGHT = 10;
     private static final int MENU_ARROW_X = 161;
     private static final int MENU_ARROW_Y = 217;
     private static final int MENU_ARROW_SRC_X = 0;
@@ -383,7 +383,7 @@ public class GuiQuestBook extends GuiBase {
         return shouldDisplayBackArrow() && page.hasGoToMenuButton();
     }
     
-    private boolean shouldDisplayBackArrow() {
+    public boolean shouldDisplayBackArrow() {
         return page.canGoBack() && editMenu == null;
     }
     

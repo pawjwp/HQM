@@ -34,25 +34,25 @@ import java.util.UUID;
  * It shows some general info such as hearts, reputation bars, and can lead to various other menus.
  */
 public class MenuPageGraphic extends EditableGraphic {
-    private static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
-    private static final int INFO_RIGHT_X = 180;
-    private static final int INFO_LIVES_Y = 20;
+    public static final int VISIBLE_DISPLAY_REPUTATIONS = 4;
+    public static final int INFO_RIGHT_X = 180;
+    public static final int INFO_LIVES_Y = 20;
     private static final int INFO_DEATHS_Y = 55;
     private static final int INFO_TEAM_Y = 95;
-    private static final int INFO_LEFT_X = 20;
-    private static final int INFO_QUESTS_Y = 20;
-    private static final int INFO_REPUTATION_Y = 110;
+    public static final int INFO_LEFT_X = 20;
+    public static final int INFO_QUESTS_Y = 20;
+    public static final int INFO_REPUTATION_Y = 110;
     private static final int INFO_HEARTS_X = 5;
-    private static final int INFO_HEARTS_Y = 12;
+    public static final int INFO_HEARTS_Y = 12;
     private static final int INFO_HEARTS_SPACING = 18;
     private static final int TEAM_TEXT_Y = 12;
     private static final int TEAM_CLICK_TEXT_Y = 30;
     private static final int DEATH_TEXT_Y = 0;
     private static final int DEATH_CLICK_TEXT_Y = 10;
-    private static final int QUEST_CLICK_TEXT_Y = 67;
+    public static final int QUEST_CLICK_TEXT_Y = 67;
     private static final int INFO_REPUTATION_OFFSET_X = 5;
-    private static final int INFO_REPUTATION_OFFSET_Y = 12;
-    private static final int REPUTATION_OFFSET_Y = 24;
+    public static final int INFO_REPUTATION_OFFSET_Y = 12;
+    public static final int REPUTATION_OFFSET_Y = 24;
     
     private final ExtendedScrollBar<Reputation> reputationDisplayScroll;
     {

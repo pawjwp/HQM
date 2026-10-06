@@ -35,8 +35,8 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class MainPageGraphic extends EditableGraphic {
     private static final String FRONT_KEY = "hqm_front_texture";
-    private static final int DESCRIPTION_X = 180;
-    private static final int DESCRIPTION_Y = 20;
+    public static final int DESCRIPTION_X = 180;
+    public static final int DESCRIPTION_Y = 20;
     public static final int VISIBLE_MAIN_DESCRIPTION_LINES = 21;
     
     private final ExtendedScrollBar<FormattedText> mainDescriptionScroll;

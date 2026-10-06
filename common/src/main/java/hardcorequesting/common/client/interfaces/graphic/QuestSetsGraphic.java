@@ -27,6 +27,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.player.Player;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +56,11 @@ public class QuestSetsGraphic extends EditableGraphic {
     private static int lastClicked = -1;
     private static QuestSet lastLastQuestSet = null;
     private static QuestSet selectedSet;
+
+    @Nullable
+    public static QuestSet getSelectedSet() {
+        return selectedSet;
+    }
     
     private final BookPage.SetsPage page;
     private final ExtendedScrollBar<QuestSet> setScroll;

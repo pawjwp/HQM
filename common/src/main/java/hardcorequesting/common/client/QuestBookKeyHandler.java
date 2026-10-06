@@ -1,7 +1,10 @@
 package hardcorequesting.common.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import dev.architectury.event.EventResult;
+import dev.architectury.event.events.client.ClientScreenInputEvent;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.tutorial.TutorialPlayer;
 import hardcorequesting.common.config.HQMConfig;
@@ -36,6 +39,27 @@ public class QuestBookKeyHandler {
         tutorialPrevious = register("key.hqm.tutorial.previous");
         tutorialNext = register("key.hqm.tutorial.next");
         tutorialPause = register("key.hqm.tutorial.pause");
+
+        // Tutorial keybinds in screens
+        ClientScreenInputEvent.KEY_PRESSED_POST.register((minecraft, screen, keyCode, scanCode, modifiers) -> {
+            if (handleTutorialKey(keyCode, scanCode)) return EventResult.interruptFalse();
+            return EventResult.pass();
+        });
+    }
+
+    // Handles tutorial keybinds when in a screen
+    private static boolean handleTutorialKey(int keyCode, int scanCode) {
+        if (TutorialPlayer.getPlayingId() == null) return false;
+        if (matches(tutorialPrevious, keyCode, scanCode)) TutorialPlayer.previousStep();
+        else if (matches(tutorialNext, keyCode, scanCode)) TutorialPlayer.nextStep();
+        else if (matches(tutorialPause, keyCode, scanCode)) TutorialPlayer.pause();
+        else return false;
+        return true;
+    }
+
+    // If the keybind key matches
+    private static boolean matches(KeyMapping mapping, int keyCode, int scanCode) {
+        return mapping.matches(keyCode, scanCode) && HardcoreQuestingCore.platform.isKeyModifierActive(mapping);
     }
 
     private static KeyMapping register(String name) {

@@ -13,6 +13,8 @@ import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.mat.MatScreen;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.items.mat.MatMode;
+import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestSet;
 import hardcorequesting.common.reputation.ReputationManager;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -24,6 +26,8 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * The anchors available at which text boxes can be placed based on GUI coordinates
@@ -128,7 +132,27 @@ public class TutorialAnchors {
                 int bars = Math.min(ReputationManager.getInstance().getReputationList().size(), MenuPageGraphic.VISIBLE_DISPLAY_REPUTATIONS);
                 yield new Rect2i(MenuPageGraphic.INFO_LEFT_X, MenuPageGraphic.INFO_REPUTATION_Y, QUEST_BOOK_TEXT_WIDTH, MenuPageGraphic.INFO_REPUTATION_OFFSET_Y + bars * MenuPageGraphic.REPUTATION_OFFSET_Y);
             }
-            default -> null;
+            default -> {
+                // a visible quest on its quest line
+                if (anchor.startsWith(TutorialScreens.QUEST_BOOK_QUEST) && page instanceof BookPage.SetMapPage map) {
+                    for (Quest quest : map.getSet().getQuests().values()) {
+                        if (TutorialScreens.matchesQuest(quest, anchor.substring(TutorialScreens.QUEST_BOOK_QUEST.length())) && (Quest.canQuestsBeEdited() || quest.isVisible(player))) {
+                            yield new Rect2i(quest.getGuiX(), quest.getGuiY(), quest.getGuiW(), quest.getGuiH());
+                        }
+                    }
+                }
+                // a visible quest set in the set list
+                if (anchor.startsWith(TutorialScreens.QUEST_BOOK_SET) && book.getPageGraphic() instanceof QuestSetsGraphic sets) {
+                    List<QuestSet> rows = sets.getVisibleSets();
+                    for (int i = 0; i < rows.size(); i++) {
+                        if (TutorialScreens.matchesSet(rows.get(i), anchor.substring(TutorialScreens.QUEST_BOOK_SET.length()))) {
+                            int rowY = QuestSetsGraphic.LIST_Y + i * (GuiBase.TEXT_HEIGHT + QuestSetsGraphic.TEXT_SPACING);
+                            yield new Rect2i(QuestSetsGraphic.LIST_X, rowY, QUEST_BOOK_TEXT_WIDTH, QuestSetsGraphic.LINE_2_Y + textHeight);
+                        }
+                    }
+                }
+                yield null;
+            }
         };
     }
 
@@ -141,6 +165,7 @@ public class TutorialAnchors {
     public static boolean isClickableAnchor(String anchor) {
         if (anchor.matches("slot/\\d+|inventory/\\d+|screen/panel|mat/panel|mat/tab_bar")) return true;
         if (anchor.matches("quest_book/(panel|back|claim|open|description|menu/quests|menu/lives|menu/reputation)")) return true;
+        if (anchor.startsWith(TutorialScreens.QUEST_BOOK_QUEST) || anchor.startsWith(TutorialScreens.QUEST_BOOK_SET)) return TutorialScreens.isKnownScreen(anchor);
         for (MatMode mode : MatMode.values()) {
             if (anchor.equals("mat/tab/" + TutorialScreens.modeName(mode))) return true;
         }

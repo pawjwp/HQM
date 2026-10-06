@@ -112,6 +112,10 @@ public class QuestSetsGraphic extends EditableGraphic {
                 VISIBLE_SETS, Quest::getQuestSets));
     }
     
+    public List<QuestSet> getVisibleSets() {
+        return setScroll.getVisibleEntries();
+    }
+
     public static void loginReset() {
         lastClicked = -1;
         lastLastQuestSet = null;

@@ -403,4 +403,8 @@ public class GuiQuestBook extends GuiBase {
     public BookPage getPage() {
         return page;
     }
+
+    public Graphic getPageGraphic() {
+        return pageGraphic;
+    }
 }

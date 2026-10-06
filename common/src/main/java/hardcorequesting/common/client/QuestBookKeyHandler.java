@@ -3,6 +3,7 @@ package hardcorequesting.common.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
+import hardcorequesting.common.client.tutorial.TutorialPlayer;
 import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.GeneralUsage;
@@ -21,6 +22,9 @@ public class QuestBookKeyHandler {
     public static KeyMapping openMatCrafting;
     public static KeyMapping openMatTracking;
     public static KeyMapping openMatStorage;
+    public static KeyMapping tutorialPrevious;
+    public static KeyMapping tutorialNext;
+    public static KeyMapping tutorialPause;
 
     public static void register() {
         openQuests = register("key.hqm.openQuests");
@@ -29,6 +33,9 @@ public class QuestBookKeyHandler {
         openMatCrafting = register("key.hqm.mat.crafting");
         openMatTracking = register("key.hqm.mat.tracking");
         openMatStorage = register("key.hqm.mat.storage");
+        tutorialPrevious = register("key.hqm.tutorial.previous");
+        tutorialNext = register("key.hqm.tutorial.next");
+        tutorialPause = register("key.hqm.tutorial.pause");
     }
 
     private static KeyMapping register(String name) {
@@ -51,6 +58,11 @@ public class QuestBookKeyHandler {
         handleModeKey(mc, openMatCrafting, MatMode.CRAFTING);
         handleModeKey(mc, openMatTracking, MatMode.TRACKING);
         handleModeKey(mc, openMatStorage, MatMode.STORAGE);
+
+        // Tutorial keybinds work like the navigation arrows and the pause button
+        while (tutorialPrevious.consumeClick()) TutorialPlayer.previousStep();
+        while (tutorialNext.consumeClick()) TutorialPlayer.nextStep();
+        while (tutorialPause.consumeClick()) TutorialPlayer.pause();
     }
 
     private static void handleModeKey(Minecraft mc, KeyMapping mapping, MatMode mode) {

@@ -177,7 +177,8 @@ public class TutorialAdapter {
             readStrings(json, "screens"),
             GsonHelper.getAsBoolean(json, "line", false),
             GsonHelper.getAsInt(json, "line_width", 1),
-            GsonHelper.getAsBoolean(json, "clamp", true)
+            GsonHelper.getAsBoolean(json, "clamp", true),
+            GsonHelper.getAsString(json, "icon", null)
         );
     }
 

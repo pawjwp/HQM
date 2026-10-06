@@ -18,8 +18,8 @@ public record Tutorial(String id, Component title, Component description, @Nulla
     }
 
     // A text box placed on the screen, including text content, anchor location, anchor side, gap from the anchor, offset, width,
-    // screens to display on, if it has a connecting line, width of connecting line, and if it's clamped in the window
-    public record TextBox(Component text, String anchor, Side side, int gap, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth, boolean clamp) {
+    // screens to display on, if it has a connecting line, width of connecting line, if it's clamped in the window, and its icon's name
+    public record TextBox(Component text, String anchor, Side side, int gap, int offsetX, int offsetY, int width, List<String> screens, boolean line, int lineWidth, boolean clamp, @Nullable String icon) {
     }
 
     // Where a text box is placed relative to its anchor point, with AUTO picking placing automatically towards the center

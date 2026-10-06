@@ -9,6 +9,7 @@ import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
+import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.quests.QuestingDataManager;
@@ -39,7 +40,8 @@ import java.util.Set;
 @Environment(EnvType.CLIENT)
 public class TutorialPlayer {
     private static final int Z = 500;                     // above item tooltips which are drawn at a z of 400
-    private static final int FRAME = 6;                   // space between a text box's edge and its text, including the outlines
+    private static final int OUTLINE = 2;                 // the box's dark outline and white border
+    private static final int FRAME = OUTLINE + 4;         // space between a text box's edge and its text, the outline plus 4px of padding
     private static final int FILL = 0xBF000000;
     private static final int HOVERED_FILL = 0xEF080808;   // more opaque when hovered
     private static final int BORDER_TOP = 0xBFFFFFFF;
@@ -53,12 +55,15 @@ public class TutorialPlayer {
     private static final int ARROW_WIDTH = 3;
     private static final int ARROW_HOVERED = 0xFFFFFFFF;
     private static final int ARROW_DISABLED = 0x40FFFFFF;
+    private static final int ICON_SIZE = 18;              // the icon dimensions
+    private static final int ICON_GAP = 2;                // gap around the icon, from the text and the box's border
 
     @Nullable
     private static Tutorial tutorial;
     private static int stepIndex;
     private static int furthestStep; // the furthest step reached, which navigating forward can move up to
     private static final Map<Tutorial.Trigger, TriggerState> states = new IdentityHashMap<>(); // by identity, since identical triggers can appear twice
+    private static final Map<Tutorial.TextBox, MatIcons.Icon> icons = new IdentityHashMap<>(); // each text box's icon
     @Nullable
     private static Screen tickScreen; // the screen open last tick
     private static final Set<String> pausedAutoPlays = new HashSet<>(); // list of auto-play tutorials paused this session not played until a rejoin
@@ -70,9 +75,10 @@ public class TutorialPlayer {
         int timerTicks;        // ticks counted so far for a timer trigger
     }
 
-    // A text box's lines and size on-screen, the anchor it was placed against, the side it was placed on,
-    // if it shows navigation controls, and where the navigation controls are placed
-    private record Layout(List<FormattedCharSequence> lines, int x, int y, int width, int height, Rect2i anchor, Tutorial.Side side, boolean navigation, int navX, int navY) {
+    // A text box's lines and where they start, its icon and the icon's top, its size on-screen, the anchor it was placed against,
+    // the side it was placed on, if it shows navigation controls, and where the navigation controls are placed
+    private record Layout(List<FormattedCharSequence> lines, int textX, int textY, @Nullable MatIcons.Icon icon, int iconY,
+                          int x, int y, int width, int height, Rect2i anchor, Tutorial.Side side, boolean navigation, int navX, int navY) {
         int right() {
             return x + width;
         }
@@ -189,8 +195,14 @@ public class TutorialPlayer {
     // Starts the tutorial at a step, replacing any that are already running, and saves that step on the server
     public static void start(Tutorial tutorial, int startStep) {
         states.clear();
+        icons.clear();
         for (Tutorial.Step step : tutorial.steps()) {
             for (Tutorial.TextBox textBox : step.textBoxes()) {
+                if (textBox.icon() != null) {
+                    MatIcons.Icon icon = MatIcons.parse(textBox.icon());
+                    if (icon != null) icons.put(textBox, icon);
+                    else HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown icon %s, it will not be shown", tutorial.id(), textBox.icon());
+                }
                 if (!TutorialAnchors.isKnownAnchor(textBox.anchor())) {
                     HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown anchor %s, so that text box is not shown", tutorial.id(), textBox.anchor());
                 }
@@ -413,8 +425,9 @@ public class TutorialPlayer {
                 graphics.fill(layout.x() + 1, layout.bottom() - 2, layout.x() + 1 + (int) ((layout.width() - 2) * progress), layout.bottom() - 1, TIMER_COLOR);
             }
             if (textBox.line()) drawConnectingLine(graphics, textBox, layout);
+            if (layout.icon() != null) layout.icon().draw(graphics, layout.x() + OUTLINE + ICON_GAP, layout.iconY());
             for (int i = 0; i < layout.lines().size(); i++) {
-                graphics.drawString(font, layout.lines().get(i), layout.x() + FRAME, layout.y() + FRAME + i * font.lineHeight, TEXT_COLOR, false);
+                graphics.drawString(font, layout.lines().get(i), layout.textX(), layout.textY() + i * font.lineHeight, TEXT_COLOR, false);
             }
             if (layout.navigation()) drawNavigation(graphics, font, layout.navX(), layout.navY(), mouseX, mouseY, BORDER_TOP, ARROW_HOVERED, ARROW_DISABLED, TEXT_COLOR);
         }
@@ -479,8 +492,15 @@ public class TutorialPlayer {
                 textWidth = Math.max(textWidth, lastLine + NAV_GAP + navWidth);
             }
         }
-        int width = textWidth + 2 * FRAME;
-        int height = textHeight + 2 * FRAME;
+        // Icons are placed to the left of the text with reduced margins
+        MatIcons.Icon icon = icons.get(textBox);
+        int textLeft = icon == null ? FRAME : OUTLINE + ICON_GAP + ICON_SIZE + ICON_GAP; // space left of the text
+        int width = textLeft + textWidth + FRAME;
+        int height = Math.max(textHeight + 2 * FRAME, icon == null ? 0 : ICON_SIZE + 2 * (OUTLINE + ICON_GAP));
+        // Whichever of the text or icon is shorter will be centered to the text box
+        int textTop = (height - textHeight + 1) / 2;
+        int iconTop = (height - ICON_SIZE) / 2;
+        if (iconTop > FRAME) iconTop = OUTLINE + ICON_GAP; // if the text is long enough, the icon will stay in the corner instead
 
         Tutorial.Side side = textBox.side();
         if (side == Tutorial.Side.AUTO) side = autoSide(anchor, width, height, textBox.gap());
@@ -495,7 +515,8 @@ public class TutorialPlayer {
             y = Mth.clamp(y, 0, Math.max(window.getGuiScaledHeight() - height, 0));
         }
 
-        return new Layout(lines, x, y, width, height, anchor, side, navigation, x + width - FRAME - navWidth, y + FRAME + navOffsetY);
+        return new Layout(lines, x + textLeft, y + textTop, icon, y + iconTop,
+                x, y, width, height, anchor, side, navigation, x + width - FRAME - navWidth, y + textTop + navOffsetY);
     }
 
     // The current step out of the total steps

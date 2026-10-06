@@ -34,6 +34,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.advancements.Advancement;
 import net.fabricmc.fabric.api.object.builder.v1.client.model.FabricModelPredicateProviderRegistry;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
@@ -154,6 +155,12 @@ public class HardcoreQuestingFabric implements ModInitializer, AbstractPlatform 
     @Override
     public Rect2i getContainerPanel(AbstractContainerScreen<?> screen) {
         return new Rect2i(screen.leftPos, screen.topPos, screen.imageWidth, screen.imageHeight);
+    }
+
+    // Fabric keybinds have no modifiers
+    @Override
+    public boolean isKeyModifierActive(KeyMapping keybind) {
+        return true;
     }
     
     @Override

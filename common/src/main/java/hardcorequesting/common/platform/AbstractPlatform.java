@@ -7,6 +7,7 @@ import hardcorequesting.common.util.Fraction;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
@@ -78,6 +79,10 @@ public interface AbstractPlatform {
     // The container's screen's panel size
     @Environment(EnvType.CLIENT)
     Rect2i getContainerPanel(AbstractContainerScreen<?> screen);
+
+    // If the keybind's modifier is held, always true when a keybind has no modifiers
+    @Environment(EnvType.CLIENT)
+    boolean isKeyModifierActive(KeyMapping keybind);
     
     void registerOnWorldTick(Consumer<Level> consumer);
 

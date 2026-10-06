@@ -1,6 +1,7 @@
 package hardcorequesting.common.client.tutorial;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import hardcorequesting.common.HardcoreQuestingCore;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.KeyMapping;
@@ -19,7 +20,8 @@ public class TutorialKeys {
     // Whether a key name matches the pressed key
     public static boolean matches(String name, InputConstants.Key pressed) {
         KeyMapping keybind = findKeybind(name);
-        if (keybind != null) return keybind.saveString().equals(pressed.getName()); // name of the key it's bound to
+        // name of the key it's bound to and its modifier
+        if (keybind != null) return keybind.saveString().equals(pressed.getName()) && HardcoreQuestingCore.platform.isKeyModifierActive(keybind);
         return name.equals(pressed.getName());
     }
 

@@ -13,6 +13,7 @@ import hardcorequesting.common.tileentity.AbstractBarrelBlockEntity;
 import hardcorequesting.common.util.Fraction;
 import hardcorequesting.forge.tileentity.BarrelBlockEntity;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
@@ -210,6 +211,13 @@ public class HardcoreQuestingForge implements AbstractPlatform {
     @Override
     public Rect2i getContainerPanel(AbstractContainerScreen<?> screen) {
         return new Rect2i(screen.getGuiLeft(), screen.getGuiTop(), screen.getXSize(), screen.getYSize());
+    }
+
+    // Forge's check for keybind modifiers
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public boolean isKeyModifierActive(KeyMapping keybind) {
+        return keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
     
     @Override

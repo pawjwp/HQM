@@ -86,12 +86,7 @@ public class TutorialScreens {
             }
             return false;
         }
-        if (name.startsWith(QUEST_BOOK_QUEST)) {
-            for (Quest quest : QuestSetsManager.getInstance().quests.values()) {
-                if (matchesQuest(quest, name.substring(QUEST_BOOK_QUEST.length()))) return true;
-            }
-            return false;
-        }
+        if (name.startsWith(QUEST_BOOK_QUEST)) return isKnownQuest(name.substring(QUEST_BOOK_QUEST.length()));
         for (MatMode mode : MatMode.values()) {
             if (name.equals("mat/" + modeName(mode))) return true;
         }
@@ -109,6 +104,14 @@ public class TutorialScreens {
     // A quest, matched with either the UUID or name
     static boolean matchesQuest(Quest quest, String name) {
         return quest.getQuestId().toString().equalsIgnoreCase(name) || quest.getName().getString().equals(name);
+    }
+
+    // If there is a valid quest with the provided UUID or name
+    static boolean isKnownQuest(String name) {
+        for (Quest quest : QuestSetsManager.getInstance().quests.values()) {
+            if (matchesQuest(quest, name)) return true;
+        }
+        return false;
     }
 
     // A quest set, matched by name

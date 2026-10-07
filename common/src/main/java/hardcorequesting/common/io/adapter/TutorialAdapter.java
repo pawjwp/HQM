@@ -113,6 +113,8 @@ public class TutorialAdapter {
                 if (dimensions.isEmpty() && position == null && biomes.isEmpty()) throw new JsonSyntaxException("A location trigger needs a position, dimensions, or biomes");
                 yield new Tutorial.Trigger.Location(dimensions, position, GsonHelper.getAsInt(json, "radius", 3), biomes);
             }
+            case "quest_complete" -> new Tutorial.Trigger.QuestComplete(readStrings(json, "quests"));
+            case "reward_claim" -> new Tutorial.Trigger.RewardClaim(readStrings(json, "quests"));
             case "any" -> new Tutorial.Trigger.Any(readTriggers(json));
             case "all" -> new Tutorial.Trigger.All(readTriggers(json));
             default -> throw new JsonSyntaxException("Unknown trigger type " + type);

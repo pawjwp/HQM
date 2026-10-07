@@ -12,6 +12,8 @@ import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.items.mat.MatPlayerData;
 import hardcorequesting.common.network.GeneralUsage;
+import hardcorequesting.common.quests.Quest;
+import hardcorequesting.common.quests.QuestSetsManager;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.tutorial.Tutorial;
 import hardcorequesting.common.tutorial.TutorialManager;
@@ -33,6 +35,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Plays a tutorial by drawing its text boxes over the screen
@@ -73,6 +76,8 @@ public class TutorialPlayer {
         boolean done;
         boolean screenWasOpen; // if a screen_close trigger's screen was open during this step
         int timerTicks;        // ticks counted so far for a timer trigger
+        @Nullable
+        Set<UUID> unclaimed;   // the quest of a reward_claim trigger that had an unclaimed reward last tick
     }
 
     // A text box's lines and where they start, its icon and the icon's top, its size on-screen, the anchor it was placed against,
@@ -167,6 +172,18 @@ public class TutorialPlayer {
                     state.done = true;
                 } else if (trigger instanceof Tutorial.Trigger.Location location && !state.done && TutorialLocations.matches(location, minecraft.player)) {
                     state.done = true;
+                } else if (trigger instanceof Tutorial.Trigger.QuestComplete complete && !state.done) {
+                    for (Quest quest : questsMatching(complete.quests())) {
+                        if (quest.isCompleted(minecraft.player)) state.done = true;
+                    }
+                } else if (trigger instanceof Tutorial.Trigger.RewardClaim claim && !state.done) {
+                    // a reward is marked as claimed when a quest is claimed that previously wasn't
+                    Set<UUID> unclaimed = new HashSet<>();
+                    for (Quest quest : questsMatching(claim.quests())) {
+                        if (quest.isCompleted(minecraft.player) && quest.hasReward(minecraft.player.getUUID())) unclaimed.add(quest.getQuestId());
+                    }
+                    if (state.unclaimed != null && !unclaimed.containsAll(state.unclaimed)) state.done = true;
+                    state.unclaimed = unclaimed;
                 }
             }
             advanceIfDone();
@@ -265,6 +282,14 @@ public class TutorialPlayer {
                         }
                     }
                 }
+                List<String> quests = List.of();
+                if (trigger instanceof Tutorial.Trigger.QuestComplete complete) quests = complete.quests();
+                if (trigger instanceof Tutorial.Trigger.RewardClaim claim) quests = claim.quests();
+                for (String quest : quests) {
+                    if (!TutorialScreens.isKnownQuest(quest)) {
+                        HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown quest %s, so it never matches", tutorial.id(), quest);
+                    }
+                }
             }
         }
         if (TutorialPlayer.tutorial != null && TutorialPlayer.tutorial.autoPlay() && !TutorialPlayer.tutorial.id().equals(tutorial.id())) {
@@ -350,6 +375,14 @@ public class TutorialPlayer {
             GeneralUsage.sendMatTutorialCompleted(tutorial.id());
             tutorial = null;
         }
+    }
+
+    private static List<Quest> questsMatching(List<String> names) {
+        List<Quest> quests = new ArrayList<>();
+        for (Quest quest : QuestSetsManager.getInstance().quests.values()) {
+            if (names.isEmpty() || names.stream().anyMatch(name -> TutorialScreens.matchesQuest(quest, name))) quests.add(quest);
+        }
+        return quests;
     }
 
     // Goes to a specific step and saves progress there

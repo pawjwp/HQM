@@ -85,6 +85,14 @@ public record Tutorial(String id, Component title, Component description, @Nulla
         record Location(List<String> dimensions, @Nullable BlockPos position, int radius, List<String> biomes) implements Trigger {
         }
 
+        // A quest is completed (even if completed previously)
+        record QuestComplete(List<String> quests) implements Trigger {
+        }
+
+        // A reward of a quest is claimed during the step
+        record RewardClaim(List<String> quests) implements Trigger {
+        }
+
         // One of the triggers happens
         record Any(List<Trigger> triggers) implements Trigger {
         }

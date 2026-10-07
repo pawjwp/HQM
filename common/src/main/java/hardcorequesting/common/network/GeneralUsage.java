@@ -7,8 +7,9 @@ import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.client.interfaces.mat.MatScreens;
 import hardcorequesting.common.client.tutorial.TutorialPlayer;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.event.EventTrigger;
+import hardcorequesting.common.items.MatItem;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.QuestBookItem;
 import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMaps;
 import hardcorequesting.common.items.mat.MatMode;
@@ -19,17 +20,18 @@ import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.team.PlayerEntry;
 import hardcorequesting.common.tutorial.Tutorial;
 import hardcorequesting.common.tutorial.TutorialManager;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
@@ -74,27 +76,37 @@ public enum GeneralUsage {
     REQUEST_BOOK_OPEN {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            // Opens the MAT to questing mode if the player has a MAT and ENABLE_MAT is true, otherwise opens the quest book
-            if (HQMConfig.getInstance().MAT.ENABLE_MAT && MatMode.QUEST.isEnabled() && MatHandler.hasMat(player)) {
-                MatHandler.openMatMode(player, MatMode.QUEST);
-                return;
+            // Opens the MAT or quest book, using a held one if present or whichever there are more of.
+            // Skips the MAT when it is disabled or questing mode is diabled. The MAT breaks ties when relevant.
+            // REQUIRE_BOOK skips any item the player isn't carryingplayer doesn't carry.
+            Inventory inventory = player.getInventory();
+            ItemStack book = ItemStack.EMPTY;
+            int mats = 0, books = 0;
+            for (int i = 0; i < inventory.getContainerSize(); i++) {
+                ItemStack stack = inventory.getItem(i);
+                if (stack.getItem() instanceof MatItem) mats++;
+                else if (stack.getItem() instanceof QuestBookItem) {
+                    books++;
+                    // An OP book is opened over a normal book
+                    if (book.isEmpty() || stack.is(ModItems.enabledBook.get())) book = stack;
+                }
             }
-            QuestingDataManager data = QuestingDataManager.getInstance();
-            if (!data.isQuestActive()) {
-                player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
-                return;
+            boolean requireBook = HQMConfig.getInstance().Keybind.REQUIRE_BOOK;
+            boolean canMat = HQMConfig.getInstance().MAT.ENABLE_MAT && MatMode.QUEST.isEnabled() && (!requireBook || mats > 0);
+            boolean canBook = !requireBook || books > 0;
+            for (InteractionHand hand : InteractionHand.values()) {
+                ItemStack held = player.getItemInHand(hand);
+                if (held.getItem() instanceof MatItem && canMat) {
+                    MatHandler.openMatMode(player, MatMode.QUEST);
+                    return;
+                }
+                if (held.getItem() instanceof QuestBookItem) {
+                    QuestBookItem.open(player, held);
+                    return;
+                }
             }
-            if (HQMConfig.getInstance().Keybind.REQUIRE_BOOK
-                    && !player.getInventory().hasAnyMatching(stack -> stack.is(ModItems.book.get()) || stack.is(ModItems.enabledBook.get()))) {
-                return;
-            }
-            EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
-            PlayerEntry entry = data.getQuestingData(player).getTeam().getEntry(player.getUUID());
-            if (entry != null) {
-                sendOpenBook(player, false);
-            } else {
-                player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
-            }
+            if (canMat && (!canBook || mats >= books)) MatHandler.openMatMode(player, MatMode.QUEST);
+            else if (canBook) QuestBookItem.open(player, book);
         }
     },
     MAT_OPEN {

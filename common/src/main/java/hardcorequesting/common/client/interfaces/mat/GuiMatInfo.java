@@ -270,6 +270,13 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
         return left + TUTORIAL_X + TUTORIAL_WIDTH - TutorialPlayer.navigationWidth(font);
     }
 
+    // The navigation buttons next to the tutorials heading
+    @Nullable
+    public Rect2i getNavigationArea() {
+        if (!isPlaying(selectedTutorial)) return null;
+        return new Rect2i(navigationX() - left, HEADER_Y, TutorialPlayer.navigationWidth(font), TutorialPlayer.NAV_HEIGHT);
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         if (tabBar.mouseClicked(left, top, mouseX, mouseY)) {

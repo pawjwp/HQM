@@ -10,6 +10,7 @@ import hardcorequesting.common.client.interfaces.graphic.MenuPageGraphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestGraphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestRewardsGraphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
+import hardcorequesting.common.client.interfaces.mat.GuiMatInfo;
 import hardcorequesting.common.client.interfaces.mat.MatScreen;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.items.mat.MatMode;
@@ -35,6 +36,7 @@ import java.util.List;
  * - HUD anchors are locations on the vanilla HUD
  * - Container anchors are locations on an active container UI
  * - MAT anchors are the MAT's main panel, tabs, and tab bar
+ * - Info screen anchors are the Info mode's tutorial list, buttons, navigation bar, and the statistic list
  * - Quest book anchors are the book itself and various buttons and screen regions
  */
 @Environment(EnvType.CLIENT)
@@ -77,6 +79,12 @@ public class TutorialAnchors {
             }
         }
 
+        // Info screen anchors are only valid while the MAT's Info screen is open
+        if (Minecraft.getInstance().screen instanceof GuiMatInfo info) {
+            Rect2i area = matInfoArea(anchor, info);
+            if (area != null) return new Rect2i(info.getPanel().getX() + area.getX(), info.getPanel().getY() + area.getY(), area.getWidth(), area.getHeight());
+        }
+
         // Quest book anchors are only valid when a quest book/questing MAT is open
         if (Minecraft.getInstance().screen instanceof GuiQuestBook book) {
             Rect2i area = questBookArea(anchor, book, player);
@@ -105,6 +113,21 @@ public class TutorialAnchors {
             case "hud/experience" -> new Rect2i(horizontalCenter - 91, height - 29, 182, 5);
             case "hud/crosshair" -> new Rect2i((width - 15) / 2, (height - 15) / 2, 15, 15);
 
+            default -> null;
+        };
+    }
+
+    // An info screen anchor's area relative to the MAT's upper-left corner
+    @Nullable
+    private static Rect2i matInfoArea(String anchor, GuiMatInfo info) {
+        return switch (anchor) {
+            case "mat/info/tutorials" -> new Rect2i(GuiMatInfo.TUTORIAL_ICON_X, GuiMatInfo.TEXT_Y,
+                    GuiMatInfo.TUTORIAL_X + GuiMatInfo.TUTORIAL_WIDTH - GuiMatInfo.TUTORIAL_ICON_X, GuiMatInfo.VISIBLE_TUTORIALS * GuiMatInfo.TUTORIAL_ROW_HEIGHT);
+            case "mat/info/play" -> new Rect2i(GuiMatInfo.PLAY_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
+            case "mat/info/restart" -> new Rect2i(GuiMatInfo.RESTART_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
+            case "mat/info/navigation" -> info.getNavigationArea();
+            case "mat/info/statistics" -> new Rect2i(GuiMatInfo.STAT_ICON_X, GuiMatInfo.STAT_Y,
+                    GuiMatInfo.STAT_X + GuiMatInfo.STAT_WIDTH - GuiMatInfo.STAT_ICON_X, GuiMatInfo.VISIBLE_STATS * GuiMatInfo.STAT_ROW_HEIGHT);
             default -> null;
         };
     }
@@ -164,6 +187,7 @@ public class TutorialAnchors {
     // Container, MAT, and quest book anchors are the only clickable ones, and only exist while their screen is open
     public static boolean isClickableAnchor(String anchor) {
         if (anchor.matches("slot/\\d+|inventory/\\d+|screen/panel|mat/panel|mat/tab_bar")) return true;
+        if (anchor.matches("mat/info/(tutorials|play|restart|navigation|statistics)")) return true;
         if (anchor.matches("quest_book/(panel|back|claim|open|description|menu/quests|menu/lives|menu/reputation)")) return true;
         if (anchor.startsWith(TutorialScreens.QUEST_BOOK_QUEST) || anchor.startsWith(TutorialScreens.QUEST_BOOK_SET)) return TutorialScreens.isKnownScreen(anchor);
         for (MatMode mode : MatMode.values()) {

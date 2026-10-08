@@ -19,6 +19,7 @@ import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
+import hardcorequesting.common.quests.reward.CommandReward;
 import hardcorequesting.common.quests.task.QuestTask;
 import hardcorequesting.common.tutorial.Tutorial;
 import hardcorequesting.common.tutorial.TutorialManager;
@@ -34,6 +35,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 /**
@@ -192,6 +194,25 @@ public enum GeneralUsage {
             sendMatTutorialAutoPlay(serverPlayer);
         }
     },
+    // Runs the commands from finishing a step, taken from the server version of the tutorial
+    // Commands set to per_player only run once, the client decides when the others repeat
+    MAT_TUTORIAL_STEP_DONE {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            if (!(player instanceof ServerPlayer)) return;
+            String id = nbt.getString("Tutorial");
+            int step = nbt.getInt("Step");
+            Tutorial tutorial = TutorialManager.getInstance().tutorials.get(id);
+            if (tutorial == null || step < 0 || step >= tutorial.steps().size()) return;
+            Tutorial.Step done = tutorial.steps().get(step);
+            if (done.commandRepeat() == Tutorial.CommandRepeat.PER_PLAYER) {
+                MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
+                // don't run per_player commands if the tutorial is not unlocked, since then it is not trackable
+                if (!mat.unlockedTutorials.contains(id) || !mat.tutorialCommandsRun.computeIfAbsent(id, key -> new HashSet<>()).add(step)) return;
+            }
+            for (String command : done.commands()) new CommandReward.Command(command).execute(player);
+        }
+    },
     MAT_UNLOCK_TOAST {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
@@ -315,6 +336,15 @@ public enum GeneralUsage {
         CompoundTag nbt = new CompoundTag();
         nbt.putString("Tutorial", tutorial);
         MAT_TUTORIAL_COMPLETED.sendMessageToServer(nbt);
+    }
+
+    // client -> server
+    @Environment(EnvType.CLIENT)
+    public static void sendMatTutorialStepDone(String tutorial, int step) {
+        CompoundTag nbt = new CompoundTag();
+        nbt.putString("Tutorial", tutorial);
+        nbt.putInt("Step", step);
+        MAT_TUTORIAL_STEP_DONE.sendMessageToServer(nbt);
     }
 
     // server -> client

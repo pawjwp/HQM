@@ -24,6 +24,7 @@ public class MatPlayerData {
     public final Set<String> completedTutorials = new HashSet<>();
     public final Map<String, Integer> tutorialProgress = new HashMap<>(); // the current step
     public final Map<String, Integer> tutorialFurthest = new HashMap<>(); // the furthest step reached, for navigating forward again
+    public final Map<String, Set<Integer>> tutorialCommandsRun = new HashMap<>(); // the steps whose per_player commands have run
     public final List<String> unlockedStats = new ArrayList<>(); // stats, unlock order
     public final List<TrackedLocation> locations = new ArrayList<>(); // locations, insertion order
     public int selectedLocation = -1; // start with no selected location
@@ -45,6 +46,9 @@ public class MatPlayerData {
         CompoundTag furthest = new CompoundTag();
         for (Map.Entry<String, Integer> entry : tutorialFurthest.entrySet()) furthest.putInt(entry.getKey(), entry.getValue());
         tag.put("TutorialFurthest", furthest);
+        CompoundTag commandsRun = new CompoundTag();
+        for (Map.Entry<String, Set<Integer>> entry : tutorialCommandsRun.entrySet()) commandsRun.putIntArray(entry.getKey(), List.copyOf(entry.getValue()));
+        tag.put("TutorialCommandsRun", commandsRun);
         tag.put("UnlockedStats", stringList(unlockedStats));
 
         ListTag locationList = new ListTag();
@@ -67,6 +71,13 @@ public class MatPlayerData {
         tutorialFurthest.clear();
         CompoundTag furthest = tag.getCompound("TutorialFurthest");
         for (String id : furthest.getAllKeys()) tutorialFurthest.put(id, furthest.getInt(id));
+        tutorialCommandsRun.clear();
+        CompoundTag commandsRun = tag.getCompound("TutorialCommandsRun");
+        for (String id : commandsRun.getAllKeys()) {
+            Set<Integer> steps = new HashSet<>();
+            for (int step : commandsRun.getIntArray(id)) steps.add(step);
+            tutorialCommandsRun.put(id, steps);
+        }
         unlockedStats.clear();
         readStrings(tag.getList("UnlockedStats", Tag.TAG_STRING), unlockedStats);
 

@@ -62,7 +62,8 @@ public class TutorialAdapter {
         if (json.has("trigger")) {
             trigger = readTrigger(GsonHelper.getAsJsonObject(json, "trigger"));
         }
-        return new Tutorial.Step(textBoxes, highlights, trigger);
+        Tutorial.CommandRepeat commandRepeat = Tutorial.CommandRepeat.valueOf(GsonHelper.getAsString(json, "command_repeat", "per_player").toUpperCase(Locale.ROOT));
+        return new Tutorial.Step(textBoxes, highlights, trigger, readStrings(json, "commands"), commandRepeat);
     }
 
     private static Tutorial.Highlight readHighlight(JsonObject json) {

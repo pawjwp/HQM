@@ -9,8 +9,14 @@ import java.util.List;
 // The tutorial itself
 public record Tutorial(String id, Component title, Component description, @Nullable String icon, boolean defaultUnlocked, boolean autoPlay, boolean navigation, List<Step> steps) {
 
-    // A step of a tutorial, including the text boxes and highlights it shows and the trigger that advances it to the next step
-    public record Step(List<TextBox> textBoxes, List<Highlight> highlights, Trigger trigger) {
+    // A step of a tutorial, including the text boxes and highlights it shows, the trigger that advances it to the next step,
+    // the commands run when advancing, and how often those commands repeat
+    public record Step(List<TextBox> textBoxes, List<Highlight> highlights, Trigger trigger, List<String> commands, CommandRepeat commandRepeat) {
+    }
+
+    // How often a step's commands run: once for each player, once each time the tutorial is played through, or every time the step finishes
+    public enum CommandRepeat {
+        PER_PLAYER, PER_TUTORIAL, PER_STEP
     }
 
     // An outline around an anchor, the screens to display on, and its width

@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -70,6 +71,7 @@ public class TutorialPlayer {
     @Nullable
     private static Screen tickScreen; // the screen open last tick
     private static final Set<String> pausedAutoPlays = new HashSet<>(); // list of auto-play tutorials paused this session not played until a rejoin
+    private static final Map<String, Set<Integer>> playthroughCommands = new HashMap<>(); // each step which has already ran its per_tutorial commands this playthrough
 
     // Progress of one trigger during the current step
     private static class TriggerState {
@@ -213,6 +215,7 @@ public class TutorialPlayer {
     public static void start(Tutorial tutorial, int startStep) {
         states.clear();
         icons.clear();
+        if (startStep == 0) playthroughCommands.remove(tutorial.id()); // reset played commands at the start
         for (Tutorial.Step step : tutorial.steps()) {
             for (Tutorial.TextBox textBox : step.textBoxes()) {
                 if (textBox.icon() != null) {
@@ -366,6 +369,12 @@ public class TutorialPlayer {
     // Moves to the next step when the current step's trigger is done and saves it on the server, completes the tutorial after the last step
     private static void advanceIfDone() {
         if (tutorial == null || !isDone(tutorial.steps().get(stepIndex).trigger())) return;
+        // run the steps' commands when advancing, limit per step if applicable
+        Tutorial.Step finished = tutorial.steps().get(stepIndex);
+        if (!finished.commands().isEmpty() && (finished.commandRepeat() != Tutorial.CommandRepeat.PER_TUTORIAL
+                || playthroughCommands.computeIfAbsent(tutorial.id(), id -> new HashSet<>()).add(stepIndex))) {
+            GeneralUsage.sendMatTutorialStepDone(tutorial.id(), stepIndex);
+        }
         states.clear();
         stepIndex++;
         if (stepIndex < tutorial.steps().size()) {

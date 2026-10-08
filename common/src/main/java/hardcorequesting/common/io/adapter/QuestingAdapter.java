@@ -14,7 +14,9 @@ import net.minecraft.Util;
 import net.minecraft.util.GsonHelper;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class QuestingAdapter {
@@ -68,6 +70,15 @@ public class QuestingAdapter {
                                     builder.add(entry.getKey(), entry.getValue());
                             })
                             .build())
+                    .add("tutorialCommandsRun", object()
+                            .use(builder -> {
+                                for (Map.Entry<String, Set<Integer>> entry : mat.tutorialCommandsRun.entrySet()) {
+                                    JsonArray steps = new JsonArray();
+                                    for (int step : entry.getValue()) steps.add(step);
+                                    builder.add(entry.getKey(), steps);
+                                }
+                            })
+                            .build())
                     .add("unlockedStats", stringArray(mat.unlockedStats))
                     .add("locations", locations)
                     .add("selectedLocation", mat.selectedLocation)
@@ -90,6 +101,11 @@ public class QuestingAdapter {
                 mat.tutorialProgress.put(entry.getKey(), entry.getValue().getAsInt());
             for (Map.Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(object, "tutorialFurthest", new JsonObject()).entrySet())
                 mat.tutorialFurthest.put(entry.getKey(), entry.getValue().getAsInt());
+            for (Map.Entry<String, JsonElement> entry : GsonHelper.getAsJsonObject(object, "tutorialCommandsRun", new JsonObject()).entrySet()) {
+                Set<Integer> steps = new HashSet<>();
+                for (JsonElement step : entry.getValue().getAsJsonArray()) steps.add(step.getAsInt());
+                mat.tutorialCommandsRun.put(entry.getKey(), steps);
+            }
             for (JsonElement element : GsonHelper.getAsJsonArray(object, "unlockedStats", new JsonArray()))
                 mat.unlockedStats.add(element.getAsString());
             for (JsonElement element : GsonHelper.getAsJsonArray(object, "locations", new JsonArray()))

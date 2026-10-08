@@ -61,15 +61,15 @@ public class MatHandler {
                     (id, inventory, p) -> new MatCraftingMenu(id, inventory, ContainerLevelAccess.create(p.level(), p.blockPosition())),
                     Component.translatable("container.hardcorequesting.mat.crafting")));
             case QUEST -> openQuest(player);
-            case DEFAULT -> openDefault(player);
+            case INFO -> openInfo(player);
             default -> GeneralUsage.sendOpenMat(player, mode);
         }
     }
 
-    // Opens the Default mode, loading the statistics
-    private static void openDefault(Player player) {
+    // Opens the Info mode, loading the statistics
+    private static void openInfo(Player player) {
         if (!(player instanceof ServerPlayer serverPlayer)) return;
-        GeneralUsage.sendOpenMat(player, MatMode.DEFAULT, MatStats.buildStatsPayload(serverPlayer));
+        GeneralUsage.sendOpenMat(player, MatMode.INFO, MatStats.buildStatsPayload(serverPlayer));
     }
 
     private static void openQuest(Player player) {

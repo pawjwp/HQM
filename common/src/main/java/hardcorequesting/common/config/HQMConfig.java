@@ -369,8 +369,8 @@ public class HQMConfig {
     public static class MAT {
         @Comment("Enable the Multipurpose Assistance Terminal (MAT). When disabled, the item is non-functional.")
         public boolean ENABLE_MAT = true;
-        @Comment("Enable the Default mode tab")
-        public boolean ENABLE_DEFAULT = true;
+        @Comment("Enable the Info mode tab")
+        public boolean ENABLE_INFO = true;
         @Comment("Enable the Quest mode tab")
         public boolean ENABLE_QUEST = true;
         @Comment("Enable the Crafting mode tab")

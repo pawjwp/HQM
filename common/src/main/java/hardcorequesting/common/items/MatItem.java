@@ -40,7 +40,7 @@ public class MatItem extends Item {
         if (tag != null && tag.contains(TAG_MODE)) {
             return MatMode.fromId(tag.getInt(TAG_MODE));
         }
-        return MatMode.DEFAULT;
+        return MatMode.INFO;
     }
 
     public static void setMode(ItemStack stack, MatMode mode) {

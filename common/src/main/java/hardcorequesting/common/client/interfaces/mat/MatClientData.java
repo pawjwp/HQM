@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Holds the statistics the server sent for the most recent opening of the default MAT mode.
+ * Holds the statistics the server sent for the most recent opening of the Info MAT mode.
  * Also formats them for display on the MAT screen.
  */
 @Environment(EnvType.CLIENT)

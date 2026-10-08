@@ -14,10 +14,10 @@ import java.util.List;
  * - Overlay color
  */
 public enum MatMode {
-    // Declared in the tab order, with the default mode in the center=
+    // Declared in the tab order, with the Info mode in the center
     CRAFTING(-2, "hqm.mat.mode.crafting", "mat_mode_crafting", 0x9F8B28, 0xDFDFA7),
     TRACKING(-1, "hqm.mat.mode.tracking", "mat_mode_tracking", 0x289F28, 0xB1DFA7),
-    DEFAULT(0, "hqm.mat.mode.default", "mat_mode_default", 0x28959F, 0xA7DFDA),
+    INFO(0, "hqm.mat.mode.info", "mat_mode_info", 0x28959F, 0xA7DFDA),
     QUEST(1, "hqm.mat.mode.questing", "mat_mode_questing", 0x28469F, 0xA7BFDF),
     STORAGE(2, "hqm.mat.mode.storage", "mat_mode_storage", 0x5A289F, 0xC8A7DF),
     ;
@@ -40,7 +40,7 @@ public enum MatMode {
         return id;
     }
 
-    // Translation key for the mode name ("Default", "Questing", "Crafting", etc.)
+    // Translation key for the mode name ("Info", "Questing", "Crafting", etc.)
     // This is used for the item name, tab name, and keybind name.
     public String getNameKey() {
         return nameKey;
@@ -65,7 +65,7 @@ public enum MatMode {
     public boolean isEnabled() {
         HQMConfig.MAT cfg = HQMConfig.getInstance().MAT;
         return switch (this) {
-            case DEFAULT -> cfg.ENABLE_DEFAULT;
+            case INFO -> cfg.ENABLE_INFO;
             case QUEST -> cfg.ENABLE_QUEST;
             case CRAFTING -> cfg.ENABLE_CRAFTING;
             case TRACKING -> cfg.ENABLE_TRACKING;
@@ -87,7 +87,7 @@ public enum MatMode {
         for (MatMode mode : values()) {
             if (mode.id == id) return mode;
         }
-        return DEFAULT;
+        return INFO;
     }
 
     public static List<MatMode> enabledModes() {

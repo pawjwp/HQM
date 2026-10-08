@@ -20,7 +20,7 @@ import java.util.List;
 public class StatisticDataChipItem extends DataChipItem {
 
     public StatisticDataChipItem() {
-        super(MatMode.DEFAULT);
+        super(MatMode.INFO);
     }
 
     @Override

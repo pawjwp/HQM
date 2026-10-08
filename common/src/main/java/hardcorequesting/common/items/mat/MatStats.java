@@ -12,7 +12,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.monster.Enemy;
 
-// Builds the statistics list the server sends when a player opens the MAT's Default mode.
+// Builds the statistics list the server sends when a player opens the MAT's Info mode.
 public class MatStats {
     // The three statistics unlocked by default
     private static final ResourceLocation[] BASE_STATS = {
@@ -21,7 +21,7 @@ public class MatStats {
         Stats.MOB_KILLS
     };
 
-    // Produces the {Stats:[{Key,Value}]} format used by Default MAT mode
+    // Produces the {Stats:[{Key,Value}]} format used by Info MAT mode
     public static CompoundTag buildStatsPayload(ServerPlayer player) {
         ListTag list = new ListTag();
         for (ResourceLocation stat : BASE_STATS) {

@@ -35,10 +35,10 @@ import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The MAT's Default mode shows the unlocked tutorials on the left and statistics on the right
+ * The MAT's Info mode shows the unlocked tutorials on the left and statistics on the right
  */
 @Environment(EnvType.CLIENT)
-public class GuiMatDefault extends GuiBase implements MatScreen {
+public class GuiMatInfo extends GuiBase implements MatScreen {
     private static final int HEADER_Y = 20;               // heading y on both sides
     private static final int TEXT_Y = 35;                 // first line of text content on both sides
     private static final int TUTORIAL_X = 20;             // x of the tutorial heading
@@ -78,12 +78,12 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
     private final Map<String, MatIcons.Icon> icons = new HashMap<>(); // tutorials' icons
     private String selectedTutorial;
 
-    public GuiMatDefault(Player player) {
+    public GuiMatInfo(Player player) {
         super(CommonComponents.EMPTY);
         this.player = player;
-        this.tabBar = new MatTabBar(MatMode.DEFAULT, GuiQuestBook.TEXTURE_WIDTH);
+        this.tabBar = new MatTabBar(MatMode.INFO, GuiQuestBook.TEXTURE_WIDTH);
         this.mapTexture = BookTheme.MAT.map;
-        this.background = ResourceHelper.getResource(MatMode.DEFAULT.getBackgroundName());
+        this.background = ResourceHelper.getResource(MatMode.INFO.getBackgroundName());
         this.widgetSprites = WidgetSprites.fromMatMode(background);
 
         this.tutorialList = new SelectableList<>(this, TUTORIAL_ICON_X, TEXT_Y, TUTORIAL_X + TUTORIAL_WIDTH - TUTORIAL_ICON_X, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
@@ -104,7 +104,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
 
                 // Default title to tutorial ID and description to "unavailable text"
                 FormattedText title = Component.literal(id);
-                FormattedText description = Translator.translatable("hqm.mat.default.unavailable");
+                FormattedText description = Translator.translatable("hqm.mat.info.unavailable");
 
                 // Set title and description
                 if (tutorial != null) {
@@ -141,7 +141,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
         };
 
         // Plays the selected tutorial from its saved step, replacing any running tutorials, or pauses it if this tutorial is active
-        this.playButton = new LargeButton(this, "hqm.mat.default.play", "hqm.mat.default.unavailable", PLAY_X, BUTTON_Y) {
+        this.playButton = new LargeButton(this, "hqm.mat.info.play", "hqm.mat.info.unavailable", PLAY_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
                 return TutorialManager.getInstance().tutorials.containsKey(selectedTutorial);
@@ -155,10 +155,10 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
 
             @Override
             protected FormattedText getName() {
-                if (isPlaying(selectedTutorial)) return Translator.translatable("hqm.mat.default.pause");
-                if (hasProgress(selectedTutorial)) return Translator.translatable("hqm.mat.default.resume");
-                if (isCompleted(selectedTutorial)) return Translator.translatable("hqm.mat.default.replay");
-                return Translator.translatable("hqm.mat.default.play");
+                if (isPlaying(selectedTutorial)) return Translator.translatable("hqm.mat.info.pause");
+                if (hasProgress(selectedTutorial)) return Translator.translatable("hqm.mat.info.resume");
+                if (isCompleted(selectedTutorial)) return Translator.translatable("hqm.mat.info.replay");
+                return Translator.translatable("hqm.mat.info.play");
             }
 
             @Override
@@ -169,7 +169,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
         };
 
         // Starts the selected tutorial over from its first step, while it's running or has a saved step
-        this.restartButton = new LargeButton(this, "hqm.mat.default.restart", "hqm.mat.default.unavailable", RESTART_X, BUTTON_Y) {
+        this.restartButton = new LargeButton(this, "hqm.mat.info.restart", "hqm.mat.info.unavailable", RESTART_X, BUTTON_Y) {
             @Override
             public boolean isEnabled() {
                 return TutorialManager.getInstance().tutorials.containsKey(selectedTutorial) && (isPlaying(selectedTutorial) || hasProgress(selectedTutorial));
@@ -227,9 +227,9 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
 
     // Draws the tutorial list
     private void renderTutorials(GuiGraphics graphics, int mX, int mY) {
-        drawString(graphics, Translator.translatable("hqm.mat.default.tutorials"), TUTORIAL_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
+        drawString(graphics, Translator.translatable("hqm.mat.info.tutorials"), TUTORIAL_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
         if (matData().unlockedTutorials.isEmpty()) {
-            drawString(graphics, Translator.translatable("hqm.mat.default.noTutorials"), TUTORIAL_X, TEXT_Y, HQMConfig.TEXT_HINT);
+            drawString(graphics, Translator.translatable("hqm.mat.info.noTutorials"), TUTORIAL_X, TEXT_Y, HQMConfig.TEXT_HINT);
         }
         tutorialList.render(graphics, mX, mY);
         playButton.render(graphics, mX, mY);
@@ -238,7 +238,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
 
     // Draws the statistic list
     private void renderStatistics(GuiGraphics graphics) {
-        drawString(graphics, Translator.translatable("hqm.mat.default.statistics"), STAT_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
+        drawString(graphics, Translator.translatable("hqm.mat.info.statistics"), STAT_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
         List<MatClientData.StatRow> rows = statScroll.getVisibleEntries();
         for (int i = 0; i < rows.size(); i++) {
             MatClientData.StatRow row = rows.get(i);
@@ -369,7 +369,7 @@ public class GuiMatDefault extends GuiBase implements MatScreen {
 
     @Override
     public MatMode getMode() {
-        return MatMode.DEFAULT;
+        return MatMode.INFO;
     }
 
     @Override

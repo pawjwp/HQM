@@ -52,7 +52,7 @@ public class TutorialPlayer {
     private static final int BORDER_BOTTOM = 0xBFDFDFDF;
     private static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final int TIMER_COLOR = 0xFF00AA00;    // green timer color vanilla toasts use for progress
-    private static final int NAV_HEIGHT = 9;              // height of the navigation controls
+    public static final int NAV_HEIGHT = 9;              // height of the navigation controls
     private static final int NAV_GAP = 4;                 // gap between the text and navigation controls
     private static final int NAV_SPACE = 3;               // gap between the navigation arrows and text
     private static final int NAV_DROP = 3;                // distance the navigation controls are offset below their line

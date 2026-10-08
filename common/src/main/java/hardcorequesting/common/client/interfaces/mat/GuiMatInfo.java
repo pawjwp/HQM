@@ -40,32 +40,32 @@ import org.jetbrains.annotations.Nullable;
 @Environment(EnvType.CLIENT)
 public class GuiMatInfo extends GuiBase implements MatScreen {
     private static final int HEADER_Y = 20;               // heading y on both sides
-    private static final int TEXT_Y = 35;                 // first line of text content on both sides
-    private static final int TUTORIAL_X = 20;             // x of the tutorial heading
-    private static final int TUTORIAL_WIDTH = 137;
+    public static final int TEXT_Y = 35;                 // first line of text content on both sides
+    public static final int TUTORIAL_X = 20;             // x of the tutorial heading
+    public static final int TUTORIAL_WIDTH = 137;
     private static final int TITLE_WIDTH = TUTORIAL_WIDTH - 10;  // leaves room for the completion check mark at the row's right end
-    private static final int TUTORIAL_ROW_HEIGHT = 24;
-    private static final int VISIBLE_TUTORIALS = 7;
+    public static final int TUTORIAL_ROW_HEIGHT = 24;
+    public static final int VISIBLE_TUTORIALS = 7;
     private static final int TUTORIAL_SCROLL_X = 159;
-    private static final int TUTORIAL_ICON_X = TUTORIAL_X - 3;  // tutorial icons are a few pixels to the left of the tutorial heading
+    public static final int TUTORIAL_ICON_X = TUTORIAL_X - 3;  // tutorial icons are a few pixels to the left of the tutorial heading
     private static final int TUTORIAL_ICON_Y = -1;
     private static final int TUTORIAL_TEXT_X = 18;        // the text's offset from the heading in rows with an icon
     private static final int DESCRIPTION_Y = 10;
     private static final float DESCRIPTION_SCALE = 0.7F;
-    private static final int PLAY_X = 36;                 // x of the play button
-    private static final int RESTART_X = 95;              // x of the restart button
-    private static final int BUTTON_Y = 200;              // y of both buttons
-    private static final int STAT_X = 176;                // x of the statistics heading
-    private static final int STAT_WIDTH = 142;
-    private static final int STAT_ROW_HEIGHT = 18;        // height of each statistic row (18 pixel icons)
-    private static final int VISIBLE_STATS = 9;
+    public static final int PLAY_X = 36;                 // x of the play button
+    public static final int RESTART_X = 95;              // x of the restart button
+    public static final int BUTTON_Y = 200;              // y of both buttons
+    public static final int STAT_X = 176;                // x of the statistics heading
+    public static final int STAT_WIDTH = 142;
+    public static final int STAT_ROW_HEIGHT = 18;        // height of each statistic row (18 pixel icons)
+    public static final int VISIBLE_STATS = 9;
     private static final int STAT_SCROLL_X = 320;
     private static final int SCROLL_Y = 30;               // y of both scrollbars
     private static final int SCROLL_LENGTH = 166;         // height of both scrollbars
-    private static final int STAT_ICON_X = STAT_X - 3;    // stat icons are a few pixels to the left of the stat heading
+    public static final int STAT_ICON_X = STAT_X - 3;    // stat icons are a few pixels to the left of the stat heading
     private static final int STAT_TEXT_X = 18;            // the text's offset from its row: against the icon, which few icons fill edge to edge, and centered on the row
     private static final int STAT_TEXT_Y = 5;
-    private static final int STAT_Y = TEXT_Y-STAT_TEXT_Y;
+    public static final int STAT_Y = TEXT_Y-STAT_TEXT_Y;
     private static final int STAT_VALUE_GAP = 4;          // the minimum gap between a statistic's name and value
 
     private final Player player;

@@ -55,7 +55,7 @@ public class TutorialAnchors {
         // Calculates hotbar locations, 20 pixels each
         if (anchor.matches("hud/hotbar/[0-8]")) {
             int slot = anchor.charAt(anchor.length() - 1) - '0';
-            return new Rect2i(horizontalCenter - 90 + 20 * slot, height - 22, 20, 22);
+            return new Rect2i(horizontalCenter - 90 + 20 * slot, height - 21, 20, 20);
         }
 
         // Container anchors are only valid when a container screen is open

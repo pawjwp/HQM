@@ -149,6 +149,8 @@
   "hqm.mat.info.pause": "Pause",
   "hqm.mat.info.restart": "Restart",
   "hqm.mat.info.unavailable": "Unavailable",
+  "hqm.tutorial.mat.title": "The MAT",
+  "hqm.tutorial.mat.description": "How to use your MAT",
   "hqm.mat.tracking.locations": "Locations",
   "hqm.mat.tracking.empty": "No locations to track yet.",
   "hqm.mat.tracking.noneTracked": "Select a location to track it.",

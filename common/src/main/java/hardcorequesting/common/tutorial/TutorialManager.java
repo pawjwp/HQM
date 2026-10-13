@@ -14,10 +14,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TutorialManager implements Serializable {
+    private static final String BUNDLED_TUTORIAL = "mat.json"; // the name of the default MAT tutorial
     public final Map<String, Tutorial> tutorials = new LinkedHashMap<>();
     public final Map<String, String> files = new LinkedHashMap<>();
     public int skippedFiles; // files not read in the last load
@@ -51,6 +56,7 @@ public class TutorialManager implements Serializable {
         tutorials.clear();
         files.clear();
         skippedFiles = 0;
+        if (reader == HardcoreQuestingCore.packManager) copyBundledTutorial();
         for (Map.Entry<String, String> file : reader.readFolder("tutorials").entrySet()) {
             String fileName = file.getKey();
             String id = fileName.substring(0, fileName.length() - ".json".length());
@@ -67,6 +73,18 @@ public class TutorialManager implements Serializable {
             }
         }
         HardcoreQuestingCore.LOGGER.info("Loaded %d tutorials.", tutorials.size());
+    }
+
+    // Copies the bundled tutorial into the modpack's tutorials folder if it isn't there already
+    private static void copyBundledTutorial() {
+        Path file = HardcoreQuestingCore.packDir.resolve("tutorials").resolve(BUNDLED_TUTORIAL);
+        if (Files.exists(file)) return;
+        try (InputStream bundled = TutorialManager.class.getResourceAsStream("/assets/hardcorequesting/tutorials/" + BUNDLED_TUTORIAL)) {
+            Files.createDirectories(file.getParent());
+            Files.copy(bundled, file);
+        } catch (IOException e) {
+            HardcoreQuestingCore.LOGGER.warn("Couldn't copy the bundled tutorial %s into the tutorial folder: %s", BUNDLED_TUTORIAL, e.getMessage());
+        }
     }
 
     private static boolean isKnownIcon(String icon) {

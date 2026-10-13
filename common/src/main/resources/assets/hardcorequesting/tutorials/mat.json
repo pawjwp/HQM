@@ -1,0 +1,8 @@
+{
+  "title": { "translate": "hqm.tutorial.mat.title", "fallback": "The MAT" },
+  "description": { "translate": "hqm.tutorial.mat.description", "fallback": "How to use your MAT" },
+  "icon": "hardcorequesting:mat",
+  "steps": [
+    { "text_boxes": [ { "text": "Not finished yet.", "anchor": "window/center" } ] }
+  ]
+}

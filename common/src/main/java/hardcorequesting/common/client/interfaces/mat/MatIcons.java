@@ -33,7 +33,7 @@ import net.minecraft.world.level.ItemLike;
  */
 @Environment(EnvType.CLIENT)
 public class MatIcons {
-    private static final int SIZE = 18;
+    public static final int SIZE = 18;
 
     // Draws an icon
     public interface Icon {

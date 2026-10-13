@@ -39,34 +39,46 @@ import org.jetbrains.annotations.Nullable;
  */
 @Environment(EnvType.CLIENT)
 public class GuiMatInfo extends GuiBase implements MatScreen {
-    private static final int HEADER_Y = 20;               // heading y on both sides
-    public static final int TEXT_Y = 35;                 // first line of text content on both sides
-    public static final int TUTORIAL_X = 20;             // x of the tutorial heading
+    // Both columns
+    private static final int HEADER_Y = 20;             // y of both headings
+    public static final int TEXT_Y = 35;                // y of the first line of text in both lists
+    public static final int ICON_X = -3;                // icon offset from the column's text
+    private static final int ICON_TEXT_X = 18;          // text offset from the heading when an icon is present
+
+    // Tutorial column
+    public static final int TUTORIAL_X = 20;            // x of the tutorials heading
     public static final int TUTORIAL_WIDTH = 137;
-    private static final int TITLE_WIDTH = TUTORIAL_WIDTH - 10;  // leaves room for the completion check mark at the row's right end
-    public static final int TUTORIAL_ROW_HEIGHT = 24;
+    public static final int TUTORIAL_LIST_WIDTH = TUTORIAL_WIDTH - ICON_X;
+    private static final int TITLE_WIDTH = TUTORIAL_WIDTH - 10; // leaves room for the completion check mark at the row's right end
+    private static final int TUTORIAL_TEXT_Y = 1;       // the title's offset from its row's top, which is its icon's top
+    private static final int DESCRIPTION_Y = 10;        // the description's offset below the title
+    private static final float DESCRIPTION_SCALE = 0.7F;
+    public static final int TUTORIAL_Y = TEXT_Y - TUTORIAL_TEXT_Y; // the first row's top
+    public static final int TUTORIAL_ROW_HEIGHT = MatIcons.SIZE + 6;
     public static final int VISIBLE_TUTORIALS = 7;
     private static final int TUTORIAL_SCROLL_X = 159;
-    public static final int TUTORIAL_ICON_X = TUTORIAL_X - 3;  // tutorial icons are a few pixels to the left of the tutorial heading
-    private static final int TUTORIAL_ICON_Y = -1;
-    private static final int TUTORIAL_TEXT_X = 18;        // the text's offset from the heading in rows with an icon
-    private static final int DESCRIPTION_Y = 10;
-    private static final float DESCRIPTION_SCALE = 0.7F;
-    public static final int PLAY_X = 36;                 // x of the play button
-    public static final int RESTART_X = 95;              // x of the restart button
-    public static final int BUTTON_Y = 200;              // y of both buttons
-    public static final int STAT_X = 176;                // x of the statistics heading
+
+    // Tutorial buttons
+    public static final int PLAY_X = 36;                // x of the play button
+    public static final int RESTART_X = 95;             // x of the restart button
+    public static final int BUTTON_Y = 200;             // y of both buttons
+ 
+    // Statistics column
+    public static final int STAT_X = 176;               // x of the statistics heading
     public static final int STAT_WIDTH = 142;
-    public static final int STAT_ROW_HEIGHT = 18;        // height of each statistic row (18 pixel icons)
+    public static final int STAT_LIST_WIDTH = STAT_WIDTH - ICON_X;
+    private static final int STAT_TEXT_Y = 5;           // the text's offset from its row's top
+    private static final int STAT_VALUE_GAP = 4;        // the minimum gap between a statistic's name and value
+    public static final int STAT_ROW_HEIGHT = MatIcons.SIZE;
     public static final int VISIBLE_STATS = 9;
     private static final int STAT_SCROLL_X = 320;
-    private static final int SCROLL_Y = 30;               // y of both scrollbars
-    private static final int SCROLL_LENGTH = 166;         // height of both scrollbars
-    public static final int STAT_ICON_X = STAT_X - 3;    // stat icons are a few pixels to the left of the stat heading
-    private static final int STAT_TEXT_X = 18;            // the text's offset from its row: against the icon, which few icons fill edge to edge, and centered on the row
-    private static final int STAT_TEXT_Y = 5;
-    public static final int STAT_Y = TEXT_Y-STAT_TEXT_Y;
-    private static final int STAT_VALUE_GAP = 4;          // the minimum gap between a statistic's name and value
+
+    // The vertical placement position for both lists
+    // Starts at the top of the first statistic icon, ends after the last tutorial row
+    public static final int LIST_TOP = TEXT_Y - STAT_TEXT_Y;
+    public static final int LIST_HEIGHT = TUTORIAL_Y + (VISIBLE_TUTORIALS - 1) * TUTORIAL_ROW_HEIGHT + MatIcons.SIZE - LIST_TOP;
+
+
 
     private final Player player;
     private final MatTabBar tabBar;
@@ -86,7 +98,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
         this.background = ResourceHelper.getResource(MatMode.INFO.getBackgroundName());
         this.widgetSprites = WidgetSprites.fromMatMode(background);
 
-        this.tutorialList = new SelectableList<>(this, TUTORIAL_ICON_X, TEXT_Y, TUTORIAL_X + TUTORIAL_WIDTH - TUTORIAL_ICON_X, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
+        this.tutorialList = new SelectableList<>(this, TUTORIAL_X + ICON_X, TUTORIAL_Y, TUTORIAL_LIST_WIDTH, TUTORIAL_ROW_HEIGHT, VISIBLE_TUTORIALS, TUTORIAL_SCROLL_X, LIST_TOP, LIST_HEIGHT) {
             @Override
             protected List<String> getEntries() {
                 return matData().unlockedTutorials.stream().toList();
@@ -114,11 +126,11 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
                     color = HQMConfig.TEXT_HINT;
                 }
                 MatIcons.Icon icon = icon(id);
-                if (icon != null) icon.draw(graphics, left + TUTORIAL_ICON_X, top + y + TUTORIAL_ICON_Y);
-                drawString(graphics, trimToWidth(title, titleWidth(id)), textX(id), y, color);
-                drawString(graphics, trimToWidth(description, descriptionWidth(id)), textX(id), y + DESCRIPTION_Y, DESCRIPTION_SCALE, HQMConfig.TEXT_HINT);
+                if (icon != null) icon.draw(graphics, left + TUTORIAL_X + ICON_X, top + y);
+                drawString(graphics, trimToWidth(title, titleWidth(id)), textX(id), y + TUTORIAL_TEXT_Y, color);
+                drawString(graphics, trimToWidth(description, descriptionWidth(id)), textX(id), y + TUTORIAL_TEXT_Y + DESCRIPTION_Y, DESCRIPTION_SCALE, HQMConfig.TEXT_HINT);
                 if (isCompleted(id)) {
-                    drawString(graphics, Component.literal("✔"), TUTORIAL_X + TUTORIAL_WIDTH - getStringWidth("✔"), y, HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET);
+                    drawString(graphics, Component.literal("✔"), TUTORIAL_X + TUTORIAL_WIDTH - getStringWidth("✔"), y + TUTORIAL_TEXT_Y, HQMConfig.COMPLETED_UNSELECTED_IN_BOUNDS_SET);
                 }
             }
 
@@ -187,7 +199,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
             }
         };
 
-        this.statScroll = new ExtendedScrollBar<>(this, SCROLL_LENGTH, STAT_SCROLL_X, SCROLL_Y, STAT_ICON_X, VISIBLE_STATS, () -> MatClientData.stats());
+        this.statScroll = new ExtendedScrollBar<>(this, LIST_HEIGHT, STAT_SCROLL_X, LIST_TOP, STAT_X + ICON_X, VISIBLE_STATS, () -> MatClientData.stats());
         this.selectedTutorial = TutorialPlayer.getPlayingId(); // the active tutorial is selected when opening the screen
     }
 
@@ -242,9 +254,9 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
         List<MatClientData.StatRow> rows = statScroll.getVisibleEntries();
         for (int i = 0; i < rows.size(); i++) {
             MatClientData.StatRow row = rows.get(i);
-            int rowY = STAT_Y + i * STAT_ROW_HEIGHT;
-            row.icon().draw(graphics, left + STAT_ICON_X, top + rowY);
-            drawString(graphics, trimToWidth(row.title(), getNameWidth(row)), STAT_X + STAT_TEXT_X, rowY + STAT_TEXT_Y, HQMConfig.TEXT_NORMAL);
+            int rowY = LIST_TOP + i * STAT_ROW_HEIGHT;
+            row.icon().draw(graphics, left + STAT_X + ICON_X, top + rowY);
+            drawString(graphics, trimToWidth(row.title(), getNameWidth(row)), STAT_X + ICON_TEXT_X, rowY + STAT_TEXT_Y, HQMConfig.TEXT_NORMAL);
             drawString(graphics, row.value(), STAT_X + STAT_WIDTH - getStringWidth(row.value()), rowY + STAT_TEXT_Y, HQMConfig.TEXT_HINT);
         }
     }
@@ -254,7 +266,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
         List<MatClientData.StatRow> rows = statScroll.getVisibleEntries();
         for (int i = 0; i < rows.size(); i++) {
             MatClientData.StatRow row = rows.get(i);
-            if (inBounds(STAT_ICON_X, STAT_Y + i * STAT_ROW_HEIGHT, STAT_X + STAT_WIDTH - STAT_ICON_X, STAT_ROW_HEIGHT, mX, mY) && getStringWidth(row.title()) > getNameWidth(row)) {
+            if (inBounds(STAT_X + ICON_X, LIST_TOP + i * STAT_ROW_HEIGHT, STAT_LIST_WIDTH, STAT_ROW_HEIGHT, mX, mY) && getStringWidth(row.title()) > getNameWidth(row)) {
                 renderTooltip(graphics, row.title(), mX + left, mY + top);
             }
         }
@@ -262,7 +274,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
 
     // The width available for a statistic's name (minus the size of the icon and value)
     private int getNameWidth(MatClientData.StatRow row) {
-        return STAT_WIDTH - STAT_TEXT_X - getStringWidth(row.value()) - STAT_VALUE_GAP;
+        return STAT_WIDTH - ICON_TEXT_X - getStringWidth(row.value()) - STAT_VALUE_GAP;
     }
 
     // Horizontal starting coord of the navigation bar
@@ -274,7 +286,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
     @Nullable
     public Rect2i getNavigationArea() {
         if (!isPlaying(selectedTutorial)) return null;
-        return new Rect2i(navigationX() - left, HEADER_Y, TutorialPlayer.navigationWidth(font), TutorialPlayer.NAV_HEIGHT);
+        return new Rect2i(navigationX() - left, HEADER_Y - 1, TutorialPlayer.navigationWidth(font), TutorialPlayer.NAV_HEIGHT);
     }
 
     @Override
@@ -340,7 +352,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
 
     // If the row has an icon, text starts after it, otherwise it's aligned with the heading
     private int textX(String id) {
-        return TUTORIAL_X + (icon(id) == null ? 0 : TUTORIAL_TEXT_X);
+        return TUTORIAL_X + (icon(id) == null ? 0 : ICON_TEXT_X);
     }
 
     // The max width a row's title can take up, minus the completion mark space

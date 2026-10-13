@@ -121,13 +121,11 @@ public class TutorialAnchors {
     @Nullable
     private static Rect2i matInfoArea(String anchor, GuiMatInfo info) {
         return switch (anchor) {
-            case "mat/info/tutorials" -> new Rect2i(GuiMatInfo.TUTORIAL_ICON_X, GuiMatInfo.TEXT_Y,
-                    GuiMatInfo.TUTORIAL_X + GuiMatInfo.TUTORIAL_WIDTH - GuiMatInfo.TUTORIAL_ICON_X, GuiMatInfo.VISIBLE_TUTORIALS * GuiMatInfo.TUTORIAL_ROW_HEIGHT);
+            case "mat/info/tutorials" -> new Rect2i(GuiMatInfo.TUTORIAL_X + GuiMatInfo.ICON_X, GuiMatInfo.LIST_TOP, GuiMatInfo.TUTORIAL_LIST_WIDTH, GuiMatInfo.LIST_HEIGHT);
             case "mat/info/play" -> new Rect2i(GuiMatInfo.PLAY_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
             case "mat/info/restart" -> new Rect2i(GuiMatInfo.RESTART_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
             case "mat/info/navigation" -> info.getNavigationArea();
-            case "mat/info/statistics" -> new Rect2i(GuiMatInfo.STAT_ICON_X, GuiMatInfo.STAT_Y,
-                    GuiMatInfo.STAT_X + GuiMatInfo.STAT_WIDTH - GuiMatInfo.STAT_ICON_X, GuiMatInfo.VISIBLE_STATS * GuiMatInfo.STAT_ROW_HEIGHT);
+            case "mat/info/statistics" -> new Rect2i(GuiMatInfo.STAT_X + GuiMatInfo.ICON_X, GuiMatInfo.LIST_TOP, GuiMatInfo.STAT_LIST_WIDTH, GuiMatInfo.LIST_HEIGHT);
             default -> null;
         };
     }

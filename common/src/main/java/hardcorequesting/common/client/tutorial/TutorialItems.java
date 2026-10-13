@@ -33,14 +33,19 @@ public class TutorialItems {
     // Whether any of the items match
     private static boolean matchesAny(List<String> names, ItemStack stack) {
         for (String name : names) {
-            if (name.startsWith("#")) {
-                ResourceLocation tag = ResourceLocation.tryParse(name.substring(1));
-                if (tag != null && stack.is(TagKey.create(Registries.ITEM, tag))) return true;
-            } else if (BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(ResourceLocation.tryParse(name))) {
-                return true;
-            }
+            if (matches(name, stack)) return true;
         }
         return false;
+    }
+
+    // If the an ItemStack is a valid match for the provided item name
+    public static boolean matches(String name, ItemStack stack) {
+        if (stack.isEmpty()) return false;
+        if (name.startsWith("#")) {
+            ResourceLocation tag = ResourceLocation.tryParse(name.substring(1));
+            return tag != null && stack.is(TagKey.create(Registries.ITEM, tag));
+        }
+        return BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(ResourceLocation.tryParse(name));
     }
 
     // Whether a name is a valid item id or a tag name

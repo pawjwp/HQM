@@ -24,6 +24,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
@@ -35,6 +36,7 @@ import java.util.List;
  * - Window anchors are locations based on the bounds of the screen
  * - HUD anchors are locations on the vanilla HUD
  * - Container anchors are locations on an active container UI
+ * - Slot anchors can name their slot by number, item, or #tag
  * - MAT anchors are the MAT's main panel, tabs, and tab bar
  * - Info screen anchors are the Info mode's tutorial list, buttons, navigation bar, and the statistic list
  * - Quest book anchors are the book itself and various buttons and screen regions
@@ -42,6 +44,11 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class TutorialAnchors {
     private static final int QUEST_BOOK_TEXT_WIDTH = 130; // width of the text area of the quest book pages
+    // Slot anchor types, each followed by a slot number, item id, or #tag
+    private static final String HOTBAR = "hud/hotbar/";
+    private static final String OFFHAND = "hud/offhand/";
+    private static final String SLOT = "slot/";
+    private static final String INVENTORY = "inventory/";
 
     @Nullable
     public static Rect2i resolve(String anchor) {
@@ -53,9 +60,16 @@ public class TutorialAnchors {
         int verticalCenter = height / 2;
 
         // Calculates hotbar locations, 20 pixels each
-        if (anchor.matches("hud/hotbar/[0-8]")) {
-            int slot = anchor.charAt(anchor.length() - 1) - '0';
+        if (anchor.startsWith(HOTBAR)) {
+            Integer slot = hotbarSlot(anchor.substring(HOTBAR.length()), player.getInventory());
+            if (slot == null) return null;
             return new Rect2i(horizontalCenter - 90 + 20 * slot, height - 21, 20, 20);
+        }
+
+        // The offhand slot holding the named item
+        if (anchor.startsWith(OFFHAND)) {
+            if (!TutorialItems.matches(anchor.substring(OFFHAND.length()), player.getOffhandItem())) return null;
+            return resolve("hud/offhand");
         }
 
         // Container anchors are only valid when a container screen is open
@@ -63,7 +77,7 @@ public class TutorialAnchors {
             Rect2i panel = HardcoreQuestingCore.platform.getContainerPanel(screen);
             if (anchor.equals("screen/panel")) return panel;
             for (Slot slot : screen.getMenu().slots) {
-                if (anchor.equals("slot/" + slot.index) || (slot.container == player.getInventory() && anchor.equals("inventory/" + slot.getContainerSlot()))) {
+                if (namesSlot(anchor, SLOT, slot.index, slot) || (slot.container == player.getInventory() && namesSlot(anchor, INVENTORY, slot.getContainerSlot(), slot))) {
                     return new Rect2i(panel.getX() + slot.x - 1, panel.getY() + slot.y - 1, 18, 18);
                 }
             }
@@ -115,6 +129,27 @@ public class TutorialAnchors {
 
             default -> null;
         };
+    }
+
+    // If a hotbar anchor names this slot, either by number, item match, selected item, or selected item match
+    @Nullable
+    private static Integer hotbarSlot(String target, Inventory inventory) {
+        if (target.matches("[0-8]")) return target.charAt(0) - '0';
+        if (target.equals("selected")) return inventory.selected;
+        if (target.startsWith("selected/")) return TutorialItems.matches(target.substring("selected/".length()), inventory.getSelected()) ? inventory.selected : null;
+        if (TutorialItems.matches(target, inventory.getSelected())) return inventory.selected;
+        for (int i = 0; i < Inventory.getSelectionSize(); i++) {
+            if (TutorialItems.matches(target, inventory.getItem(i))) return i;
+        }
+        return null;
+    }
+
+    // If a slot or inventory anchor names this slot, either by number or item match
+    private static boolean namesSlot(String anchor, String family, int number, Slot slot) {
+        if (!anchor.startsWith(family)) return false;
+        String target = anchor.substring(family.length());
+        if (target.matches("\\d+")) return target.equals(String.valueOf(number));
+        return TutorialItems.matches(target, slot.getItem());
     }
 
     // An info screen anchor's area relative to the MAT's upper-left corner
@@ -179,12 +214,22 @@ public class TutorialAnchors {
 
     // If an anchor name is valid or not
     public static boolean isKnownAnchor(String anchor) {
-        return resolve(anchor) != null || isClickableAnchor(anchor);
+        if (resolve(anchor) != null || isClickableAnchor(anchor)) return true;
+        if (anchor.startsWith(HOTBAR + "selected/")) return TutorialItems.isKnownItem(anchor.substring((HOTBAR + "selected/").length()));
+        if (anchor.startsWith(HOTBAR)) return TutorialItems.isKnownItem(anchor.substring(HOTBAR.length()));
+        if (anchor.startsWith(OFFHAND)) return TutorialItems.isKnownItem(anchor.substring(OFFHAND.length()));
+        return false;
     }
 
     // Container, MAT, and quest book anchors are the only clickable ones, and only exist while their screen is open
     public static boolean isClickableAnchor(String anchor) {
-        if (anchor.matches("slot/\\d+|inventory/\\d+|screen/panel|mat/panel|mat/tab_bar")) return true;
+        if (anchor.matches("screen/panel|mat/panel|mat/tab_bar")) return true;
+        for (String family : List.of(SLOT, INVENTORY)) {
+            if (anchor.startsWith(family)) {
+                String target = anchor.substring(family.length());
+                return target.matches("\\d+") || TutorialItems.isKnownItem(target);
+            }
+        }
         if (anchor.matches("mat/info/(tutorials|play|restart|navigation|statistics)")) return true;
         if (anchor.matches("quest_book/(panel|back|claim|open|description|menu/quests|menu/lives|menu/reputation)")) return true;
         if (anchor.startsWith(TutorialScreens.QUEST_BOOK_QUEST) || anchor.startsWith(TutorialScreens.QUEST_BOOK_SET)) return TutorialScreens.isKnownScreen(anchor);

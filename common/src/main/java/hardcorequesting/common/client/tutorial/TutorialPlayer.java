@@ -228,6 +228,11 @@ public class TutorialPlayer {
                 } else if (textBox.width() == Tutorial.TextBox.ANCHOR_WIDTH && textBox.anchor().startsWith("window/")) {
                     HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses the width of %s, which has no width, that text box will use the default width", tutorial.id(), textBox.anchor());
                 }
+                if (textBox.lineAnchor() != null && !textBox.line()) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s has a line anchor %s on a text box without \"line\": true, no line is drawn", tutorial.id(), textBox.lineAnchor());
+                } else if (textBox.lineAnchor() != null && !TutorialAnchors.isKnownAnchor(textBox.lineAnchor())) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown line anchor %s, so that line is not drawn", tutorial.id(), textBox.lineAnchor());
+                }
                 for (String screen : textBox.screens()) {
                     if (!TutorialScreens.isKnownScreen(screen)) {
                         HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s, so that text box is not shown", tutorial.id(), screen);
@@ -653,7 +658,10 @@ public class TutorialPlayer {
 
     // Draws the line connecting a text box to its anchor between the two edges facing each other
     private static void drawConnectingLine(GuiGraphics graphics, Tutorial.TextBox textBox, Layout layout) {
+        // The line connects to the line anchor if one exists, the text box's anchor otherwise
         Rect2i anchor = layout.anchor();
+        if (textBox.lineAnchor() != null) anchor = TutorialAnchors.resolve(textBox.lineAnchor());
+        if (anchor == null) return;
         int anchorRight = anchor.getX() + anchor.getWidth();    // right anchor edge
         int anchorBottom = anchor.getY() + anchor.getHeight();  // bottom anchor edge
 

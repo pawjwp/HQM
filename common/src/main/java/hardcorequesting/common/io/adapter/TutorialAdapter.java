@@ -178,6 +178,7 @@ public class TutorialAdapter {
             readWidth(json),
             readStrings(json, "screens"),
             GsonHelper.getAsBoolean(json, "line", false),
+            GsonHelper.getAsString(json, "line_anchor", null),
             GsonHelper.getAsInt(json, "line_width", 1),
             GsonHelper.getAsBoolean(json, "clamp", true),
             GsonHelper.getAsString(json, "icon", null)

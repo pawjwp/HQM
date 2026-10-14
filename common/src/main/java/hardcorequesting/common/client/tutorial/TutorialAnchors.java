@@ -11,6 +11,7 @@ import hardcorequesting.common.client.interfaces.graphic.QuestGraphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestRewardsGraphic;
 import hardcorequesting.common.client.interfaces.graphic.QuestSetsGraphic;
 import hardcorequesting.common.client.interfaces.mat.GuiMatInfo;
+import hardcorequesting.common.client.interfaces.mat.GuiMatTracking;
 import hardcorequesting.common.client.interfaces.mat.MatScreen;
 import hardcorequesting.common.client.interfaces.widget.LargeButton;
 import hardcorequesting.common.items.mat.MatMode;
@@ -39,6 +40,7 @@ import java.util.List;
  * - Slot anchors can name their slot by number, item, or #tag
  * - MAT anchors are the MAT's main panel, tabs, and tab bar
  * - Info screen anchors are the Info mode's tutorial list, buttons, navigation bar, and the statistic list
+ * - Tracking screen anchors are the Tracking mode's location list, buttons, and the tracked location's details
  * - Quest book anchors are the book itself and various buttons and screen regions
  */
 @Environment(EnvType.CLIENT)
@@ -97,6 +99,12 @@ public class TutorialAnchors {
         if (Minecraft.getInstance().screen instanceof GuiMatInfo info) {
             Rect2i area = matInfoArea(anchor, info);
             if (area != null) return new Rect2i(info.getPanel().getX() + area.getX(), info.getPanel().getY() + area.getY(), area.getWidth(), area.getHeight());
+        }
+
+        // Tracking screen anchors are only valid while the MAT's Tracking screen is open
+        if (Minecraft.getInstance().screen instanceof GuiMatTracking tracking) {
+            Rect2i area = matTrackingArea(anchor, tracking);
+            if (area != null) return new Rect2i(tracking.getPanel().getX() + area.getX(), tracking.getPanel().getY() + area.getY(), area.getWidth(), area.getHeight());
         }
 
         // Quest book anchors are only valid when a quest book/questing MAT is open
@@ -161,6 +169,18 @@ public class TutorialAnchors {
             case "mat/info/restart" -> new Rect2i(GuiMatInfo.RESTART_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
             case "mat/info/navigation" -> info.getNavigationArea();
             case "mat/info/statistics" -> new Rect2i(GuiMatInfo.STAT_X + GuiMatInfo.ICON_X, GuiMatInfo.LIST_TOP, GuiMatInfo.STAT_LIST_WIDTH, GuiMatInfo.LIST_HEIGHT);
+            default -> null;
+        };
+    }
+
+    // A tracking screen anchor's area relative to the MAT's upper-left corner
+    @Nullable
+    private static Rect2i matTrackingArea(String anchor, GuiMatTracking tracking) {
+        return switch (anchor) {
+            case "mat/tracking/locations" -> new Rect2i(GuiMatTracking.LOCATION_X, GuiMatTracking.LIST_TOP, GuiMatTracking.LOCATION_WIDTH, GuiMatTracking.LIST_HEIGHT);
+            case "mat/tracking/delete" -> new Rect2i(GuiMatTracking.DELETE_X, GuiMatTracking.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
+            case "mat/tracking/stop" -> new Rect2i(GuiMatTracking.STOP_X, GuiMatTracking.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
+            case "mat/tracking/details" -> tracking.getDetailsArea();
             default -> null;
         };
     }
@@ -231,6 +251,7 @@ public class TutorialAnchors {
             }
         }
         if (anchor.matches("mat/info/(tutorials|play|restart|navigation|statistics)")) return true;
+        if (anchor.matches("mat/tracking/(locations|delete|stop|details)")) return true;
         if (anchor.matches("quest_book/(panel|back|claim|open|description|menu/quests|menu/lives|menu/reputation)")) return true;
         if (anchor.startsWith(TutorialScreens.QUEST_BOOK_QUEST) || anchor.startsWith(TutorialScreens.QUEST_BOOK_SET)) return TutorialScreens.isKnownScreen(anchor);
         for (MatMode mode : MatMode.values()) {

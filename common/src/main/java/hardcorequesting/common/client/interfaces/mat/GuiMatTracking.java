@@ -54,8 +54,8 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
     private static final int TEXT_Y = 35;               // y of the first line of text in both columns
 
     // Location column
-    private static final int LOCATION_X = 20;           // x of the locations heading
-    private static final int LOCATION_WIDTH = 137;
+    public static final int LOCATION_X = 20;            // x of the locations heading
+    public static final int LOCATION_WIDTH = 137;
     private static final int DIMENSION_X = 10;          // the dimension line's offset from its row
     private static final int DIMENSION_Y = 10;          // the dimension line's offset below the name
     private static final int LOCATION_CONTENT_HEIGHT = 17; // a row's name line plus the smaller dimension line below it
@@ -64,9 +64,9 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
     private static final int LOCATION_SCROLL_X = 159;
 
     // Location buttons
-    private static final int DELETE_X = 36;             // x of the delete button
-    private static final int STOP_X = 95;               // x of the stop tracking button
-    private static final int BUTTON_Y = 200;            // y of both buttons
+    public static final int DELETE_X = 36;              // x of the delete button
+    public static final int STOP_X = 95;                // x of the stop tracking button
+    public static final int BUTTON_Y = 200;             // y of both buttons
 
     // Details column
     private static final int DETAILS_X = 176;           // x of the tracked location's name and details
@@ -82,8 +82,8 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
 
     // The vertical placement position for both lists
     // Starts at the top border of the map, ends at the bottom of the last visible location row
-    private static final int LIST_TOP = MAP_Y - MAP_BORDER;
-    private static final int LIST_HEIGHT = TEXT_Y + (VISIBLE_LOCATIONS - 1) * LOCATION_ROW_HEIGHT + LOCATION_CONTENT_HEIGHT - LIST_TOP;
+    public static final int LIST_TOP = MAP_Y - MAP_BORDER;
+    public static final int LIST_HEIGHT = TEXT_Y + (VISIBLE_LOCATIONS - 1) * LOCATION_ROW_HEIGHT + LOCATION_CONTENT_HEIGHT - LIST_TOP;
 
     private record Detail(Component label, Component value) {}
 
@@ -315,6 +315,19 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
             if (mapZ >= 63F) markerZ = 127;
         }
         return new MapDecoration(type, markerX, markerZ, markerRotation, null);
+    }
+
+    // The details column's content relative
+    // Starting with the map, ending at the bottom of the last detail's text
+    public Rect2i getDetailsArea() {
+        TrackedLocation location = getTracked();
+        if (location == null) {
+            int lines = getLinesFromText(Translator.translatable("hqm.mat.tracking.noneTracked"), 0.7F, DETAILS_WIDTH).size();
+            return new Rect2i(DETAILS_X, TEXT_Y, DETAILS_WIDTH, (int) (lines * TEXT_HEIGHT * 0.7F));
+        }
+        int areaTop = hasMap(location) ? MAP_Y - MAP_BORDER : TEXT_Y;
+        int areaBottom = getDetailsY(location) + (getDetails(location).size() - 1) * DETAIL_ROW_HEIGHT + TEXT_HEIGHT;
+        return new Rect2i(DETAILS_X, areaTop, DETAILS_WIDTH, areaBottom - areaTop);
     }
 
     // The y height of the first detail listed, below the map when it's drawn

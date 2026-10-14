@@ -233,6 +233,9 @@ public class TutorialPlayer {
                 } else if (textBox.lineAnchor() != null && !TutorialAnchors.isKnownAnchor(textBox.lineAnchor())) {
                     HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown line anchor %s, so that line is not drawn", tutorial.id(), textBox.lineAnchor());
                 }
+                if (textBox.unlessAnchor() != null && !TutorialAnchors.isKnownAnchor(textBox.unlessAnchor())) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown \"unless\" anchor %s, which is not found, so that text box always shows", tutorial.id(), textBox.unlessAnchor());
+                }
                 for (String screen : textBox.screens()) {
                     if (!TutorialScreens.isKnownScreen(screen)) {
                         HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown screen %s, so that text box is not shown", tutorial.id(), screen);
@@ -514,11 +517,13 @@ public class TutorialPlayer {
         Screen screen = Minecraft.getInstance().screen;
         Font font = Minecraft.getInstance().font;
 
-        // Null when the text box isn't shown, when its anchor can't be found, or if its screen isn't open
+        // Null when the text box isn't shown
+        // This includes if its screen isn't open, its anchor can't be found, or its unless anchor can be found
         if (!textBox.screens().isEmpty() && !TutorialScreens.matchesAny(textBox.screens(), screen)) return null;
         
         Rect2i anchor = TutorialAnchors.resolve(textBox.anchor());
         if (anchor == null) return null;
+        if (textBox.unlessAnchor() != null && TutorialAnchors.resolve(textBox.unlessAnchor()) != null) return null;
         
         // Icons are placed to the left of the text with reduced margins
         MatIcons.Icon icon = icons.get(textBox);

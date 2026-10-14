@@ -177,6 +177,7 @@ public class TutorialAdapter {
             offsetY,
             readWidth(json),
             readStrings(json, "screens"),
+            GsonHelper.getAsString(json, "unless_anchor", null),
             GsonHelper.getAsBoolean(json, "line", false),
             GsonHelper.getAsString(json, "line_anchor", null),
             GsonHelper.getAsInt(json, "line_width", 1),

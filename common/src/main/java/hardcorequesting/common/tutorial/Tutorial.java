@@ -24,9 +24,9 @@ public record Tutorial(String id, Component title, Component description, @Nulla
     }
 
     // A text box placed on the screen, including text content, anchor location, anchor side, gap from the anchor, offset, width, screens to display on,
-    // if it has a connecting line, the anchor of that line, the width of that line, if it's clamped in the window, and its icon's name
+    // the anchor that hides it, if it has a connecting line, the anchor of that line, the width of that line, if it's clamped in the window, and its icon's name
     // Its width is either the width its text wraps at, or ANCHOR_WIDTH to make the whole box exactly as wide as its anchor.
-    public record TextBox(Component text, String anchor, Side side, int gap, int offsetX, int offsetY, int width, List<String> screens, boolean line, @Nullable String lineAnchor, int lineWidth, boolean clamp, @Nullable String icon) {
+    public record TextBox(Component text, String anchor, Side side, int gap, int offsetX, int offsetY, int width, List<String> screens, @Nullable String unlessAnchor, boolean line, @Nullable String lineAnchor, int lineWidth, boolean clamp, @Nullable String icon) {
         public static final int DEFAULT_WIDTH = 180;
         public static final int ANCHOR_WIDTH = -1;
     }

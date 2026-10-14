@@ -78,7 +78,7 @@ public class TutorialAdapter {
         if (screens.isEmpty()) screens = List.of(type.equals("key") ? "gameplay" : "any");
         return switch (type) {
             case "click_text_box" -> new Tutorial.Trigger.ClickTextBox(readClicks(json));
-            case "screen_open" -> new Tutorial.Trigger.ScreenOpen(screens);
+            case "screen_open" -> new Tutorial.Trigger.ScreenOpen(screens, GsonHelper.getAsBoolean(json, "already_open", true));
             case "screen_close" -> new Tutorial.Trigger.ScreenClose(screens);
             case "key" -> {
                 List<String> keys = readStrings(json, "keys");

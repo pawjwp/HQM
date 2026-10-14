@@ -77,6 +77,7 @@ public class TutorialPlayer {
     private static class TriggerState {
         boolean done;
         boolean screenWasOpen; // if a screen_close trigger's screen was open during this step
+        boolean screenWasClosed; // if a screen_open trigger's screen was not open during this step
         int timerTicks;        // ticks counted so far for a timer trigger
         @Nullable
         Set<UUID> unclaimed;   // the quest of a reward_claim trigger that had an unclaimed reward last tick
@@ -163,8 +164,9 @@ public class TutorialPlayer {
             for (Tutorial.Trigger trigger : currentTriggers()) {
                 TriggerState state = state(trigger);
                 boolean open = TutorialScreens.matchesAny(trigger.screens(), minecraft.screen);
-                if (trigger instanceof Tutorial.Trigger.ScreenOpen && open) {
-                    state.done = true;
+                if (trigger instanceof Tutorial.Trigger.ScreenOpen screenOpen) {
+                    if (!open) state.screenWasClosed = true;
+                    else if (screenOpen.alreadyOpen() || state.screenWasClosed) state.done = true;
                 } else if (trigger instanceof Tutorial.Trigger.ScreenClose) {
                     if (open) state.screenWasOpen = true;
                     else if (state.screenWasOpen) state.done = true;

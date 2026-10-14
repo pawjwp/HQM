@@ -70,8 +70,8 @@ public record Tutorial(String id, Component title, Component description, @Nulla
         record ClickTextBox(List<Click> clicks) implements Trigger {
         }
 
-        // A screens opens, or is open
-        record ScreenOpen(List<String> screens) implements Trigger {
+        // A screens opens, or is open if alreadyOpen
+        record ScreenOpen(List<String> screens, boolean alreadyOpen) implements Trigger {
         }
 
         // A screen closes

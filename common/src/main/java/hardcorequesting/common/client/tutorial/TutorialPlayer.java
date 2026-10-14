@@ -225,6 +225,8 @@ public class TutorialPlayer {
                 }
                 if (!TutorialAnchors.isKnownAnchor(textBox.anchor())) {
                     HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses an unknown anchor %s, so that text box is not shown", tutorial.id(), textBox.anchor());
+                } else if (textBox.width() == Tutorial.TextBox.ANCHOR_WIDTH && textBox.anchor().startsWith("window/")) {
+                    HardcoreQuestingCore.LOGGER.warn("Tutorial %s uses the width of %s, which has no width, that text box will use the default width", tutorial.id(), textBox.anchor());
                 }
                 for (String screen : textBox.screens()) {
                     if (!TutorialScreens.isKnownScreen(screen)) {
@@ -513,8 +515,18 @@ public class TutorialPlayer {
         Rect2i anchor = TutorialAnchors.resolve(textBox.anchor());
         if (anchor == null) return null;
         
+        // Icons are placed to the left of the text with reduced margins
+        MatIcons.Icon icon = icons.get(textBox);
+        int textLeft = icon == null ? FRAME : OUTLINE + ICON_GAP + ICON_SIZE + ICON_GAP; // space left of the text
+
+        // Anchor width boxes are as wide as their anchor unless they have no width
+        boolean anchorWidth = textBox.width() == Tutorial.TextBox.ANCHOR_WIDTH && anchor.getWidth() > 0;
+        int wrapWidth = textBox.width();
+        if (anchorWidth) wrapWidth = Math.max(anchor.getWidth() - textLeft - FRAME, 1);
+        else if (wrapWidth == Tutorial.TextBox.ANCHOR_WIDTH) wrapWidth = Tutorial.TextBox.DEFAULT_WIDTH;
+
         // Each text box is as wide and tall as it needs to be to fit all lines (and line width is limited by configured size)
-        List<FormattedCharSequence> lines = font.split(textBox.text(), textBox.width());
+        List<FormattedCharSequence> lines = font.split(textBox.text(), wrapWidth);
         int textWidth = lines.stream().mapToInt(font::width).max().orElse(0);
         int textHeight = lines.size() * font.lineHeight;
 
@@ -526,7 +538,7 @@ public class TutorialPlayer {
         if (navigation) {
             int lastLine = lines.isEmpty() ? 0 : font.width(lines.get(lines.size() - 1));
             // increase size of text box as needed to accommodate the nav bar
-            if (lines.isEmpty() || lastLine + NAV_GAP + navWidth > textBox.width()) {
+            if (lines.isEmpty() || lastLine + NAV_GAP + navWidth > wrapWidth) {
                 navOffsetY = textHeight;
                 textHeight += NAV_HEIGHT - (lines.isEmpty() ? 0 : NAV_DROP);
                 textWidth = Math.max(textWidth, navWidth);
@@ -534,10 +546,7 @@ public class TutorialPlayer {
                 textWidth = Math.max(textWidth, lastLine + NAV_GAP + navWidth);
             }
         }
-        // Icons are placed to the left of the text with reduced margins
-        MatIcons.Icon icon = icons.get(textBox);
-        int textLeft = icon == null ? FRAME : OUTLINE + ICON_GAP + ICON_SIZE + ICON_GAP; // space left of the text
-        int width = textLeft + textWidth + FRAME;
+        int width = anchorWidth ? anchor.getWidth() : textLeft + textWidth + FRAME;
         int height = Math.max(textHeight + 2 * FRAME, icon == null ? 0 : ICON_SIZE + 2 * (OUTLINE + ICON_GAP));
         // Whichever of the text or icon is shorter will be centered to the text box
         int textTop = (height - textHeight + 1) / 2;

@@ -20,7 +20,6 @@ import java.util.Set;
  */
 public class TutorialAdapter {
     private static final String DEFAULT_ANCHOR = "window/center";
-    private static final int DEFAULT_WIDTH = 180;
     private static final Tutorial.Click LEFT_CLICK = new Tutorial.Click(0, false, false, false);
     private static final Set<String> MODIFIERS = Set.of("shift", "ctrl", "alt");
 
@@ -176,13 +175,19 @@ public class TutorialAdapter {
             GsonHelper.getAsInt(json, "gap", 0),
             offsetX,
             offsetY,
-            GsonHelper.getAsInt(json, "width", DEFAULT_WIDTH),
+            readWidth(json),
             readStrings(json, "screens"),
             GsonHelper.getAsBoolean(json, "line", false),
             GsonHelper.getAsInt(json, "line_width", 1),
             GsonHelper.getAsBoolean(json, "clamp", true),
             GsonHelper.getAsString(json, "icon", null)
         );
+    }
+
+    // A text box's width, set to "anchor" for a box the size of its anchor
+    private static int readWidth(JsonObject json) {
+        if (json.has("width") && GsonHelper.getAsString(json, "width").equals("anchor")) return Tutorial.TextBox.ANCHOR_WIDTH;
+        return GsonHelper.getAsInt(json, "width", Tutorial.TextBox.DEFAULT_WIDTH);
     }
 
     // An array of strings, empty if the key is missing

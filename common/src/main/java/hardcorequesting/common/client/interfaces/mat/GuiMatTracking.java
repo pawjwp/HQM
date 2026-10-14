@@ -49,30 +49,41 @@ import java.util.Set;
  */
 @Environment(EnvType.CLIENT)
 public class GuiMatTracking extends GuiBase implements MatScreen {
-    private static final int HEADER_Y = 20;               // heading y on both sides
-    private static final int TEXT_Y = 35;                 // first line of text content on both sides
-    private static final int LIST_X = 20;                 // x of the location heading
-    private static final int LIST_WIDTH = 137;
-    private static final int ROW_HEIGHT = 24;
-    private static final int VISIBLE_ROWS = 7;
-    private static final int LIST_SCROLL_X = 159;
-    private static final int SCROLL_Y = 30;
-    private static final int SCROLL_LENGTH = 166;
-    private static final int DIMENSION_X = 10;            // a dimension line's offset from its row
-    private static final int DIMENSION_Y = 10;
-    private static final int DELETE_X = 36;               // x of the delete button
-    private static final int STOP_X = 95;                 // x of the stop tracking button
-    private static final int BUTTON_Y = 200;              // y of both buttons
-    private static final int DETAILS_X = 176;             // x of the tracked location's name and details
+    // Both columns
+    private static final int HEADER_Y = 20;             // y of both headings
+    private static final int TEXT_Y = 35;               // y of the first line of text in both columns
+
+    // Location column
+    private static final int LOCATION_X = 20;           // x of the locations heading
+    private static final int LOCATION_WIDTH = 137;
+    private static final int DIMENSION_X = 10;          // the dimension line's offset from its row
+    private static final int DIMENSION_Y = 10;          // the dimension line's offset below the name
+    private static final int LOCATION_CONTENT_HEIGHT = 17; // a row's name line plus the smaller dimension line below it
+    private static final int LOCATION_ROW_HEIGHT = LOCATION_CONTENT_HEIGHT + 7;
+    private static final int VISIBLE_LOCATIONS = 7;
+    private static final int LOCATION_SCROLL_X = 159;
+
+    // Location buttons
+    private static final int DELETE_X = 36;             // x of the delete button
+    private static final int STOP_X = 95;               // x of the stop tracking button
+    private static final int BUTTON_Y = 200;            // y of both buttons
+
+    // Details column
+    private static final int DETAILS_X = 176;           // x of the tracked location's name and details
     private static final int DETAILS_WIDTH = 142;
-    private static final int MAP_SIZE = 128;              // vanilla maps are 128 pixels
-    private static final int MAP_X = DETAILS_X + (DETAILS_WIDTH - MAP_SIZE) / 2; // centered on the right half
-    private static final int MAP_BORDER = 2;              // width of the colored border around the map, matching the panel frame
-    private static final int MAP_Y = SCROLL_Y + MAP_BORDER;
+    private static final int MAP_SIZE = 128;            // vanilla maps are 128 pixels
+    private static final int MAP_X = DETAILS_X + (DETAILS_WIDTH - MAP_SIZE) / 2; // centered on the details column
+    private static final int MAP_Y = 32;                // the map's top, inside its border
+    private static final int MAP_BORDER = 2;            // width of the colored border around the map, matching the panel frame
     private static final int MAP_DETAILS_Y = MAP_Y + MAP_SIZE + MAP_BORDER + 4;
     private static final int DETAIL_ROW_HEIGHT = 12;
-    private static final int DETAIL_VALUE_GAP = 4;        // the minimum gap between a detail's label and value
-    private static final int DISTANCE_ROUNDING = 50;      // when the distance is hidden, round to this many blocks
+    private static final int DETAIL_VALUE_GAP = 4;      // the minimum gap between a detail's label and value
+    private static final int DISTANCE_ROUNDING = 50;    // when the distance is hidden, round to this many blocks
+
+    // The vertical placement position for both lists
+    // Starts at the top border of the map, ends at the bottom of the last visible location row
+    private static final int LIST_TOP = MAP_Y - MAP_BORDER;
+    private static final int LIST_HEIGHT = TEXT_Y + (VISIBLE_LOCATIONS - 1) * LOCATION_ROW_HEIGHT + LOCATION_CONTENT_HEIGHT - LIST_TOP;
 
     private record Detail(Component label, Component value) {}
 
@@ -95,7 +106,7 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
         this.background = ResourceHelper.getResource(MatMode.TRACKING.getBackgroundName());
         this.widgetSprites = WidgetSprites.fromMatMode(background);
 
-        this.locationList = new SelectableList<>(this, LIST_X, TEXT_Y, LIST_WIDTH, ROW_HEIGHT, VISIBLE_ROWS, LIST_SCROLL_X, SCROLL_Y, SCROLL_LENGTH) {
+        this.locationList = new SelectableList<>(this, LOCATION_X, TEXT_Y, LOCATION_WIDTH, LOCATION_ROW_HEIGHT, VISIBLE_LOCATIONS, LOCATION_SCROLL_X, LIST_TOP, LIST_HEIGHT) {
             @Override
             protected List<TrackedLocation> getEntries() {
                 return matData().locations;
@@ -108,14 +119,14 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
 
             @Override
             protected void drawRow(GuiGraphics graphics, TrackedLocation location, int x, int y, int color) {
-                drawString(graphics, trimToWidth(Component.literal(location.name()), LIST_WIDTH), x, y, color);
+                drawString(graphics, trimToWidth(Component.literal(location.name()), LOCATION_WIDTH), x, y, color);
                 drawString(graphics, displayName("dimension", location.dimension()), x + DIMENSION_X, y + DIMENSION_Y, 0.7F, HQMConfig.TEXT_HINT);
             }
 
             // Cut off text shows the full name of the location on hover
             @Override
             protected FormattedText getTooltip(TrackedLocation location) {
-                if (getStringWidth(location.name()) > LIST_WIDTH) return Component.literal(location.name());
+                if (getStringWidth(location.name()) > LOCATION_WIDTH) return Component.literal(location.name());
                 return null;
             }
 
@@ -190,9 +201,9 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
 
     // Draws the location list, its heading, and the buttons below it
     private void renderLocations(GuiGraphics graphics, int mX, int mY) {
-        drawString(graphics, Translator.translatable("hqm.mat.tracking.locations"), LIST_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
+        drawString(graphics, Translator.translatable("hqm.mat.tracking.locations"), LOCATION_X, HEADER_Y, HQMConfig.TEXT_NORMAL);
         if (matData().locations.isEmpty()) {
-            drawString(graphics, Translator.translatable("hqm.mat.tracking.empty"), LIST_X, TEXT_Y, 0.7F, HQMConfig.TEXT_HINT);
+            drawString(graphics, Translator.translatable("hqm.mat.tracking.empty"), LOCATION_X, TEXT_Y, 0.7F, HQMConfig.TEXT_HINT);
         }
         locationList.render(graphics, mX, mY);
         deleteButton.render(graphics, mX, mY);

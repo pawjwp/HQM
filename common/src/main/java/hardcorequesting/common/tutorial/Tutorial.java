@@ -30,7 +30,7 @@ public record Tutorial(String id, Component title, Component description, @Nulla
 
     // Where a text box is placed relative to its anchor point, with AUTO picking placing automatically towards the center
     public enum Side {
-        ABOVE, BELOW, LEFT, RIGHT, CENTER, AUTO;
+        ABOVE, BELOW, LEFT, RIGHT, CENTER, AUTO, INSIDE_TOP, INSIDE_BOTTOM, INSIDE_LEFT, INSIDE_RIGHT;
 
         public Side opposite() {
             return switch (this) {
@@ -38,6 +38,10 @@ public record Tutorial(String id, Component title, Component description, @Nulla
                 case BELOW -> ABOVE;
                 case LEFT -> RIGHT;
                 case RIGHT -> LEFT;
+                case INSIDE_TOP -> INSIDE_BOTTOM;
+                case INSIDE_BOTTOM -> INSIDE_TOP;
+                case INSIDE_LEFT -> INSIDE_RIGHT;
+                case INSIDE_RIGHT -> INSIDE_LEFT;
                 default -> this;
             };
         }

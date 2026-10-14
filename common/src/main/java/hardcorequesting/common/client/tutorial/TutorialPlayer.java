@@ -601,16 +601,20 @@ public class TutorialPlayer {
         }
     }
 
-    // The box's rectangle placed on the side of an anchor
+    // The box's rectangle placed on the side or inside of an anchor
     private static Rect2i place(Tutorial.Side side, Rect2i anchor, int width, int height, int gap) {
         int x = switch (side) {
             case LEFT -> anchor.getX() - width - gap;
             case RIGHT -> anchor.getX() + anchor.getWidth() + gap;
+            case INSIDE_LEFT -> anchor.getX() + gap;
+            case INSIDE_RIGHT -> anchor.getX() + anchor.getWidth() - width - gap;
             default -> anchor.getX() + (anchor.getWidth() - width) / 2;
         };
         int y = switch (side) {
             case ABOVE -> anchor.getY() - height - gap;
             case BELOW -> anchor.getY() + anchor.getHeight() + gap;
+            case INSIDE_TOP -> anchor.getY() + gap;
+            case INSIDE_BOTTOM -> anchor.getY() + anchor.getHeight() - height - gap;
             default -> anchor.getY() + (anchor.getHeight() - height) / 2;
         };
         return new Rect2i(x, y, width, height);

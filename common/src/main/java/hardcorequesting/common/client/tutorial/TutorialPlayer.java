@@ -8,6 +8,7 @@ import dev.architectury.event.events.client.ClientPlayerEvent;
 import dev.architectury.event.events.client.ClientRawInputEvent;
 import dev.architectury.event.events.client.ClientScreenInputEvent;
 import dev.architectury.event.events.client.ClientTickEvent;
+import dev.architectury.event.events.client.ClientTooltipEvent;
 import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.items.mat.MatPlayerData;
@@ -106,6 +107,17 @@ public class TutorialPlayer {
             if (Minecraft.getInstance().screen == null) render(graphics, Integer.MIN_VALUE, Integer.MIN_VALUE, partialTick);
         });
         ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, partialTick) -> render(graphics, mouseX, mouseY, partialTick));
+
+        // Don't draw tooltips when hovering over an area under a text box
+        ClientTooltipEvent.RENDER_PRE.register((graphics, texts, x, y) -> {
+            if (tutorial == null || !isClickable()) return EventResult.pass();
+            Minecraft minecraft = Minecraft.getInstance();
+            Window window = minecraft.getWindow();
+            double mouseX = minecraft.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
+            double mouseY = minecraft.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
+            if (isOverTextBox(mouseX, mouseY)) return EventResult.interruptFalse();
+            return EventResult.pass();
+        });
 
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((minecraft, screen, mouseX, mouseY, button) -> {
             if (tutorial == null) return EventResult.pass();

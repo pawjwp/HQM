@@ -221,7 +221,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
         statScroll.render(graphics, x, y);
 
         if (isPlaying(selectedTutorial)) {
-            TutorialPlayer.drawNavigation(graphics, font, navigationX(), top + HEADER_Y, mouseX, mouseY,
+            TutorialPlayer.drawNavigation(graphics, font, Tutorial.Navigation.FULL, navigationX(), top + HEADER_Y, mouseX, mouseY,
                     0xFF000000 | HQMConfig.TEXT_HINT,    // color
                     0xFF000000 | HQMConfig.TEXT_NORMAL,  // hovered
                     0xFF000000 | HQMConfig.DISABLED_SET, // disabled
@@ -279,14 +279,14 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
 
     // Horizontal starting coord of the navigation bar
     private int navigationX() {
-        return left + TUTORIAL_X + TUTORIAL_WIDTH - TutorialPlayer.navigationWidth(font);
+        return left + TUTORIAL_X + TUTORIAL_WIDTH - TutorialPlayer.navigationWidth(font, Tutorial.Navigation.FULL);
     }
 
     // The navigation buttons next to the tutorials heading
     @Nullable
     public Rect2i getNavigationArea() {
         if (!isPlaying(selectedTutorial)) return null;
-        return new Rect2i(navigationX() - left, HEADER_Y - 1, TutorialPlayer.navigationWidth(font), TutorialPlayer.NAV_HEIGHT);
+        return new Rect2i(navigationX() - left, HEADER_Y - 1, TutorialPlayer.navigationWidth(font, Tutorial.Navigation.FULL), TutorialPlayer.NAV_HEIGHT);
     }
 
     @Override
@@ -300,7 +300,7 @@ public class GuiMatInfo extends GuiBase implements MatScreen {
                 TutorialPlayer.previousStep();
                 return true;
             }
-            if (TutorialPlayer.nextArea(font, navigationX(), top + HEADER_Y).contains((int) mouseX, (int) mouseY)) {
+            if (TutorialPlayer.nextArea(font, Tutorial.Navigation.FULL, navigationX(), top + HEADER_Y).contains((int) mouseX, (int) mouseY)) {
                 TutorialPlayer.nextStep();
                 return true;
             }

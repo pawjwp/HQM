@@ -36,7 +36,7 @@ public class TutorialAdapter {
             GsonHelper.getAsString(json, "icon", null),
             GsonHelper.getAsBoolean(json, "default_unlocked", false),
             GsonHelper.getAsBoolean(json, "auto_play", false),
-            GsonHelper.getAsBoolean(json, "navigation", false),
+            readNavigation(json),
             steps
         );
     }
@@ -190,6 +190,15 @@ public class TutorialAdapter {
     private static int readWidth(JsonObject json) {
         if (json.has("width") && GsonHelper.getAsString(json, "width").equals("anchor")) return Tutorial.TextBox.ANCHOR_WIDTH;
         return GsonHelper.getAsInt(json, "width", Tutorial.TextBox.DEFAULT_WIDTH);
+    }
+
+    // A navigation style type
+    private static Tutorial.Navigation readNavigation(JsonObject json) {
+        if (!json.has("navigation")) return Tutorial.Navigation.NONE;
+        JsonElement navigation = json.get("navigation");
+        // interpret a boolean, full if true, none if false
+        if (navigation.getAsJsonPrimitive().isBoolean()) return navigation.getAsBoolean() ? Tutorial.Navigation.FULL : Tutorial.Navigation.NONE;
+        return Tutorial.Navigation.valueOf(navigation.getAsString().toUpperCase(Locale.ROOT));
     }
 
     // An array of strings, empty if the key is missing

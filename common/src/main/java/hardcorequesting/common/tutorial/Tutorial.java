@@ -7,11 +7,31 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 // The tutorial itself
-public record Tutorial(String id, Component title, Component description, @Nullable String icon, boolean defaultUnlocked, boolean autoPlay, boolean navigation, List<Step> steps) {
+public record Tutorial(String id, Component title, Component description, @Nullable String icon, boolean defaultUnlocked, boolean autoPlay, Navigation navigation, List<Step> steps) {
 
     // A step of a tutorial, including the text boxes and highlights it shows, the trigger that advances it to the next step,
     // the commands run when advancing, and how often those commands repeat
     public record Step(List<TextBox> textBoxes, List<Highlight> highlights, Trigger trigger, List<String> commands, CommandRepeat commandRepeat) {
+    }
+
+    // Which of the navigation controls are displayed in text boxes
+    public enum Navigation {
+        NONE(false, false, false),
+        FULL(true, true, true),
+        ARROWS(true, false, true),
+        COUNTER(false, true, false),
+        NEXT(false, false, true),
+        NEXT_COUNTER(false, true, true),
+        PREVIOUS(true, false, false),
+        PREVIOUS_COUNTER(true, true, false);
+
+        public final boolean previous, counter, next;
+
+        Navigation(boolean previous, boolean counter, boolean next) {
+            this.previous = previous;
+            this.counter = counter;
+            this.next = next;
+        }
     }
 
     // How often a step's commands run: once for each player, once each time the tutorial is played through, or every time the step finishes

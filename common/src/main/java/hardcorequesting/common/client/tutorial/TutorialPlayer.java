@@ -114,11 +114,12 @@ public class TutorialPlayer {
                 for (Tutorial.TextBox textBox : tutorial.steps().get(stepIndex).textBoxes()) {
                     Layout layout = layout(textBox);
                     if (layout == null || !layout.navigation()) continue;
-                    if (previousArea(layout.navX(), layout.navY()).contains((int) mouseX, (int) mouseY)) {
+                    Tutorial.Navigation style = tutorial.navigation();
+                    if (style.previous && previousArea(layout.navX(), layout.navY()).contains((int) mouseX, (int) mouseY)) {
                         previousStep();
                         return EventResult.interruptFalse();
                     }
-                    if (nextArea(minecraft.font, layout.navX(), layout.navY()).contains((int) mouseX, (int) mouseY)) {
+                    if (style.next && nextArea(minecraft.font, style, layout.navX(), layout.navY()).contains((int) mouseX, (int) mouseY)) {
                         nextStep();
                         return EventResult.interruptFalse();
                     }
@@ -483,7 +484,7 @@ public class TutorialPlayer {
             for (int i = 0; i < layout.lines().size(); i++) {
                 graphics.drawString(font, layout.lines().get(i), layout.textX(), layout.textY() + i * font.lineHeight, TEXT_COLOR, false);
             }
-            if (layout.navigation()) drawNavigation(graphics, font, layout.navX(), layout.navY(), mouseX, mouseY, BORDER_TOP, ARROW_HOVERED, ARROW_DISABLED, TEXT_COLOR);
+            if (layout.navigation()) drawNavigation(graphics, font, tutorial.navigation(), layout.navX(), layout.navY(), mouseX, mouseY, BORDER_TOP, ARROW_HOVERED, ARROW_DISABLED, TEXT_COLOR);
         }
         graphics.pose().popPose();
     }
@@ -543,8 +544,8 @@ public class TutorialPlayer {
         int textHeight = lines.size() * font.lineHeight;
 
         // Navigation controls show at the end of the last line
-        boolean navigation = /*screen != null &&*/ tutorial.navigation();
-        int navWidth = navigationWidth(font);
+        boolean navigation = /*screen != null &&*/ tutorial.navigation() != Tutorial.Navigation.NONE;
+        int navWidth = navigationWidth(font, tutorial.navigation());
         // Place navigation bar on the last line, offset NAV_DROP pixels down as long as the box is multiple lines tall
         int navOffsetY = textHeight - font.lineHeight + (lines.size() > 1 ? NAV_DROP : 0);
         if (navigation) {
@@ -587,25 +588,30 @@ public class TutorialPlayer {
         return (stepIndex + 1) + "/" + tutorial.steps().size();
     }
 
-    // Width of the navigation bar including both arrows, the step counter, and the gaps between them
-    public static int navigationWidth(Font font) {
-        return 2 * ARROW_WIDTH + 2 * NAV_SPACE + font.width(stepCounter()) - 1; // -1 since the font has a trailing pixel
+    // Width of the navigation bar's enabled parts (the previous arrow, the step counter, and the next arrow), and the gaps between them
+    public static int navigationWidth(Font font, Tutorial.Navigation style) {
+        int width = 0;
+        int parts = 0;
+        if (style.previous) { width += ARROW_WIDTH; parts++; }
+        if (style.counter) { width += font.width(stepCounter()) - 1; parts++; } // -1 since the font has a trailing pixel
+        if (style.next) { width += ARROW_WIDTH; parts++; }
+        return width + Math.max(parts - 1, 0) * NAV_SPACE;
     }
 
-    // The clickable areas of each arrow, slightly larger than the arrow itself
+    // The clickable areas of each arrow, slightly larger than the arrow itself. The previous arrow starts the bar and the next arrow ends it.
     public static Rect2i previousArea(int x, int y) {
         return new Rect2i(x - 2, y - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
     }
-    public static Rect2i nextArea(Font font, int x, int y) {
-        return new Rect2i(x + navigationWidth(font) - ARROW_WIDTH - 2, y - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
+    public static Rect2i nextArea(Font font, Tutorial.Navigation style, int x, int y) {
+        return new Rect2i(x + navigationWidth(font, style) - ARROW_WIDTH - 2, y - 1, ARROW_WIDTH + 4, NAV_HEIGHT + 2);
     }
 
-    // Draws the navigation bar at x, y in the given colors, used by text boxes and in the MAT
-    public static void drawNavigation(GuiGraphics graphics, Font font, int x, int y, int mouseX, int mouseY, int color, int hoveredColor, int disabledColor, int textColor) {
+    // Draws the navigation bar's enabled parts at x, y in the given colors, used by text boxes and in the MAT
+    public static void drawNavigation(GuiGraphics graphics, Font font, Tutorial.Navigation style, int x, int y, int mouseX, int mouseY, int color, int hoveredColor, int disabledColor, int textColor) {
         // dim arrows if not currently usable
-        drawArrow(graphics, x, y + 1, false, arrowColor(stepIndex > 0, previousArea(x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
-        drawArrow(graphics, x + navigationWidth(font) - ARROW_WIDTH, y + 1, true, arrowColor(canGoNext(), nextArea(font, x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
-        graphics.drawString(font, stepCounter(), x + ARROW_WIDTH + NAV_SPACE, y, textColor, false);
+        if (style.previous) drawArrow(graphics, x, y + 1, false, arrowColor(stepIndex > 0, previousArea(x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
+        if (style.next) drawArrow(graphics, x + navigationWidth(font, style) - ARROW_WIDTH, y + 1, true, arrowColor(canGoNext(), nextArea(font, style, x, y).contains(mouseX, mouseY), color, hoveredColor, disabledColor));
+        if (style.counter) graphics.drawString(font, stepCounter(), x + (style.previous ? ARROW_WIDTH + NAV_SPACE : 0), y, textColor, false);
     }
 
     private static int arrowColor(boolean enabled, boolean hovered, int color, int hoveredColor, int disabledColor) {

@@ -542,8 +542,8 @@ public class TutorialPlayer {
         int textWidth = lines.stream().mapToInt(font::width).max().orElse(0);
         int textHeight = lines.size() * font.lineHeight;
 
-        // Navigation controls show only when a screen is open at the end of the last line
-        boolean navigation = screen != null && tutorial.navigation();
+        // Navigation controls show at the end of the last line
+        boolean navigation = /*screen != null &&*/ tutorial.navigation();
         int navWidth = navigationWidth(font);
         // Place navigation bar on the last line, offset NAV_DROP pixels down as long as the box is multiple lines tall
         int navOffsetY = textHeight - font.lineHeight + (lines.size() > 1 ? NAV_DROP : 0);

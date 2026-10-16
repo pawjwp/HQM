@@ -14,10 +14,10 @@ import net.minecraft.nbt.CompoundTag;
 @Environment(EnvType.CLIENT)
 public class QuestBookKeyHandler {
     public static final String CATEGORY = "key.hqm.category";
-    public static KeyMapping openBook;
+    public static KeyMapping openQuests;
 
     public static void register() {
-        openBook = register("key.hqm.openBook");
+        openQuests = register("key.hqm.openQuests");
     }
 
     private static KeyMapping register(String name) {

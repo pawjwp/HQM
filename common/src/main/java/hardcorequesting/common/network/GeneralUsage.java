@@ -3,20 +3,19 @@ package hardcorequesting.common.network;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.GuiReward;
 import hardcorequesting.common.config.HQMConfig;
-import hardcorequesting.common.event.EventTrigger;
 import hardcorequesting.common.items.ModItems;
+import hardcorequesting.common.items.QuestBookItem;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
 import hardcorequesting.common.quests.QuestingData;
 import hardcorequesting.common.quests.QuestingDataManager;
 import hardcorequesting.common.quests.task.QuestTask;
-import hardcorequesting.common.team.PlayerEntry;
-import hardcorequesting.common.util.Translator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -62,22 +61,29 @@ public enum GeneralUsage {
     REQUEST_BOOK_OPEN {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
-            QuestingDataManager data = QuestingDataManager.getInstance();
-            if (!data.isQuestActive()) {
-                player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
-                return;
+            // Opens the quest book, using a held one if present.
+            // REQUIRE_BOOK skips the quest book if the player doesn't carry one.
+            Inventory inventory = player.getInventory();
+            ItemStack book = ItemStack.EMPTY;
+            int books = 0;
+            for (int i = 0; i < inventory.getContainerSize(); i++) {
+                ItemStack stack = inventory.getItem(i);
+                if (stack.getItem() instanceof QuestBookItem) {
+                    books++;
+                    // An OP book is opened over a normal book
+                    if (book.isEmpty() || stack.is(ModItems.enabledBook.get())) book = stack;
+                }
             }
-            if (HQMConfig.getInstance().Keybind.REQUIRE_BOOK
-                    && !player.getInventory().contains(new ItemStack(ModItems.book.get()))) {
-                return;
+            boolean requireBook = HQMConfig.getInstance().Keybind.REQUIRE_BOOK;
+            boolean canBook = !requireBook || books > 0;
+            for (InteractionHand hand : InteractionHand.values()) {
+                ItemStack held = player.getItemInHand(hand);
+                if (held.getItem() instanceof QuestBookItem) {
+                    QuestBookItem.open(player, held);
+                    return;
+                }
             }
-            EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
-            PlayerEntry entry = data.getQuestingData(player).getTeam().getEntry(player.getUUID());
-            if (entry != null) {
-                sendOpenBook(player, false);
-            } else {
-                player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
-            }
+            if (canBook) QuestBookItem.open(player, book);
         }
     };
     

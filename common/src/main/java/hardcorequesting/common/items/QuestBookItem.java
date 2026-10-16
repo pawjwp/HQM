@@ -53,53 +53,58 @@ public class QuestBookItem extends Item {
         
         if (!world.isClientSide && player instanceof ServerPlayer) {
             ItemStack stack = player.getItemInHand(hand);
-            QuestingDataManager questingData = QuestingDataManager.getInstance();
-            if (!questingData.isQuestActive()) {
-                player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
-            } else {
-                if (enabled) {
-                    CompoundTag compound = stack.getTagElement("hqm");
-                    if (compound != null && compound.contains(NBT_PLAYER)) {
-                        String uuidS = compound.getString(NBT_PLAYER);
-                        UUID uuid;
-                        try {
-                            uuid = UUID.fromString(uuidS);
-                        } catch (IllegalArgumentException e) {
-                            compound.remove(NBT_PLAYER);
-                            return InteractionResultHolder.fail(stack);
-                        }
-                        if (questingData.hasData(uuid)) {
-                            if (HardcoreQuestingCore.getServer().getProfilePermissions(player.getGameProfile()) >= 4) {
-                                Player subject = QuestingData.getPlayer(uuid);
-                                if (subject instanceof ServerPlayer) {
-                                    EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
-                                    PlayerEntry entry = questingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
-                                    if (entry != null) {
-                                        GeneralUsage.sendOpenBook(player, true);
-                                    } else {
-                                        player.sendSystemMessage(Translator.translatable("hqm.message.bookNoEntry"));
-                                    }
-                                }
-                            } else {
-                                player.sendSystemMessage(Translator.translatable("hqm.message.bookNoPermission"));
-                            }
-                        } else {
-                            player.sendSystemMessage(Translator.translatable("hqm.message.bookNoData"));
-                        }
-                    }
-                } else {
-                    EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
-                    PlayerEntry entry = questingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
-                    if (entry != null) {
-                        GeneralUsage.sendOpenBook(player, false);
-                    } else {
-                        player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
-                    }
-                }
-            }
+            open(player, stack);
             return InteractionResultHolder.success(stack);
         }
         return super.use(world, player, hand);
+    }
+
+    // Opens the quest book on the server
+    public static void open(Player player, ItemStack stack) {
+        QuestingDataManager questingData = QuestingDataManager.getInstance();
+        if (!questingData.isQuestActive()) {
+            player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
+        } else {
+            if (stack.is(ModItems.enabledBook.get())) {
+                CompoundTag compound = stack.getTagElement("hqm");
+                if (compound != null && compound.contains(NBT_PLAYER)) {
+                    String uuidS = compound.getString(NBT_PLAYER);
+                    UUID uuid;
+                    try {
+                        uuid = UUID.fromString(uuidS);
+                    } catch (IllegalArgumentException e) {
+                        compound.remove(NBT_PLAYER);
+                        return;
+                    }
+                    if (questingData.hasData(uuid)) {
+                        if (HardcoreQuestingCore.getServer().getProfilePermissions(player.getGameProfile()) >= 4) {
+                            Player subject = QuestingData.getPlayer(uuid);
+                            if (subject instanceof ServerPlayer) {
+                                EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), true, false));
+                                PlayerEntry entry = questingData.getQuestingData(subject).getTeam().getEntry(subject.getUUID());
+                                if (entry != null) {
+                                    GeneralUsage.sendOpenBook(player, true);
+                                } else {
+                                    player.sendSystemMessage(Translator.translatable("hqm.message.bookNoEntry"));
+                                }
+                            }
+                        } else {
+                            player.sendSystemMessage(Translator.translatable("hqm.message.bookNoPermission"));
+                        }
+                    } else {
+                        player.sendSystemMessage(Translator.translatable("hqm.message.bookNoData"));
+                    }
+                }
+            } else {
+                EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
+                PlayerEntry entry = questingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
+                if (entry != null) {
+                    GeneralUsage.sendOpenBook(player, false);
+                } else {
+                    player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
+                }
+            }
+        }
     }
     
     @Override

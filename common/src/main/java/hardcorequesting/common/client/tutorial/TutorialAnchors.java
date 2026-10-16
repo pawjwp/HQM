@@ -167,6 +167,7 @@ public class TutorialAnchors {
             case "mat/info/tutorials" -> new Rect2i(GuiMatInfo.TUTORIAL_X + GuiMatInfo.ICON_X, GuiMatInfo.LIST_TOP, GuiMatInfo.TUTORIAL_LIST_WIDTH, GuiMatInfo.LIST_HEIGHT);
             case "mat/info/play" -> new Rect2i(GuiMatInfo.PLAY_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
             case "mat/info/restart" -> new Rect2i(GuiMatInfo.RESTART_X, GuiMatInfo.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
+            case "mat/info/buttons" -> new Rect2i(GuiMatInfo.PLAY_X, GuiMatInfo.BUTTON_Y, GuiMatInfo.RESTART_X + LargeButton.BUTTON_WIDTH - GuiMatInfo.PLAY_X, LargeButton.BUTTON_HEIGHT);
             case "mat/info/navigation" -> info.getNavigationArea();
             case "mat/info/statistics" -> new Rect2i(GuiMatInfo.STAT_X + GuiMatInfo.ICON_X, GuiMatInfo.LIST_TOP, GuiMatInfo.STAT_LIST_WIDTH, GuiMatInfo.LIST_HEIGHT);
             default -> null;
@@ -180,6 +181,7 @@ public class TutorialAnchors {
             case "mat/tracking/locations" -> new Rect2i(GuiMatTracking.LOCATION_X, GuiMatTracking.LIST_TOP, GuiMatTracking.LOCATION_WIDTH, GuiMatTracking.LIST_HEIGHT);
             case "mat/tracking/delete" -> new Rect2i(GuiMatTracking.DELETE_X, GuiMatTracking.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
             case "mat/tracking/stop" -> new Rect2i(GuiMatTracking.STOP_X, GuiMatTracking.BUTTON_Y, LargeButton.BUTTON_WIDTH, LargeButton.BUTTON_HEIGHT);
+            case "mat/tracking/buttons" -> new Rect2i(GuiMatTracking.DELETE_X, GuiMatTracking.BUTTON_Y, GuiMatTracking.STOP_X + LargeButton.BUTTON_WIDTH - GuiMatTracking.DELETE_X, LargeButton.BUTTON_HEIGHT);
             case "mat/tracking/details" -> tracking.getDetailsArea();
             default -> null;
         };
@@ -250,8 +252,8 @@ public class TutorialAnchors {
                 return target.matches("\\d+") || TutorialItems.isKnownItem(target);
             }
         }
-        if (anchor.matches("mat/info/(tutorials|play|restart|navigation|statistics)")) return true;
-        if (anchor.matches("mat/tracking/(locations|delete|stop|details)")) return true;
+        if (anchor.matches("mat/info/(tutorials|play|restart|buttons|navigation|statistics)")) return true;
+        if (anchor.matches("mat/tracking/(locations|delete|stop|buttons|details)")) return true;
         if (anchor.matches("quest_book/(panel|back|claim|open|description|menu/quests|menu/lives|menu/reputation)")) return true;
         if (anchor.startsWith(TutorialScreens.QUEST_BOOK_QUEST) || anchor.startsWith(TutorialScreens.QUEST_BOOK_SET)) return TutorialScreens.isKnownScreen(anchor);
         for (MatMode mode : MatMode.values()) {

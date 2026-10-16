@@ -99,6 +99,7 @@ processResources {
 }
 
 shadowJar {
+    from rootProject.file("LICENSE.md"), rootProject.file("LICENSE_ART.md")
     relocate "hardcorequesting.common", "hardcorequesting.common.fabric"
     filesMatching("fabric.mod.json") {
         filter { it.replace("hardcorequesting.common.client", "hardcorequesting.common.fabric.client") }
@@ -115,7 +116,6 @@ remapJar {
 }
 
 jar {
-    from "LICENSE"
     archiveClassifier = "dev"
 }
 
@@ -123,10 +123,6 @@ sourcesJar {
     def commonSources = project(":common").sourcesJar
     dependsOn commonSources
     from commonSources.archiveFile.map { zipTree(it) }
-}
-
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
 }
 
 loom {

@@ -3,7 +3,7 @@
   "id": "hardcorequesting",
   "version": "${version}",
   "name": "Hardcore Questing Mode",
-  "description": "This mod will add Hardcore mode with extra lives. If you use up your lives, your world will be deleted or you will be banned.",
+  "description": "A questing system that modpacks can use to guide players or reward progress, with support for teams, lives, loot bags and reputations.",
   "authors": [
     "Vswe",
     "Lorddusk",
@@ -14,12 +14,14 @@
     "ArclightTW",
     "shedaniel",
     "kirderf1",
-    "CodexAdrian"
+    "CodexAdrian",
+    "pawjwp"
   ],
   "contact": {
-    "sources": "https://github.com/shedaniel/HQM",
-    "issues": "https://github.com/shedaniel/HQM/issues"
+    "sources": "https://github.com/pawjwp/HQM",
+    "issues": "https://github.com/pawjwp/HQM/issues"
   },
+  "license": "LGPL-3.0-only",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
@@ -41,11 +43,11 @@
   ],
   "accessWidener": "hqm.accesswidener",
   "depends": {
-    "fabricloader": ">=0.14",
-    "fabric": ">=0.81",
-    "minecraft": ">=1.19.4",
+    "fabricloader": ">=0.16.14",
+    "fabric-api": ">=0.92.12",
+    "minecraft": "1.20.1",
     "java": ">=17",
-    "architectury": ">=8",
+    "architectury": ">=9.1.12 <10",
     "cardinal-components-base": ">=5",
     "cardinal-components-entity": ">=5"
   },

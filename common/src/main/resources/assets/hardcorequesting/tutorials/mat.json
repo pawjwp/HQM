@@ -1,8 +1,162 @@
 {
-  "title": { "translate": "hqm.tutorial.mat.title", "fallback": "The MAT" },
-  "description": { "translate": "hqm.tutorial.mat.description", "fallback": "How to use your MAT" },
+  "title": { "translate": "hqm.tutorial.mat.title" },
+  "description": { "translate": "hqm.tutorial.mat.description" },
   "icon": "hardcorequesting:mat",
+  "navigation": "arrows",
   "steps": [
-    { "text_boxes": [ { "text": "Not finished yet.", "anchor": "window/center" } ] }
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.open", "with": [ { "keybind": "key.use", "color": "yellow" } ] },
+          "anchor": "hud/hotbar/selected/hardcorequesting:mat", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"] },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarSelect" },
+          "anchor": "hud/hotbar/hardcorequesting:mat", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/selected/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarMove" },
+          "anchor": "hud/hotbar", "side": "above", "gap": 40, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarMove" },
+          "anchor": "inventory/hardcorequesting:mat", "gap": 10, "line": true, "screens": ["inventory"], "unless_anchor": "hud/hotbar/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.welcome" },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 14, "screens": ["mat"] },
+        { "text": { "translate": "hqm.tutorial.mat.summary" },
+          "anchor": "mat/panel", "side": "inside_bottom", "gap": 10, "screens": ["mat"] }
+      ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.info", "with": [ { "translate": "hqm.mat.mode.info", "color": "#6FDFDF" } ] },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 30, "screens": ["mat/info"] }
+      ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.tutorials" },
+          "anchor": "mat/info/tutorials", "side": "right", "gap": 8, "line": true }
+      ],
+      "highlights": [ { "anchor": "mat/info/tutorials" } ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.buttons", "with": [ { "translate": "hqm.mat.info.play", "color": "#6FDFDF" }, { "translate": "hqm.mat.info.restart", "color": "#6FDFDF" } ] },
+          "anchor": "mat/info/buttons", "side": "above", "gap": 8, "line": true }
+      ],
+      "highlights": [ { "anchor": "mat/info/buttons" } ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.navigation" },
+          "anchor": "mat/info/navigation", "side": "right", "gap": 10, "line": true },
+        { "text": { "translate": "hqm.tutorial.mat.navigationSelect", "with": [ { "translate": "hqm.tutorial.mat.title", "color": "#6FDFDF" } ] },
+          "anchor": "mat/info/tutorials", "side": "right", "gap": 8, "line": true, "screens": ["mat/info"], "unless_anchor": "mat/info/navigation" }
+      ],
+      "highlights": [ { "anchor": "mat/info/navigation" } ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.statistics", "with": [ { "translate": "hqm.mat.mode.info", "color": "#6FDFDF" } ] },
+          "anchor": "mat/info/statistics", "side": "left", "gap": 8, "line": true }
+      ],
+      "highlights": [ { "anchor": "mat/info/statistics" } ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.tabs", "with": [ { "translate": "hqm.mat.mode.crafting", "color": "#DFD76F" } ] },
+          "anchor": "mat/tab_bar", "side": "below", "gap": 8, "line": true, "line_anchor": "mat/tab/crafting" }
+      ],
+      "highlights": [ { "anchor": "mat/tab/crafting" } ],
+      "trigger": { "type": "any", "triggers": [ { "type": "click_text_box" }, { "type": "screen_open", "screens": ["mat/crafting"], "already_open": false } ] }
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.crafting", "with": [ { "translate": "hqm.mat.mode.crafting", "color": "#DFD76F" } ] },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 30, "screens": ["mat"] }
+      ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.trackingOpen", "with": [ { "translate": "hqm.mat.mode.tracking", "color": "#7FDF6F" } ] },
+          "anchor": "mat/tab/tracking", "side": "left", "gap": 8, "line": true },
+        { "text": { "translate": "hqm.tutorial.mat.trackingOpen", "with": [ { "translate": "hqm.mat.mode.tracking", "color": "#7FDF6F" } ] },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 30, "screens": ["mat"], "unless_anchor": "mat/tab/tracking" }
+      ],
+      "highlights": [ { "anchor": "mat/tab/tracking" } ],
+      "trigger": { "type": "any", "triggers": [ { "type": "click_text_box" }, { "type": "screen_open", "screens": ["mat/tracking"], "already_open": false } ] }
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.tracking", "with": [ { "translate": "hqm.mat.mode.tracking", "color": "#7FDF6F" } ] },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 30, "screens": ["mat"] },
+        { "text": { "translate": "hqm.tutorial.mat.trackingLocations" },
+          "anchor": "mat/panel", "side": "inside_bottom", "gap": 38, "offset": [-77, 0], "width": 130, "screens": ["mat/tracking"] },
+        { "text": { "translate": "hqm.tutorial.mat.trackingDetails" },
+          "anchor": "mat/panel", "side": "inside_bottom", "gap": 38, "offset": [77, 0], "width": 130, "screens": ["mat/tracking"] }
+      ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.questingOpen", "with": [ { "translate": "hqm.mat.mode.questing", "color": "#6F93DF" } ] },
+          "anchor": "mat/tab/quest", "side": "right", "gap": 8, "line": true },
+        { "text": { "translate": "hqm.tutorial.mat.questingOpen", "with": [ { "translate": "hqm.mat.mode.questing", "color": "#6F93DF" } ] },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 30, "screens": ["mat"], "unless_anchor": "mat/tab/quest" }
+      ],
+      "highlights": [ { "anchor": "mat/tab/quest" } ],
+      "trigger": { "type": "any", "triggers": [ { "type": "click_text_box" }, { "type": "screen_open", "screens": ["mat/quest"], "already_open": false } ] }
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.questing", "with": [ { "translate": "hqm.mat.mode.questing", "color": "#6F93DF" } ] },
+          "anchor": "mat/panel", "side": "inside_top", "gap": 30, "screens": ["mat"] },
+        { "text": { "translate": "hqm.tutorial.mat.questingScreen" },
+          "anchor": "mat/panel", "side": "inside_bottom", "gap": 26, "screens": ["mat/quest"] }
+      ]
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.close", "with": [ { "translate": "key.keyboard.escape", "color": "yellow" } ] },
+          "anchor": "mat/panel", "side": "inside_bottom", "gap": 26, "screens": ["mat"] }
+      ],
+      "trigger": { "type": "screen_open", "screens": ["gameplay"] }
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.hold" },
+          "anchor": "hud/hotbar/hardcorequesting:mat", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/selected/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarMove" },
+          "anchor": "hud/hotbar", "side": "above", "gap": 40, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.switching", "with": [ { "keybind": "key.sneak", "color": "yellow" }, { "keybind": "key.use", "color": "yellow" } ] },
+          "anchor": "hud/hotbar/selected/hardcorequesting:mat", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"] }
+      ],
+      "trigger": { "type": "any", "triggers": [
+        { "type": "all", "triggers": [
+          { "type": "key", "keys": ["key.sneak"] },
+          { "type": "key", "keys": ["key.use"] },
+          { "type": "holding", "items": ["hardcorequesting:mat{Mode:1}", "hardcorequesting:mat{Mode:2}", "hardcorequesting:mat{Mode:-1}", "hardcorequesting:mat{Mode:-2}"] }
+        ] },
+        { "type": "click_text_box" }
+      ] }
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.open", "with": [ { "keybind": "key.use", "color": "yellow" } ] },
+          "anchor": "hud/hotbar/selected/hardcorequesting:mat{Mode:0}", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"] },
+        { "text": { "translate": "hqm.tutorial.mat.infoCycle", "with": [ { "translate": "hqm.mat.mode.info", "color": "#6FDFDF" } ] },
+          "anchor": "hud/hotbar/selected/hardcorequesting:mat", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/selected/hardcorequesting:mat{Mode:0}" },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarSelect" },
+          "anchor": "hud/hotbar/hardcorequesting:mat", "side": "above", "gap": 20, "line": true, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/selected/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarMove" },
+          "anchor": "hud/hotbar", "side": "above", "gap": 40, "screens": ["gameplay"], "unless_anchor": "hud/hotbar/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.hotbarMove" },
+          "anchor": "inventory/hardcorequesting:mat", "gap": 10, "line": true, "screens": ["inventory"], "unless_anchor": "hud/hotbar/hardcorequesting:mat" },
+        { "text": { "translate": "hqm.tutorial.mat.infoOpen", "with": [ { "translate": "hqm.mat.mode.info", "color": "#6FDFDF" } ] },
+          "anchor": "mat/tab/info", "side": "below", "gap": 8, "line": true, "screens": ["mat/quest", "mat/crafting", "mat/tracking", "mat/storage"] }
+      ],
+      "highlights": [ { "anchor": "mat/tab/info" } ],
+      "trigger": { "type": "any", "triggers": [ { "type": "click_text_box" }, { "type": "screen_open", "screens": ["mat/info"], "already_open": false } ] }
+    },
+    {
+      "text_boxes": [
+        { "text": { "translate": "hqm.tutorial.mat.ending", "with": [ { "text": "✔", "color": "#10A010" }, { "translate": "hqm.mat.mode.info", "color": "#6FDFDF" } ] },
+          "anchor": "mat/info/tutorials", "side": "right", "gap": 8, "line": true }
+      ],
+      "highlights": [ { "anchor": "mat/info/tutorials" } ]
+    }
   ]
 }

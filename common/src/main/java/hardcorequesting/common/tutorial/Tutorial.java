@@ -110,8 +110,8 @@ public record Tutorial(String id, Component title, Component description, @Nulla
         record Timer(int ticks) implements Trigger {
         }
 
-        // The player has a number of specified items, by id or #tag
-        record HasItem(List<String> items, int count) implements Trigger {
+        // The player has a number of specified items, by id or #tag, in their inventory or hand
+        record HasItem(List<String> items, int count, boolean held) implements Trigger {
         }
 
         // The player is located at the listed position, in the listed dimensions, or in the listed biomes

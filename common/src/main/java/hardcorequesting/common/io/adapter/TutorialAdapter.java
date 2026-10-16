@@ -95,12 +95,12 @@ public class TutorialAdapter {
                 if (ticks <= 0) throw new JsonSyntaxException("A timer trigger needs a valid second count");
                 yield new Tutorial.Trigger.Timer(ticks);
             }
-            case "has_item" -> {
+            case "has_item", "holding" -> {
                 List<String> items = readStrings(json, "items");
-                if (items.isEmpty()) throw new JsonSyntaxException("A has_item trigger needs a list of items");
+                if (items.isEmpty()) throw new JsonSyntaxException("A " + type + " trigger needs a list of items");
                 int count = GsonHelper.getAsInt(json, "count", 1);
-                if (count < 1) throw new JsonSyntaxException("A has_item trigger needs a count of at least 1");
-                yield new Tutorial.Trigger.HasItem(items, count);
+                if (count < 1) throw new JsonSyntaxException("A " + type + " trigger needs a count of at least 1");
+                yield new Tutorial.Trigger.HasItem(items, count, type.equals("holding"));
             }
             case "location" -> {
                 BlockPos position = null;

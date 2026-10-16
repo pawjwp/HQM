@@ -185,7 +185,7 @@ public class TutorialPlayer {
                     else if (state.screenWasOpen) state.done = true;
                 } else if (trigger instanceof Tutorial.Trigger.Timer timer && !state.done && !minecraft.isPaused() && ++state.timerTicks >= timer.ticks()) {
                     state.done = true;
-                } else if (trigger instanceof Tutorial.Trigger.HasItem hasItem && !state.done && TutorialItems.count(minecraft.player, hasItem.items()) >= hasItem.count()) {
+                } else if (trigger instanceof Tutorial.Trigger.HasItem hasItem && !state.done && TutorialItems.count(minecraft.player, hasItem.items(), hasItem.held()) >= hasItem.count()) {
                     state.done = true;
                 } else if (trigger instanceof Tutorial.Trigger.Location location && !state.done && TutorialLocations.matches(location, minecraft.player)) {
                     state.done = true;

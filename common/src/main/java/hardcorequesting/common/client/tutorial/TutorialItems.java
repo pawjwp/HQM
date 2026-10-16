@@ -20,17 +20,20 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The items that a has_item trigger can activate on and slot anchors can use
+ * The items that a has_item or holding trigger can activate on and slot anchors can use
  */
 @Environment(EnvType.CLIENT)
 public class TutorialItems {
     private static final Map<String, CompoundTag> PARSED_NBT = new HashMap<>(); // each item's NBT
 
     // How many of the player's items match any of the names, counting the main inventory, armor and offhand
-    public static int count(Player player, List<String> names) {
+    // If held is true, only items in the main and offhand count
+    public static int count(Player player, List<String> names, boolean held) {
         Inventory inventory = player.getInventory();
+        List<List<ItemStack>> slotLists = List.of(inventory.items, inventory.armor, inventory.offhand);
+        if (held) slotLists = List.of(List.of(player.getMainHandItem(), player.getOffhandItem()));
         int count = 0;
-        for (List<ItemStack> slots : List.of(inventory.items, inventory.armor, inventory.offhand)) {
+        for (List<ItemStack> slots : slotLists) {
             for (ItemStack stack : slots) {
                 if (!stack.isEmpty() && matchesAny(names, stack)) count += stack.getCount();
             }

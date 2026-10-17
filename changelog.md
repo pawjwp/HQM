@@ -1,3 +1,64 @@
+### 5.20.0 for 1.20.1 (16.10.2026 by pawjwp):
+This is the first update by [pawjwp](https://github.com/pawjwp), as part of the new Multipurpose Assistance Terminal mod, forked from HQM [here](https://github.com/pawjwp/HQM). This update includes a keybind to open the quest book, automatic quest file backups, JEI integration, biome and structure versions of location tasks, a new trigger type, grid snapping in the quest editor, configurable quest book colors, and various other improvements and bug fixes. See the [Questing Changes](https://github.com/pawjwp/HQM/wiki/Questing-Changes) wiki page for more information.
+
+#### Quest Book
+- Added an "Open Quests" keybind
+    - If the `REQUIRE_BOOK` config option is disabled, players don't need a quest book in their inventory to use the keybind
+- Aligned/centered quests, quest icons, and connecting lines
+    - The hexagonal quest markers are now properly centered, symmetrical, and an even number of pixels wide
+    - The items used as quest icons are now centered in their frame
+    - Connecting lines between quests are no longer drawn at 0.96x scale, meaning they are now centered to their quests instead of offset slightly to the top left corner
+    - Connecting lines are slightly thinner than before, but can be adjusted from the `LINE_THICKNESS` config option
+- Added an experimental UI scale option
+    - The `UI_SCALE_MULTIPLIER` config option can be edited to draw the UI at a larger scale when HQM screens are open (to make small text easier to read)
+- Added JEI integration
+    - JEI's "show recipe" and "show uses" hotkeys now work on items in quest tasks and rewards
+    - If the `SHOW_JEI_SIDEBAR` config option is enabled, JEI can display on the side of the quest book as well
+- Configurable quest book colors
+    - Most hardcoded color values can now be changed in the config, including all text colors
+    - Text colors are automatically reloaded from the config whenever it changes (along with most other clientside config options)
+- Fixed quest set completion percentage calculation
+    - The calculation now excludes quests that can't be completed, so trigger quests and quests locked by option links no longer count against them
+
+#### Quest Files
+- Added quest save file backups (in the style of the vanilla `level.dat` backups)
+    - All data files like player quest progress and team data now saves the previous version when saving
+    - Missing or invalid files automatically restore from their backups
+    - Files are written safely so crashing mid-save won't erase a save file and will just fall back to the previous one, usually from a few minutes earlier
+- Each quest in quest set files now stores the coordinates of its centerpoint instead of its top-left corner
+    - Old files are automatically migrated on first load/save
+- Quest and team data is now stored in UUID order so new save files don't reorder the whole file, and it shows up cleanly in version control
+
+#### Quest Editing
+- Location tasks can now require a specific biome or structure to be detected, as well as the position and dimension they required before
+- Added the "Preview Reversed Trigger" trigger type
+    - Makes a quest visible when one of its parent quests is unlocked, so players can see one quest ahead
+- Specific item tag precision
+    - Item tasks set to tag precision can now require a specific tag instead of all tags that item matches against
+    - A new "Cycle display" toggle lets the item icon cycle through each item in the tag
+- Detect item tasks now count items in the armor slots and offhand
+    - Consume item tasks still only take items from the main inventory
+- Added optional grid snapping in the quest editor
+    - When the `SNAP_TO_GRID` config option is enabled, quest markers snap to a configured grid while being moved
+    - Hold Shift to ignore the grid
+- Quest set names and the quest book's main description can now use translation keys
+
+#### Bug Fixes
+- Fixed `LOSE_QUEST_BOOK` config option not working on Fabric
+- Fixed the front page image (`front.png`) being drawn without proper transparency
+- Fixed heart recipes not unlocking in the recipe book when picking them up for the first time
+
+#### Upgrade notes
+- Older quest packs are automatically migrated upon load
+    - `description.txt` is replaced by `description.json` to support more fields and translation
+    - Quest set files
+        - Quest marker coordinates are converted to the marker's center instead of its top-left corner 
+        - Quest set file names are changed to be safe on every file system
+        - Quest set files now store a version number so they only attempt to migrate older versions
+- Resource pack changes
+    - The quest markers at `textures/gui/questmap.png` were slightly moved and increased in size to properly center them
+    - The texture `threequarts.png` was renamed to `threequartsheart.png` for consistency
+
 ### 5.16.0 for 1.20.1 (30.10.2023 by Kirderf1):
 - Added "/hqm reset" command
 - Fix world load crash when the world has quest progress data with a missing quest

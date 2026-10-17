@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatType;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -73,7 +74,12 @@ public final class StatKey {
         StatType<?> type = BuiltInRegistries.STAT_TYPE.getOptional(ResourceLocation.tryParse(parts[0])).orElse(null);
         ResourceLocation value = ResourceLocation.tryParse(parts[1]);
         if (type == null || value == null) return Component.literal(key);
-        return typedName(type, value);
+        Component name = typedName(type, value);
+        if (type == Stats.CUSTOM) return name;
+        // Construct the stat name, such as "Stone Mined" or "Zombie Kills"
+        ResourceLocation typeId = BuiltInRegistries.STAT_TYPE.getKey(type);
+        Component typeName = Component.translatableWithFallback("stat_type." + typeId.toLanguageKey(), typeId.toString());
+        return Component.translatableWithFallback("hqm.mat.stat.type." + typeId.toLanguageKey(), "%s (%s)", name, typeName);
     }
 
     private static <T> Component typedName(StatType<T> type, ResourceLocation valueId) {

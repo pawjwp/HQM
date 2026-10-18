@@ -7,10 +7,11 @@ issueTrackerURL = "https://github.com/pawjwp/HQM/issues"
 [[mods]]
 modId = "hardcorequesting"
 version = "${version}"
-displayName = "Hardcore Questing Mode"
+displayName = "Multipurpose Assistance Terminal"
 displayURL = "https://github.com/pawjwp/HQM"
+logoBlur = false
 description = '''
-A questing system that modpacks can use to guide players or reward progress, with support for teams, lives, loot bags and reputations.
+A questing mod forked from HQM that adds a customizable multipurpose terminal, alongside various quality of life improvements.
 '''
 
 [[dependencies.hardcorequesting]]

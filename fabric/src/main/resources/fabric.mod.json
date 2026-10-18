@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "hardcorequesting",
   "version": "${version}",
-  "name": "Hardcore Questing Mode",
-  "description": "A questing system that modpacks can use to guide players or reward progress, with support for teams, lives, loot bags and reputations.",
+  "name": "Multipurpose Assistance Terminal",
+  "description": "A questing mod forked from HQM that adds a customizable multipurpose terminal, alongside various quality of life improvements.",
   "authors": [
     "Vswe",
     "Lorddusk",

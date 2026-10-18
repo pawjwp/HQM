@@ -70,6 +70,7 @@ dependencies {
 
 processResources {
     inputs.property "version", project.version
+    from(project(":common").file("src/main/resources/icon.png"))
 
     filesMatching("META-INF/mods.toml") {
         expand "version": project.version

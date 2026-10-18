@@ -73,20 +73,24 @@ public class MatUnlocks {
         return Result.UNLOCKED;
     }
 
-    // Unlocks a location (must be resolved already)
+    // Unlocks locations (must be resolved already)
     public static int addLocations(ServerPlayer player, List<TrackedLocation> locations, boolean showToast) {
-        if (locations.isEmpty()) return 0;
-        data(player).locations.addAll(locations);
+        MatPlayerData mat = data(player);
+        // Skip locations the player already has at that same position and dimension
+        List<TrackedLocation> added = locations.stream().filter(location -> mat.locations.stream()
+                .noneMatch(tracked -> tracked.dimension().equals(location.dimension()) && tracked.pos().equals(location.pos()))).toList();
+        if (added.isEmpty()) return 0;
+        mat.locations.addAll(added);
         GeneralUsage.sendMatDataSync(player);
         if (showToast) {
-            Component message = locations.size() == 1
-                    ? Component.literal(locations.get(0).name())
-                    : Component.translatable("hqm.mat.toast.location.multiple", locations.size());
+            Component message = added.size() == 1
+                    ? Component.literal(added.get(0).name())
+                    : Component.translatable("hqm.mat.toast.location.multiple", added.size());
             toast(player, itemIcon(ModItems.locationDataChip.get().getDefaultInstance()),
                     Component.translatable("hqm.mat.toast.location"), message);
         }
         // returns count of added locations
-        return locations.size();
+        return added.size();
     }
 
     // Removes the matching tutorials along with their completion and saved progress, so unlocking one again starts fresh

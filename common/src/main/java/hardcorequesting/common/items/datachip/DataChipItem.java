@@ -21,6 +21,7 @@ import java.util.List;
  * A data chip is used to "upload" unlocked information to be used in a MAT unit.
  */
 public abstract class DataChipItem extends Item {
+    private static final int COOLDOWN = 20;
     private final MatMode themeMode;
 
     protected DataChipItem(MatMode themeMode) {
@@ -43,6 +44,7 @@ public abstract class DataChipItem extends Item {
         if (level.isClientSide || !(player instanceof ServerPlayer serverPlayer)) {
             return InteractionResultHolder.success(stack);
         }
+        player.getCooldowns().addCooldown(this, COOLDOWN);
         if (apply(serverPlayer, stack)) {
             if (shouldConsume(stack)) stack.shrink(1);
             return InteractionResultHolder.success(stack);

@@ -65,7 +65,10 @@ public class LocationDataChipItem extends DataChipItem {
             player.sendSystemMessage(Component.translatable("hqm.mat.chip.location.notFound"));
             return false;
         }
-        MatUnlocks.addLocations(player, results, true);
+        if (MatUnlocks.addLocations(player, results, true) == 0) {
+            player.sendSystemMessage(Component.translatable("hqm.mat.chip.alreadyUnlocked"));
+            return false;
+        }
         return true;
     }
 

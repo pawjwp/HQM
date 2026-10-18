@@ -1,3 +1,47 @@
+### 6.0.0 for 1.20.1 (17.10.2026 by pawjwp):
+This update adds the Multipurpose Assistance Terminal (MAT), an item that combines the quest book with several other tools. This includes a comprehensive tutorial system that can be used by modpack authors to explain thing in-game with on-screen text boxes. See the [wiki](https://github.com/pawjwp/HQM/wiki) for more information.
+
+#### The MAT
+- Added the MAT itself, which can be toggled on/off with the `ENABLE_MAT` config option
+    - Right-clicking opens its current mode, and sneak + right-click switches to the next mode
+    - The item's name and color changes to show its current mode
+    - Each mode can be toggled separately with their own config options
+- The MAT has a tab bar at the top of each screen to switch between modes
+    - If the `TABS_SWITCH_DEFAULT_MODE` config option is enabled, switching tabs also changes the mode of the MAT item itself
+- Each MAT mode has a keybind, which are unbound by default
+    - If the MAT is enabled, the "Open Quests" keybind will prioritize opening the MAT over the quest book
+- The `LOSE_QUEST_BOOK` config option applies to the MAT as well
+
+#### MAT Modes
+- Info mode lists the player's unlocked tutorials and statistics
+    - Statistics
+        - Time played, deaths, and mob kills are unlocked by default shown in the Info screen's statistics list
+        - Any vanilla or modded statistic can be unlocked (see the [Minecraft Wiki](https://minecraft.wiki/w/Statistics) for information about each statistic)
+        - Three custom "life signs" statistics are available that show the number of hostile, neutral, and friendly mobs near the player (the nearby search radius can be changed with the `LIFE_SIGNS_RADIUS` config option)
+    - Tutorials
+        - The tutorial system allows modpack authors to explain things in-game with text boxes (see the [wiki](https://github.com/pawjwp/HQM/wiki) for more detailed documentation)
+        - Tutorials are defined as JSON files in `config/hqm/default/tutorials/`
+        - A tutorial called "The MAT" is present in the tutorial folder by default and serves to both introduce players to the MAT and be used as a reference for making new tutorials
+        - Tutorials can be reloaded with `/hqm mat reload` or the vanilla `/reload` command
+- Questing mode opens a copy of the quest book with the MAT's theming
+- Crafting mode acts as a portable crafting table
+- Tracking mode lists the player's tracked locations
+    - Selecting a location in the tracking mode UI shows its distance, dimension, and biome, and a map of the area
+    - When in tracking mode with a selected location, the MAT item will get a pointer that points toward the selected location like a compass
+    - Exact coordinates and distances are hidden unless the `SHOW_TRACKING_COORDINATES` config option is enabled
+- Storage mode is still WIP and shows a placeholder screen
+
+#### Unlocking MAT Content
+- A series of three new "data chip" items allow the player to unlock content in their MAT
+    - Seperate items exist for unlocking tutorials, statistics, and locations
+    - The NBT of each chip controls what it unlocks and must be set by modpack authors
+    - Location chips can search for the coordinates of the nearest of a certain structure or biome and unlock those coordinates
+- Added the `/hqm mat` command
+    - `unlock` and `remove` adds/removes tutorials, statistics, or locations
+    - `reload` reloads tutorial files without requiring a restart
+    - `tutorial play` and `tutorial pause` start or pause tutorials for players
+- Unlocking content in the MAT provides a toast popup by default stating what was unlocked
+
 ### 5.20.0 for 1.20.1 (16.10.2026 by pawjwp):
 This is the first update by [pawjwp](https://github.com/pawjwp), as part of the new Multipurpose Assistance Terminal mod, forked from HQM [here](https://github.com/pawjwp/HQM). This update includes a keybind to open the quest book, automatic quest file backups, JEI integration, biome and structure versions of location tasks, a new trigger type, grid snapping in the quest editor, configurable quest book colors, and various other improvements and bug fixes. See the [Questing Changes](https://github.com/pawjwp/HQM/wiki/Questing-Changes) wiki page for more information.
 

@@ -272,6 +272,8 @@ public enum GeneralUsage {
 
     // server -> client
     public static void sendMatDataSync(ServerPlayer player) {
+        // Skips the host's data sync since the data is already shared (like QuestLine.sendDataToClient)
+        if (player.server.isSingleplayerOwner(player.getGameProfile())) return;
         MatPlayerData mat = QuestingDataManager.getInstance().getQuestingData(player).matData;
         CompoundTag nbt = new CompoundTag();
         nbt.put("Data", mat.toNBT());

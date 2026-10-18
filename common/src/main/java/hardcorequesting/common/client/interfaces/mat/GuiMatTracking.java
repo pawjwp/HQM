@@ -277,7 +277,7 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
         List<MapDecoration> markers = new ArrayList<>();
         int centerX = MatMaps.center(location.pos().getX());
         int centerZ = MatMaps.center(location.pos().getZ());
-        if (HQMConfig.getInstance().MAT.SHOW_TRACKING_COORDINATES) {
+        if (MatClientData.settings().showTrackingCoordinates()) {
             MapDecoration target = marker(MapDecoration.Type.RED_X, location.pos().getX(), location.pos().getZ(), 0, centerX, centerZ);
             if (target != null) markers.add(target);
         }
@@ -359,7 +359,7 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
         if (sameDimension) {
             details.add(new Detail(Translator.translatable("hqm.mat.tracking.distance"), distance(location.pos())));
         }
-        if (HQMConfig.getInstance().MAT.SHOW_TRACKING_COORDINATES) {
+        if (MatClientData.settings().showTrackingCoordinates()) {
             BlockPos pos = location.pos();
             details.add(new Detail(Translator.translatable("hqm.mat.tracking.coordinates"), Component.literal(pos.getX() + ", " + pos.getY() + ", " + pos.getZ())));
             if (!sameDimension) {
@@ -385,7 +385,7 @@ public class GuiMatTracking extends GuiBase implements MatScreen {
         double dx = pos.getX() + 0.5 - player.getX();
         double dz = pos.getZ() + 0.5 - player.getZ();
         long distance = Math.round(Math.sqrt(dx * dx + dz * dz));
-        if (HQMConfig.getInstance().MAT.SHOW_TRACKING_COORDINATES) {
+        if (MatClientData.settings().showTrackingCoordinates()) {
             return Component.translatable("hqm.mat.tracking.distance.exact", distance);
         }
         return Component.translatable("hqm.mat.tracking.distance.rounded", Math.round((double) distance / DISTANCE_ROUNDING) * DISTANCE_ROUNDING);

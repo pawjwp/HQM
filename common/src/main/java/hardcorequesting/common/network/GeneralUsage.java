@@ -3,6 +3,7 @@ package hardcorequesting.common.network;
 import hardcorequesting.common.client.interfaces.GuiQuestBook;
 import hardcorequesting.common.client.interfaces.GuiReward;
 import hardcorequesting.common.client.interfaces.MatUnlockToast;
+import hardcorequesting.common.client.interfaces.mat.MatClientData;
 import hardcorequesting.common.client.interfaces.mat.MatIcons;
 import hardcorequesting.common.client.interfaces.mat.MatScreens;
 import hardcorequesting.common.client.tutorial.TutorialPlayer;
@@ -14,6 +15,7 @@ import hardcorequesting.common.items.mat.MatHandler;
 import hardcorequesting.common.items.mat.MatMaps;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.items.mat.MatPlayerData;
+import hardcorequesting.common.items.mat.MatSettings;
 import hardcorequesting.common.items.mat.MatUnlocks;
 import hardcorequesting.common.items.mat.TrackedLocation;
 import hardcorequesting.common.network.message.GeneralUpdateMessage;
@@ -122,7 +124,7 @@ public enum GeneralUsage {
         public void receiveData(Player player, CompoundTag nbt) {
             if (HQMConfig.getInstance().Keybind.REQUIRE_BOOK && !MatHandler.hasMat(player)) return;
             MatMode mode = MatMode.fromId(nbt.getInt("Mode"));
-            if (nbt.getBoolean("SetDefault")) {
+            if (nbt.getBoolean("FromTab") && HQMConfig.getInstance().MAT.TABS_SWITCH_DEFAULT_MODE) {
                 MatHandler.setDefaultMode(player, mode);
             }
             MatHandler.openMatMode(player, mode, nbt.getBoolean("Dock"));
@@ -243,6 +245,12 @@ public enum GeneralUsage {
         public void receiveData(Player player, CompoundTag nbt) {
             TutorialPlayer.autoPlay();
         }
+    },
+    MAT_SETTINGS(EnvType.CLIENT) {
+        @Override
+        public void receiveData(Player player, CompoundTag nbt) {
+            MatClientData.updateSettings(nbt);
+        }
     };
 
     public final EnvType side; // the side that handles this message
@@ -281,6 +289,11 @@ public enum GeneralUsage {
     }
 
     // server -> client
+    public static void sendMatSettings(ServerPlayer player) {
+        MAT_SETTINGS.sendMessageToPlayer(MatSettings.fromConfig().toNBT(), player);
+    }
+
+    // server -> client
     public static void sendMatUnlockToast(ServerPlayer player, CompoundTag icon, Component title, Component message) {
         CompoundTag nbt = new CompoundTag();
         nbt.put("Icon", icon);
@@ -291,16 +304,16 @@ public enum GeneralUsage {
 
     // client -> server
     @Environment(EnvType.CLIENT)
-    public static void sendOpenMatMode(MatMode mode, boolean setDefault) {
-        sendOpenMatMode(mode, setDefault, false);
+    public static void sendOpenMatMode(MatMode mode, boolean fromTab) {
+        sendOpenMatMode(mode, fromTab, false);
     }
 
     // client -> server
     @Environment(EnvType.CLIENT)
-    public static void sendOpenMatMode(MatMode mode, boolean setDefault, boolean dock) {
+    public static void sendOpenMatMode(MatMode mode, boolean fromTab, boolean dock) {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("Mode", mode.getId());
-        nbt.putBoolean("SetDefault", setDefault);
+        nbt.putBoolean("FromTab", fromTab);
         nbt.putBoolean("Dock", dock);
         OPEN_MAT_MODE.sendMessageToServer(nbt);
     }

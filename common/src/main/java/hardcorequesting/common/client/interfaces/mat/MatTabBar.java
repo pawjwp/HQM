@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import hardcorequesting.common.client.interfaces.ResourceHelper;
-import hardcorequesting.common.config.HQMConfig;
 import hardcorequesting.common.items.mat.MatMode;
 import hardcorequesting.common.network.GeneralUsage;
 import net.fabricmc.api.EnvType;
@@ -64,7 +63,7 @@ public class MatTabBar {
     private static final int ACTIVE_EXTRA_WIDTH = 3 * END_CAP_SPRITE_W / 2; // the active tab is widened to compensate for a smaller area from being a trapezoid
 
     private final MatMode active;
-    private final List<MatMode> modes = MatMode.enabledModes();
+    private final List<MatMode> modes = MatClientData.settings().enabledModes();
     private final int activeIndex;
 
     public MatTabBar(MatMode active, int panelWidth) {
@@ -159,7 +158,7 @@ public class MatTabBar {
         if (index < 0) return false;
         MatMode mode = modes.get(index);
         if (mode != active) {
-            GeneralUsage.sendOpenMatMode(mode, HQMConfig.getInstance().MAT.TABS_SWITCH_DEFAULT_MODE);
+            GeneralUsage.sendOpenMatMode(mode, true);
         }
         return true;
     }

@@ -57,6 +57,7 @@ public class PlayerTracker {
         }
         
         questingData.spawnBook(player);
+        GeneralUsage.sendMatSettings(player);
         MatUnlocks.unlockDefaultTutorials(player);
         GeneralUsage.sendMatTutorialAutoPlay(player);
     }

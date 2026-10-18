@@ -1,6 +1,6 @@
 package hardcorequesting.common.client.interfaces.mat;
 
-import hardcorequesting.common.config.HQMConfig;
+import hardcorequesting.common.items.mat.MatSettings;
 import hardcorequesting.common.items.mat.StatKey;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -25,7 +25,16 @@ public class MatClientData {
 
     public record StatRow(Component title, Component value, MatIcons.Icon icon) {}
 
+    private static MatSettings settings;
     private static List<StatRow> stats = new ArrayList<>();
+
+    public static void updateSettings(CompoundTag tag) {
+        settings = MatSettings.fromNBT(tag);
+    }
+
+    public static MatSettings settings() {
+        return settings;
+    }
 
     public static void update(CompoundTag payload) {
         List<StatRow> rows = new ArrayList<>();
@@ -47,7 +56,7 @@ public class MatClientData {
             return Component.translatable("hqm.mat.stat.playtime.days", String.format("%.1f", value / 24000.0));
         }
         if (StatKey.isLifeSign(key)) {
-            return Component.translatable("hqm.mat.stat.life_signs.value", value, HQMConfig.getInstance().MAT.LIFE_SIGNS_RADIUS);
+            return Component.translatable("hqm.mat.stat.life_signs.value", value, settings.lifeSignsRadius());
         }
         Stat<?> stat = StatKey.resolveVanilla(key);
         if (stat != null) {

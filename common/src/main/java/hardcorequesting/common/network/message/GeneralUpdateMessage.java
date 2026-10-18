@@ -1,9 +1,11 @@
 package hardcorequesting.common.network.message;
 
+import hardcorequesting.common.HardcoreQuestingCore;
 import hardcorequesting.common.network.GeneralUsage;
 import hardcorequesting.common.network.IMessage;
 import hardcorequesting.common.network.IMessageHandler;
 import hardcorequesting.common.network.PacketContext;
+import net.fabricmc.api.EnvType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
@@ -43,13 +45,15 @@ public class GeneralUpdateMessage implements IMessage, IMessageHandler<GeneralUp
     @Override
     public IMessage onMessage(GeneralUpdateMessage message, PacketContext ctx) {
         ctx.getTaskQueue().accept(() -> {
-            if (message.data != null && message.usage >= 0) {
+            if (message.data != null && message.usage >= 0 && message.usage < GeneralUsage.values().length) {
                 GeneralUsage usage = GeneralUsage.values()[message.usage];
                 // Get player if they don't exist before receiving data
                 Player player = message.player;
                 if (player == null) player = ctx.getPlayer();
                 if (player != null) {
-                    usage.receiveData(player, message.data);
+                    // Ignores usages meant for the other side
+                    if ((usage.side == EnvType.CLIENT) == ctx.isClient()) usage.receiveData(player, message.data);
+                    else HardcoreQuestingCore.LOGGER.warn("Ignored %s from %s, which isn't handled on the %s", usage, player.getScoreboardName(), ctx.isClient() ? "client" : "server");
                 }
             }
         });

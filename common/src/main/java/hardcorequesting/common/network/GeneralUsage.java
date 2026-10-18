@@ -51,13 +51,13 @@ import java.util.UUID;
  */
 public enum GeneralUsage {
     
-    BOOK_OPEN {
+    BOOK_OPEN(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             GuiQuestBook.displayGui(player, nbt.getBoolean("OP"));
         }
     },
-    BOOK_SELECT_TASK {
+    BOOK_SELECT_TASK(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
@@ -65,7 +65,7 @@ public enum GeneralUsage {
             data.selectedTask = nbt.getInt("TaskId");
         }
     },
-    BAG_OPENED {
+    BAG_OPENED(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             UUID groupId = nbt.getUUID("GroupId");
@@ -75,7 +75,7 @@ public enum GeneralUsage {
             GuiReward.open(player, groupId, bag, limits);
         }
     },
-    REQUEST_BOOK_OPEN {
+    REQUEST_BOOK_OPEN(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             // Opens the MAT or quest book, using a held one if present or whichever there are more of.
@@ -111,13 +111,13 @@ public enum GeneralUsage {
             else if (canBook) QuestBookItem.open(player, book);
         }
     },
-    MAT_OPEN {
+    MAT_OPEN(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             MatScreens.open(player, MatMode.fromId(nbt.getInt("Mode")), nbt);
         }
     },
-    OPEN_MAT_MODE {
+    OPEN_MAT_MODE(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (HQMConfig.getInstance().Keybind.REQUIRE_BOOK && !MatHandler.hasMat(player)) return;
@@ -128,14 +128,14 @@ public enum GeneralUsage {
             MatHandler.openMatMode(player, mode, nbt.getBoolean("Dock"));
         }
     },
-    MAT_DATA_SYNC {
+    MAT_DATA_SYNC(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
             if (data != null) data.matData.fromNBT(nbt.getCompound("Data"));
         }
     },
-    MAT_SELECT_LOCATION {
+    MAT_SELECT_LOCATION(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             QuestingData data = QuestingDataManager.getInstance().getQuestingData(player);
@@ -147,7 +147,7 @@ public enum GeneralUsage {
             if (player instanceof ServerPlayer serverPlayer) sendMatDataSync(serverPlayer);
         }
     },
-    MAT_REMOVE_LOCATION {
+    MAT_REMOVE_LOCATION(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
@@ -158,14 +158,14 @@ public enum GeneralUsage {
             MatUnlocks.removeLocations(serverPlayer, location -> location == target);
         }
     },
-    MAT_REQUEST_MAP {
+    MAT_REQUEST_MAP(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (player instanceof ServerPlayer serverPlayer) MatMaps.sendMap(serverPlayer, nbt.getInt("Index"));
         }
     },
     // Saves the step a tutorial is on
-    MAT_TUTORIAL_PROGRESS {
+    MAT_TUTORIAL_PROGRESS(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
@@ -180,7 +180,7 @@ public enum GeneralUsage {
         }
     },
     // Marks a tutorial completed and resets its saved position
-    MAT_TUTORIAL_COMPLETED {
+    MAT_TUTORIAL_COMPLETED(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
@@ -196,7 +196,7 @@ public enum GeneralUsage {
     },
     // Runs the commands from finishing a step, taken from the server version of the tutorial
     // Commands set to per_player only run once, the client decides when the others repeat
-    MAT_TUTORIAL_STEP_DONE {
+    MAT_TUTORIAL_STEP_DONE(EnvType.SERVER) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (!(player instanceof ServerPlayer)) return;
@@ -213,7 +213,7 @@ public enum GeneralUsage {
             for (String command : done.commands()) new CommandReward.Command(command).execute(player);
         }
     },
-    MAT_UNLOCK_TOAST {
+    MAT_UNLOCK_TOAST(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             MatIcons.Icon icon = MatIcons.fromTag(nbt.getCompound("Icon"));
@@ -223,7 +223,7 @@ public enum GeneralUsage {
         }
     },
     // Starts a tutorial at a step
-    MAT_TUTORIAL_PLAY {
+    MAT_TUTORIAL_PLAY(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             Tutorial tutorial = TutorialManager.getInstance().tutorials.get(nbt.getString("Tutorial"));
@@ -231,20 +231,26 @@ public enum GeneralUsage {
         }
     },
     // Pauses a tutorial
-    MAT_TUTORIAL_PAUSE {
+    MAT_TUTORIAL_PAUSE(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             if (!nbt.contains("Tutorial") || nbt.getString("Tutorial").equals(TutorialPlayer.getPlayingId())) TutorialPlayer.pause();
         }
     },
     // Starts an auto-play tutorial if nothing is playing
-    MAT_TUTORIAL_AUTO_PLAY {
+    MAT_TUTORIAL_AUTO_PLAY(EnvType.CLIENT) {
         @Override
         public void receiveData(Player player, CompoundTag nbt) {
             TutorialPlayer.autoPlay();
         }
     };
-    
+
+    public final EnvType side; // the side that handles this message
+
+    GeneralUsage(EnvType side) {
+        this.side = side;
+    }
+
     // server -> client
     public static void sendOpenBook(Player player, boolean op) {
         CompoundTag nbt = new CompoundTag();

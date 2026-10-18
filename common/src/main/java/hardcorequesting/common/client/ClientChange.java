@@ -136,7 +136,7 @@ public enum ClientChange {
         
         @Override
         public void parse(Player player, String data) {
-            SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);
+            if (player.level().isClientSide) SoundHandler.handleSoundPacket(Sounds.values()[Integer.parseInt(data)]);
         }
     }),
     LORE(new ClientUpdater() {

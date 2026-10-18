@@ -371,8 +371,8 @@ public class HQMConfig {
         public boolean ENABLE_MAT = true;
         @Comment("Enable the Info mode tab")
         public boolean ENABLE_INFO = true;
-        @Comment("Enable the Quest mode tab")
-        public boolean ENABLE_QUEST = true;
+        @Comment("Enable the Questing mode tab")
+        public boolean ENABLE_QUESTING = true;
         @Comment("Enable the Crafting mode tab")
         public boolean ENABLE_CRAFTING = true;
         @Comment("Enable the Tracking mode tab")

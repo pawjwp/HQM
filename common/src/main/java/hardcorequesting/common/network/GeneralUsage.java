@@ -94,12 +94,12 @@ public enum GeneralUsage {
                 }
             }
             boolean requireBook = HQMConfig.getInstance().Keybind.REQUIRE_BOOK;
-            boolean canMat = HQMConfig.getInstance().MAT.ENABLE_MAT && MatMode.QUEST.isEnabled() && (!requireBook || mats > 0);
+            boolean canMat = HQMConfig.getInstance().MAT.ENABLE_MAT && MatMode.QUESTING.isEnabled() && (!requireBook || mats > 0);
             boolean canBook = !requireBook || books > 0;
             for (InteractionHand hand : InteractionHand.values()) {
                 ItemStack held = player.getItemInHand(hand);
                 if (held.getItem() instanceof MatItem && canMat) {
-                    MatHandler.openMatMode(player, MatMode.QUEST);
+                    MatHandler.openMatMode(player, MatMode.QUESTING);
                     return;
                 }
                 if (held.getItem() instanceof QuestBookItem) {
@@ -107,7 +107,7 @@ public enum GeneralUsage {
                     return;
                 }
             }
-            if (canMat && (!canBook || mats >= books)) MatHandler.openMatMode(player, MatMode.QUEST);
+            if (canMat && (!canBook || mats >= books)) MatHandler.openMatMode(player, MatMode.QUESTING);
             else if (canBook) QuestBookItem.open(player, book);
         }
     },

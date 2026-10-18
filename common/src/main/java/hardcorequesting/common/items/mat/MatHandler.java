@@ -60,7 +60,7 @@ public class MatHandler {
             case CRAFTING -> player.openMenu(new SimpleMenuProvider(
                     (id, inventory, p) -> new MatCraftingMenu(id, inventory, ContainerLevelAccess.create(p.level(), p.blockPosition())),
                     Component.translatable("container.hardcorequesting.mat.crafting")));
-            case QUEST -> openQuest(player);
+            case QUESTING -> openQuesting(player);
             case INFO -> openInfo(player);
             default -> GeneralUsage.sendOpenMat(player, mode);
         }
@@ -72,7 +72,7 @@ public class MatHandler {
         GeneralUsage.sendOpenMat(player, MatMode.INFO, MatStats.buildStatsPayload(serverPlayer));
     }
 
-    private static void openQuest(Player player) {
+    private static void openQuesting(Player player) {
         QuestingDataManager questingData = QuestingDataManager.getInstance();
         if (!questingData.isQuestActive()) {
             player.sendSystemMessage(Translator.translatable("hqm.message.noQuestYet"));
@@ -81,7 +81,7 @@ public class MatHandler {
         EventTrigger.instance().onBookOpening(new EventTrigger.BookOpeningEvent(player.getUUID(), false, true));
         PlayerEntry entry = questingData.getQuestingData(player).getTeam().getEntry(player.getUUID());
         if (entry != null) {
-            GeneralUsage.sendOpenMat(player, MatMode.QUEST);
+            GeneralUsage.sendOpenMat(player, MatMode.QUESTING);
         } else {
             player.sendSystemMessage(Component.translatable("hqm.message.bookNoPlayer"));
         }

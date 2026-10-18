@@ -16,7 +16,7 @@ import java.util.List;
 public class TutorialDataChipItem extends DataChipItem {
 
     public TutorialDataChipItem() {
-        super(MatMode.QUEST);
+        super(MatMode.QUESTING);
     }
 
     @Override

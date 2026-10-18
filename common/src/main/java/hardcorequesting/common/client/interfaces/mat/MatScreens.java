@@ -16,7 +16,7 @@ public class MatScreens {
         if (player == null) return;
         closeOpenContainer();
         switch (mode) {
-            case QUEST -> GuiMatQuestBook.displayGui(player);
+            case QUESTING -> GuiMatQuestBook.displayGui(player);
             case INFO -> {
                 MatClientData.update(payload);
                 Minecraft.getInstance().setScreen(new GuiMatInfo(player));

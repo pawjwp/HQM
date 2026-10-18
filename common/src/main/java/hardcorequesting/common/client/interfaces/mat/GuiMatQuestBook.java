@@ -15,11 +15,11 @@ import net.minecraft.world.entity.player.Player;
 // The MAT's questing mode, an extension of GuiQuestBook with the MAT theme and the tab bar added on top
 @Environment(EnvType.CLIENT)
 public class GuiMatQuestBook extends GuiQuestBook implements MatScreen {
-    private final MatTabBar tabBar = new MatTabBar(MatMode.QUEST, TEXTURE_WIDTH);
+    private final MatTabBar tabBar = new MatTabBar(MatMode.QUESTING, TEXTURE_WIDTH);
 
     private GuiMatQuestBook(Player player) {
         super(player, false, BookTheme.MAT);
-        this.background = ResourceHelper.getResource(MatMode.QUEST.getBackgroundName());
+        this.background = ResourceHelper.getResource(MatMode.QUESTING.getBackgroundName());
     }
 
     public static void displayGui(Player player) {
@@ -51,7 +51,7 @@ public class GuiMatQuestBook extends GuiQuestBook implements MatScreen {
 
     @Override
     public MatMode getMode() {
-        return MatMode.QUEST;
+        return MatMode.QUESTING;
     }
 
     @Override

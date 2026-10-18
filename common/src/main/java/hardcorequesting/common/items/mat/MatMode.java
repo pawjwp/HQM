@@ -18,7 +18,7 @@ public enum MatMode {
     CRAFTING(-2, "hqm.mat.mode.crafting", "mat_mode_crafting", 0x9F8B28, 0xDFDFA7),
     TRACKING(-1, "hqm.mat.mode.tracking", "mat_mode_tracking", 0x289F28, 0xB1DFA7),
     INFO(0, "hqm.mat.mode.info", "mat_mode_info", 0x28959F, 0xA7DFDA),
-    QUEST(1, "hqm.mat.mode.questing", "mat_mode_questing", 0x28469F, 0xA7BFDF),
+    QUESTING(1, "hqm.mat.mode.questing", "mat_mode_questing", 0x28469F, 0xA7BFDF),
     STORAGE(2, "hqm.mat.mode.storage", "mat_mode_storage", 0x5A289F, 0xC8A7DF),
     ;
 
@@ -66,7 +66,7 @@ public enum MatMode {
         HQMConfig.MAT cfg = HQMConfig.getInstance().MAT;
         return switch (this) {
             case INFO -> cfg.ENABLE_INFO;
-            case QUEST -> cfg.ENABLE_QUEST;
+            case QUESTING -> cfg.ENABLE_QUESTING;
             case CRAFTING -> cfg.ENABLE_CRAFTING;
             case TRACKING -> cfg.ENABLE_TRACKING;
             case STORAGE -> cfg.ENABLE_STORAGE;

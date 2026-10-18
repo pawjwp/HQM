@@ -98,7 +98,7 @@ public class MatSubCommand implements CommandHandler.SubCommand {
 
     @Override
     public ArgumentBuilder<CommandSourceStack, ?> build(LiteralArgumentBuilder<CommandSourceStack> builder) {
-        return builder.requires(source -> source.hasPermission(Commands.LEVEL_OWNERS))
+        return builder.requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("unlock")
                         .then(tutorialBranch())
                         .then(statisticBranch())
